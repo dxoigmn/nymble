@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://nymble/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://nymble/locale/nymble.dtd">
+<overlay id="nymble-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="overlay.js"/>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="nymble-strings" src="chrome://nymble/locale/nymble.properties"/>
+  </stringbundleset>
+
+  <menupopup id="menu_ToolsPopup">
+    <menuitem id="nymble-hello" label="&nymble.label;" 
+              oncommand="nymble.onMenuItemCommand(event);"/>
+  </menupopup>
+</overlay>

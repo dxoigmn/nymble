@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+ xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>nymble@dartmouth.edu</em:id>
+    <em:name>Nymble</em:name>
+    <em:version>0.1</em:version>
+    <em:creator>Nymble Team</em:creator>
+    <em:contributor>Daniel Peebles</em:contributor>
+    <em:description>Use the Nymble anonymous authentication scheme in FireFox</em:description>
+    <em:homepageURL>http://nymble.cs.dartmouth.edu</em:homepageURL>
+    <em:optionsURL>chrome://nymble/content/options.xul</em:optionsURL>
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
+        <em:minVersion>1.5</em:minVersion>
+        <em:maxVersion>3.0.0.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+  </Description>
+</RDF>

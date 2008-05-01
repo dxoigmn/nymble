@@ -1,0 +1,1 @@
+../prototype/specs/libnymble_spec.rb
