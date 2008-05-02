@@ -13,7 +13,7 @@ Nymble is a credential system that can be used in conjunction with anonymizing n
 
 We hope that Nymble will make anonymizing networks such as Tor more acceptable to servers that are concerned about abuse from a handful of misbehaving users. Indeed, a few bad apples should not spoil the fun for the rest of us!
 
-http://www.cs.dartmouth.edu/~nymble/
+<http://www.cs.dartmouth.edu/~nymble/>
 
 License
 =======
