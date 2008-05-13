@@ -37,8 +37,14 @@ Once you have a Makefile it is all standard from there:
 
     make
 
+### extension
+
+FIXME
+  
 Installing
 ----------
 
-Coming Soon
+### extension
+
+FIXME
 
