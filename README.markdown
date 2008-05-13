@@ -16,14 +16,29 @@ We hope that Nymble will make anonymizing networks such as Tor more acceptable t
 <http://www.cs.dartmouth.edu/~nymble/>
 
 License
-=======
+-------
 
 See LICENSE for licensing details.
 
 Compiling
-=========
-Coming Soon
+---------
+
+### libnymble-ruby
+
+To compile the ruby bindings for libnymble, you first must generate a Makefile:
+
+    ruby extconf.rb
+    
+We require OpenSSL >0.9.8 which is not installed by default on Mac OS X. When installed, you can pass the directory to which it is installed as follows:
+
+    ruby extconf.rb --with-ssl-dir=/opt/local
+
+Once you have a Makefile it is all standard from there:
+
+    make
 
 Installing
-==========
+----------
+
 Coming Soon
+

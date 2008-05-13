@@ -1,1 +1,0 @@
-../prototype/benchmark-each.rb

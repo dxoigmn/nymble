@@ -1,1 +1,0 @@
-../prototype/benchmark.rb
