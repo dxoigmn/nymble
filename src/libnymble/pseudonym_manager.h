@@ -2,6 +2,7 @@
 #define __PSEUDONYM_MANAGER_H__
 
 #include "nymble.h"
+#include "nymble_sexp.h"
 
 typedef struct {
   u_char  hmac_key_np[DIGEST_SIZE];

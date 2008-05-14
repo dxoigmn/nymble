@@ -84,6 +84,4 @@ void decrypt_trapdoor(u_char *trapdoor, u_char *pseudonym, u_char *key, u_char *
 void hmac_ticket(u_char *buffer, u_char *key, ticket_t *ticket, u_int include_hmac);
 u_int user_already_blacklisted(nymblelist_t *bl_nymbles, u_char *nymble0);
 
-#include "nymble_sexp.h"
-
 #endif

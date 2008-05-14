@@ -2,6 +2,7 @@
 #define __SERVER_H__
 
 #include "nymble.h"
+#include "nymble_sexp.h"
 
 typedef struct {
   u_int   time_period;

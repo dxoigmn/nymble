@@ -2,6 +2,7 @@
 #define __NYMBLE_MANAGER_H__
 
 #include "nymble.h"
+#include "nymble_sexp.h"
 
 typedef struct {
   u_char  server_id[DIGEST_SIZE];
