@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 %w| rubygems ramaze json openssl cgi webrick webrick/https active_support |.each { |lib| require lib }
-require File.join(File.dirname(__FILE__), '../libnymble/libnymble')
+require File.join(File.dirname(__FILE__), '../libnymble-ruby/libnymble')
 
 class MainController < Ramaze::Controller
   def register
