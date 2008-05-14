@@ -1,18 +1,21 @@
 #!/usr/bin/env ruby
-%w| rubygems ramaze json |.each { |lib| require lib }
-require File.join(File.dirname(__FILE__), 'libnymble_safe')
 
-class MainController < Ramaze::Controller
-  def pseudonym
-    pseudonym, mac_np = Nymble.pm_pseudonym_create($pm_state, Nymble.hash(request.env['REMOTE_ADDR']), $cur_link_window)
+require 'rubygems'
+require 'sinatra'
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
 
-    { :pseudonym => pseudonym, :mac_np => mac_np }.to_json
+configure do
+  PM_STATE = Nymble.pm_initialize(Nymble.digest('hmac_key_np'))
+end
+
+helpers do
+  def cur_link_window
+    cur_time = Time.now.getutc
+    366 * (cur_time.year - 1970) + cur_time.yday
   end
 end
 
-if __FILE__ == $0
-  $pm_state         = Nymble.pm_initialize(Nymble.hash('hmac_key_np'))
-  $cur_link_window  = 0
-
-  Ramaze.start(:adapter => :mongrel, :port => 3000)
+get '/pseudonym' do
+  pseudonym, mac_np = Nymble.pm_pseudonym_create(PM_STATE, Nymble.digest(request.env['REMOTE_ADDR']), cur_link_window)
+  Nymble.pseudonym_marshall(pseudonym, mac_np)
 end

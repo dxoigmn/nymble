@@ -1,70 +1,64 @@
 #!/usr/bin/env ruby
-%w| rubygems uri net/http json optparse |.each { |lib| require lib }
-require File.join(File.dirname(__FILE__), 'libnymble_safe')
 
-$cur_link_window = 0
-$cur_time_period = 1
+require 'rubygems'
+require 'uri'
+require 'net/http'
+require 'cgi'
+require 'optparse'
+require 'openssl'
 
-options = {}
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
 
-OptionParser.new do |opts|
-  opts.banner = "Usage: client.rb [options]"
-
-  opts.on("-p", "--pseudonym", "Acquire psuedonym.") do
-    options[:pseudonym] = true
-  end
-  
-  opts.on("-c", "--credential SERVER_ID", "Acquire credential for SERVER_ID.") do |server_id|
-    options[:server_id] = server_id
-  end
-end.parse!
-
-verify_key = OpenSSL::PKey::RSA.new(File.read('nm.pub'))
-
-if options[:pseudonym]
-  response = Net::HTTP.get(URI.parse("http://localhost:3000/pseudonym"))
-  
-  fail(response) if response.kind_of?(Net::HTTPBadRequest)
-
-  body = JSON.parse(response)
-
-  $user_state = Nymble.user_initialize(body['pseudonym'], body['mac_np'], verify_key)
+def cur_link_window
+  cur_time = Time.now.getutc
+  366 * (cur_time.year - 1970) + cur_time.yday
 end
 
-fail "Bad user state" unless $user_state
-
-if options[:server_id]
-  data = {
-    :pseudonym  => Nymble.user_pseudonym($user_state),
-    :mac_np     => Nymble.user_pseudonym_mac($user_state),
-    :server_id  => options[:server_id],
-  }
-  
-  response = Net::HTTP.post_form(URI.parse("http://localhost:3001/credential"), data)
-
-  fail(response.body) if response.kind_of?(Net::HTTPBadRequest)
-
-  credential = JSON.parse(response.body)
-  
-  Nymble.user_entry_initialize($user_state, options[:server_id], credential)
-
-  response = Net::HTTP.get(URI.parse("http://#{options[:server_id]}/blacklist"))
-
-  fail(response.body) if response.kind_of?(Net::HTTPBadRequest)
-
-  blacklist = JSON.parse(response)
-
-  fail "Unable to verify blacklist" unless Nymble.user_blacklist_update($user_state, options[:server_id], blacklist, $cur_link_window, $cur_time_period)
-  fail "Client is blacklisted" if Nymble.user_blacklist_check($user_state, options[:server_id])
-
-  data = {
-    :ticket => Nymble.user_credential_get($user_state, options[:server_id], $cur_time_period).to_json
-  }
-
-  response = Net::HTTP.post_form(URI.parse("http://#{options[:server_id]}/authenticate"), data)
-  
-  puts response.body
+def cur_time_period
+  cur_time = Time.now.getutc
+  (cur_time.hour * 60 + cur_time.min) / 5
 end
 
+SERVER_ID = Nymble.digest('localhost:3003')
+$L        = 288
 
-#Net::HTTP.post_form('')
+response = Net::HTTP.get_response(URI.parse("http://localhost:3000/pseudonym"))
+
+fail(response.body) unless response.kind_of?(Net::HTTPOK) || response.kind_of?(String)
+
+verify_key = File.read('nm.pub')
+pseudonym, mac_np = Nymble.pseudonym_unmarshall(response.body)
+
+USER_STATE = Nymble.user_initialize(pseudonym, mac_np, verify_key)
+
+fail "Bad user state" unless USER_STATE
+
+data = {
+  :pseudonym  => Nymble.pseudonym_marshall(pseudonym, mac_np),
+  :server_id  => SERVER_ID,
+}
+
+response = Net::HTTP.post_form(URI.parse("http://localhost:3001/credential"), data)
+
+fail(response.body) unless response.kind_of?(Net::HTTPOK) || response.kind_of?(String)
+
+credential = Nymble.user_credential_unmarshall(response.body)
+
+Nymble.user_entry_initialize(USER_STATE, SERVER_ID, credential)
+
+response = Net::HTTP.get_response(URI.parse("http://localhost:3003/blacklist"))
+
+fail(response.body) unless response.kind_of?(Net::HTTPOK) || response.kind_of?(String)
+
+blacklist = Nymble.blacklist_unmarshall(response.body)
+
+fail "Unable to verify blacklist" unless Nymble.user_blacklist_update(USER_STATE, SERVER_ID, blacklist, cur_link_window, cur_time_period)
+fail "Client is blacklisted" if Nymble.user_blacklist_check(USER_STATE, SERVER_ID)
+
+data = {
+  :ticket => Nymble.ticket_marshall(Nymble.user_credential_get(USER_STATE, SERVER_ID, cur_time_period))
+}
+
+response = Net::HTTP.post_form(URI.parse("http://localhost:3003/authenticate"), data)
+
+puts response.body

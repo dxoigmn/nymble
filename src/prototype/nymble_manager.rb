@@ -1,56 +1,75 @@
 #!/usr/bin/env ruby
-%w| rubygems ramaze json |.each { |lib| require lib }
-require File.join(File.dirname(__FILE__), 'libnymble_safe')
 
-class MainController < Ramaze::Controller
-  def register
-    server_id = request[:server_id]
-    
-    respond('server_id already registered', 400) if Nymble.nm_entry_exists($nm_state, server_id)
-    
-    hmac_key_ns = Nymble.nm_entry_add($nm_state, server_id)
-    blacklist   = Nymble.nm_blacklist_create($nm_state, server_id, $cur_time_period, $cur_link_window)
-    
-    { :hmac_key_ns  => hmac_key_ns,
-      :blacklist    => blacklist }.to_json
-  end
-    
-  def credential
-    server_id = request[:server_id]
-    pseudonym = request[:pseudonym]
-    mac_np    = request[:mac_np]
-    
-    respond('invalid server_id', 400) unless Nymble.nm_entry_exists($nm_state, server_id)
-    respond('invalid pseudonym', 400) unless Nymble.nm_pseudonym_verify($nm_state, pseudonym, $cur_link_window, mac_np)
+require 'rubygems'
+require 'sinatra'
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
 
-    Nymble.nm_credential_create($nm_state, pseudonym, server_id, $cur_link_window).to_json
+configure do
+  NM_STATE  = Nymble.nm_initialize(Nymble.digest('hmac_key_np'))
+  $L        = 288
+  
+  File.open('nm.pub', 'w') { |f| f << Nymble.nm_verify_key(NM_STATE) }
+end
+
+helpers do
+  def cur_link_window
+    cur_time = Time.now.getutc
+    366 * (cur_time.year - 1970) + cur_time.yday
   end
   
-  def complain
-    server_id   = request[:server_id]
-    blacklist   = JSON.parse(request[:blacklist])
-    complaints  = JSON.parse(request[:complaints])  if request[:complaints]
-
-    respond('invalid server_id', 400) unless Nymble.nm_entry_exists($nm_state, server_id)
-    respond('invalid blacklist', 400) unless Nymble.nm_blacklist_verify($nm_state, blacklist, server_id, $cur_link_window)
-
-    linking_tokens  = Nymble.nm_tokens_create($nm_state, server_id, blacklist, complaints, $cur_time_period, $cur_link_window)
-    new_blacklist   = Nymble.nm_blacklist_update($nm_state, blacklist, complaints, $cur_time_period, $cur_link_window)
-    
-    Nymble.nm_entry_update($nm_state, server_id, $cur_time_period)
-    
-    { :blacklist      => new_blacklist,
-      :linking_tokens => linking_tokens }.to_json
+  def cur_time_period
+    cur_time = Time.now.getutc
+    (cur_time.hour * 60 + cur_time.min) / 5
   end
 end
 
-if __FILE__ == $0
-  $nm_state         = Nymble.nm_initialize(Nymble.hash('hmac_key_np'))
-  $cur_time_period  = 1
-  $cur_link_window  = 0
-  $L                = 10
+post '/register' do
+  server_id = params[:server_id]
   
-  File.open('nm.pub', 'w') { |f| f << Nymble.nm_verify_key($nm_state) }
+  fail 'server_id already registered' if Nymble.nm_entry_exists(NM_STATE, server_id)
   
-  Ramaze.start(:adapter => :mongrel, :port => 3001)
+  hmac_key_ns = Nymble.nm_entry_add(NM_STATE, server_id)
+  Nymble.nm_entry_update(NM_STATE, server_id, cur_time_period)
+  blacklist   = Nymble.blacklist_marshall(Nymble.nm_blacklist_create(NM_STATE, server_id, cur_time_period, cur_link_window))
+  
+  "hmac_key_ns=#{CGI.escape(hmac_key_ns)}&blacklist=#{CGI.escape(blacklist)}"
+end
+
+post '/credential' do
+  server_id         = params[:server_id]
+  pseudonym, mac_np = Nymble.pseudonym_unmarshall(params[:pseudonym])
+  
+  fail 'invalid server_id' unless Nymble.nm_entry_exists(NM_STATE, server_id)
+  fail 'invalid pseudonym' unless Nymble.nm_pseudonym_verify(NM_STATE, pseudonym, cur_link_window, mac_np)
+
+  Nymble.nm_credential_marshall(Nymble.nm_credential_create(NM_STATE, pseudonym, server_id, cur_link_window))
+end
+
+post '/update' do
+  server_id   = params[:server_id]
+  blacklist_cert = Nymble.blacklist_cert_unmarshall(params[:blacklist_cert])
+
+  fail 'invalid server_id'       unless Nymble.nm_entry_exists(NM_STATE, server_id)    
+  fail 'invalid blacklist cert'  unless Nymble.nm_blacklist_cert_verify(NM_STATE, blacklist, server_id, cur_link_window)
+end
+
+post '/complain' do
+  server_id   = params[:server_id]
+  blacklist   = Nymble.blacklist_unmarshall(params[:blacklist])
+  complaints  = [Nymble.ticket_unmarshall(params[:complaints])] if params[:complaints]
+
+  fail 'invalid server_id' unless Nymble.nm_entry_exists(NM_STATE, server_id)    
+  fail 'invalid blacklist' unless Nymble.nm_blacklist_verify(NM_STATE, blacklist, server_id, cur_link_window)
+
+  if params[:complaints]
+    linking_tokens = Nymble.linking_token_marshall(Nymble.nm_tokens_create(NM_STATE, server_id, blacklist, complaints, cur_time_period, cur_link_window)[0])
+  end
+  
+  new_blacklist = Nymble.blacklist_marshall(Nymble.nm_blacklist_update(NM_STATE, blacklist, complaints, cur_time_period, cur_link_window))
+  
+  Nymble.nm_entry_update(NM_STATE, server_id, cur_time_period)
+  
+  response  = "blacklist=#{CGI.escape(new_blacklist)}"
+  response << "&linking_tokens=#{CGI.escape(linking_tokens)}" if params[:complaints]
+  response
 end
