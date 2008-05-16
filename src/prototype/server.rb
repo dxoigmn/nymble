@@ -58,7 +58,7 @@ end
 post '/authenticate' do
   ticket = Nymble.ticket_unmarshall(request[:ticket])
   
-  fail 'invalid ticket' unless Nymble.server_ticket_verify(SERVER_STATE, ticket, $cur_link_window, $cur_time_period)
+  fail 'invalid ticket' unless Nymble.server_ticket_verify(SERVER_STATE, ticket, cur_link_window, cur_time_period)
   
   'authenticated'
 end
