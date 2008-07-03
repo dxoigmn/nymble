@@ -236,12 +236,12 @@ A linking token is issued by the Nymble Manager for each nymble ticket that has 
 
 A linking token has the following format:
 
-    LINKING_TOKEN = server_id || cur_link_window || time_period || trapdoor || nymble_ticket
+    LINKING_TOKEN = server_id || link_window || time_period || trapdoor || nymble_ticket
 
 where:
 
     server_id       : a HASH() output
-    cur_link_window : an INT
+    link_window     : an INT
     time_period     : an INT
     trapdoor        : an ENC() output
     nymble_ticket   : a TICKET 
@@ -684,27 +684,23 @@ Note that because DENY payloads are `NULL`, they are not explicitly defined with
 
 This is a protocol executed between NM and PM over a confidential, mutually-authenticated channel upon initial system setup.  This happens once during the life of the system. The NM generates key material and establishes a shared key with the PM. 
 
-    (1) NM generates all the keys using the respective key generation
-        algorithm in NM_STATE and set NM_SERVER_LIST in NM_STATE to an
-        empty list.
+  1.  NM generates all the keys using the respective key generation algorithm in `NM_STATE` and set `NM_SERVER_LIST` in `NM_STATE` to an empty list.
         
-    (2) NM -> PM: REQUEST
-    
-        The payload of REQUEST is 
-        
-          hmac_key_np || verify_key_n 
+  2.  NM -> PM: `REQUEST`
+
+      The payload of `REQUEST` is:
+
+        hmac_key_np || verify_key_n
           
-    (3) PM generates keyed hash key keyedhash_key_p in PM_STATE and
-        sets hmac_key_np and verify_key_n in PM_STATE to those in
-        REQUEST
+  3.  PM generates keyed hash key `keyedhash_key_p` in `PM_STATE` and sets `hmac_key_np` and `verify_key_n` in `PM_STATE` to those in `REQUEST`
       
-    (4) PM -> NM: GRANT
+  4.  PM -> NM: `GRANT`
     
-        The payload of GRANT is:
+      The payload of `GRANT` is:
       
-          NULL
+        NULL
         
-        NM and PM terminate as success.
+      NM and PM terminate as success.
 
 ### SERVER_REGISTRATION
 
@@ -715,83 +711,76 @@ This is a protocol executed between a Server and the NM over a confidential, mut
 >> patrick : we assume X509 PKI, the details of which should probably be documented elsewhere.
 > ack: does it set finalized = true for the current time period?
 
-    (1) Server -> NM: REQUEST
+  1.  Server -> NM: `REQUEST`
+  
+      The payload of `REQUEST` is:
     
-        The payload of REQUEST is:
+        NULL
       
-          NULL
-        
-        NM extracts the hostname of the server [ from the server's cert ? ]
-      
-        NM hashes the hostname of the server to get server_id.
-      
-        If server_id  appears in NM_SERVER_LIST in NM_STATE,
-        go to (2). Otherwise, go to (3)
-      
-    (2) NM -> Server: DENY
+      NM extracts the hostname of the server [ from the server's cert ? ]
     
-        Both NM and the Server then terminate the protocol as failure.
-      
-    (3) NM does the following:
+      NM hashes the hostname of the server to get `server_id`.
     
-          blacklist       = CREATE_BLACKLIST(nm_state, server_id, cur_time_period, cur_link_window)
-          bl_last_updated = 0
-          nm_entry        = server_id || bl_last_updated || hmac_key_ns
-          NM_STATE        = NM_STATE || nm_entry
-        
-    (4) NM -> Server: GRANT
+      If `server_i`d  appears in `NM_SERVER_LIST` in `NM_STATE`, go to (2). Otherwise, go to (3).
     
-        The payload of the GRANT reply is a
+  2.  NM -> Server: `DENY`
+  
+      Both NM and the Server then terminate the protocol as failure.
+    
+  3.  NM does the following:
+  
+        blacklist       = CREATE_BLACKLIST(nm_state, server_id, cur_time_period, cur_link_window)
+        bl_last_updated = 0
+        nm_entry        = server_id || bl_last_updated || hmac_key_ns
+        NM_STATE        = NM_STATE || nm_entry
       
-          hmac_key_ns || blacklist
-        
-        NM terminates as success
+  4.  NM -> Server: GRANT
+  
+      The payload of the GRANT reply is a
+
+        hmac_key_ns || blacklist
+
+      NM terminates as success
+    
+  5.  Server sets `hmac_key_ns` and blacklist `SERVER_STATE` to those in the payload of `GRANT`, and initializes other state to the following:
       
-    (5) Server sets hmac_key_ns and blacklist SERVER_STATE to those in the
-        payload of GRANT, and initializes other state to the following:
-        
-          linking_list[server_id] = NULL (i.e. empty list)
-          finalized[server_id]    = false
-        
-        Server terminates as success.
+        linking_list[server_id] = NULL (i.e. empty list)
+        finalized[server_id]    = false
+      
+      Server terminates as success.
 
 ### USER_REGISTER
 
 This is a protocol executed between a User and the PM over a PM-authenticated, confidential channel.  A user must register once each linkability window, before acquiring a credential, and before requesting a service.
 
-    (1) User -> PM: REQUEST
+  1.  User -> PM: `REQUEST`
+  
+      The payload of `REQUEST` is:
     
-        The payload of REQUEST is:
+        NULL
       
-          NULL
-        
-        PM infers the registering user's IP address user_ip from the
-        channel. 
+      PM infers the registering user's IP address `user_ip` from the channel. 
+    
+      PM checks if the IP is allowed to register, according to some policies, such as: it's a new IP address, it's not a Tor exit node address, etc. If the check fails, goto (2). Otherwise go to (3).
       
-        PM checks if the IP is allowed to register, according to some
-        policies, such as: it's a new IP address, it's not a Tor exit
-        node address, etc. If the check fails, goto (2). Otherwise go
-        to (3).
+  2.  PM -> User: `DENY`
+  
+      PM terminates as failure. Upon receiving `DENY`, User also terminates as failure.
+      
+  3.  PM computes:
+  
+        pseudonym   = KEYED_HASH(user_id || cur_link_window, keyedhash_key_p)
+        mac_np      = HMAC(pseudonym || cur_link_window, hmac_key_np)
         
-    (2) PM -> User: DENY
-    
-        PM terminates as failure. Upon receiving DENY, User also
-        terminates as failure.
+  4.  PM -> User: `GRANT`
+  
+      The payload of the `GRANT` reply is:
+      
+        pseudonym || mac_np
         
-    (3) PM computes:
-    
-          pseudonym   = KEYED_HASH(user_id || cur_link_window, keyedhash_key_p)
-          mac_np      = HMAC(pseudonym || cur_link_window, hmac_key_np)
-          
-    (4) PM -> User: GRANT
-    
-        The payload of the GRANT reply is:
-        
-          pseudonym || mac_np
-          
-        User stores these in USER_STATE
-        
-        They both terminate as success.
+      User stores these in `USER_STATE`.
+      
+      They both terminate as success.
 
 ### CREDENTIAL_ACQUISITION
 
@@ -801,35 +790,33 @@ User wants to get a credential to connect to server with id `server_id`.
 
 > CTC: What does the user do with this credential?
 
-    (1) User -> NM: REQUEST
-    
-        The payload of the request is:
+  1.  User -> NM: `REQUEST`
+  
+      The payload of the request is:
+      
+        pseudonym || mac_np || server_id
         
-          pseudonym || mac_np || server_id
-          
-    (2) NM uses hmac_key_np in NM_STATE to verify the request by checking
-        that:
-        
+  2.  NM uses `hmac_key_np` in `NM_STATE` to verify the request by checking that:
+      
         mac_np = HMAC(pseudonym || cur_link_window, hmac_key_np)
-        
-        If server_id is invalid, or the verification fails, go to
-        (3), otherwise go to (4).  
-        
-    (3) NM -> User: DENY
-    
-        They both terminate as failure
-        
-    (4) NM creates and computes a credential as follows:
-    
+      
+      If `server_id` is invalid, or the verification fails, go to (3), otherwise go to (4).  
+      
+  3.  NM -> User: `DENY`
+  
+      They both terminate as failure
+      
+  4.  NM creates and computes a credential as follows:
+  
         credential = CREATE_CREDENTIAL(nm_state, pseudonym, server_id, cur_link_window)
+      
+  5.  NM -> User: `GRANT`
+  
+      The payload of the `GRANT` reply is:
+      
+        credential
         
-    (5) NM -> User: GRANT
-    
-        The payload of the GRANT reply is:
-        
-          credential
-          
-        They terminate as success.
+      They terminate as success.
 
 ### GET_BLACKLIST
 
@@ -838,73 +825,65 @@ This is a protocol executed between a registered User and a registered Server ov
 > Q: should the server be authenticated in the channel? what are the security and efficiency impact?
 > ack: Patrick, make more concrete after you've fleshed out the time synchronization protocol
 
-    (1) User -> Server: REQUEST
-    
-        The payload of the request is:
+  1.  User -> Server: `REQUEST`
+  
+      The payload of the request is:
+      
+        NULL
         
-          NULL
-          
-    (2) Server -> User: GRANT
-    
-        If finalized in SERVER_STATE is false, i.e. if the server does
-        not have a finalized blacklist for the cur_time_period, then
-        Server first executes COMPLAIN and UPDATE and obtains a
-        finalized blacklist from the NM.
+  2.  Server -> User: `GRANT`
+  
+      If finalized in `SERVER_STATE` is false, i.e. if the server does not have a finalized blacklist for the `cur_time_period`, then Server first executes `COMPLAIN and UPDATE` and obtains a finalized blacklist from the NM.
+      
+      The payload of a `GRANT` reply is: 
+      
+        blacklist in NM_STATE
         
-        The payload of a GRANT reply is: 
+  3.  Now, an entry for `server_id` must already exist because a user gets a credential for a server before he/she gets a blacklist of the server.
+      
+  4.  User verifies the integrity and freshness of the blacklist.
+  
+        ASSERT TRUE = BL_CHECK_INTEGRITY(blacklist, server_id, verify_key_n)
+        ASSERT TRUE = BL_CHECK_FRESHNESS(blacklist, server_id, cur_time_period, cur_link_window)
         
-          blacklist in NM_STATE
-          
-    (3) Now, an entry for server_id must already exist because a user
-        gets a credential for a server before he/she gets a blacklist
-        of the server.
-        
-    (4) User verifies the integrity and freshness of the blacklist.
-    
-          ASSERT TRUE = BL_CHECK_INTEGRITY(blacklist, server_id, verify_key_n)
-          ASSERT TRUE = BL_CHECK_FRESHNESS(blacklist, server_id, cur_time_period, cur_link_window)
-          
-        If any of the assertions fail, User removes the blacklist from the
-        entry. He terminates as failure.
-        
-        Else, the user replaces  blacklist[server_id] with this new
-        blacklist. He terminates as success.
+      If any of the assertions fail, User removes the blacklist from the entry. He terminates as failure.
+      
+      Else, the user replaces `blacklist[server_id]` with this new blacklist. He terminates as success.
 
 ### AUTHENTICATE
 
 This is a protocol executed between a registered User and a registered Server with identity `server_id` over a Server-authenticated, confidential, User-anonymous channel during time period `access_time_period = cur_time_period`.
 
-    (0) User extracts from USER_STATE the entry for server_id, and
-        ticket[cur_time_period] from the credential in that entry.
+  1.  User extracts from `USER_STATE` the entry for `server_id`, and `ticket[cur_time_period]` from the `credential` in that entry.
+      
+  2.  User -> Server: `REQUEST`
+  
+      The payload of the `REQUEST` is:
+      
+        the ticket extracted above
         
-    (1) User -> Server: REQUEST
-    
-        The payload of the REQUEST is:
-        
-          the ticket extracted above
+  3.  Server does the following:
+  
+      1. Extract `hmac_key_ns`, `server_id`, `linking_list` from its `SERVER_STATE`
+      
+      2. Asserts:
+      
+          1 = VERIFY_TICKET(ticket, server_id, cur_time_period, cur_link_window,hmac_key_ns)
+          0 = LINK_TICKET(ticket, linking_list)
           
-    (2) Server does the following:
-    
-        1. Extract hmac_key_ns, server_id, linking_list from its SERVER_STATE
+      If any of the assertions fail, go to (4), otherwise go to (5).
+      
+  4.  Server -> User : `DENY`
+  
+      Both terminate as failure
+      
+  5.  Server -> User : `GRANT`
+  
+      The payload of `GRANT` is:
+      
+        NULL
         
-        2. Asserts:
-        
-            1 = VERIFY_TICKET(ticket, server_id, cur_time_period, cur_link_window,hmac_key_ns)
-            0 = LINK_TICKET(ticket, linking_list)
-            
-        If any of the assertions fail, go to (3), otherwise go to (4).
-        
-    (3) Server -> User : DENY
-    
-        Both terminate as failure
-        
-    (4) Server -> User : GRANT
-    
-        The payload of GRANT is:
-        
-          NULL
-          
-        Both terminate as success.
+      Both terminate as success.
 
 ### REQUEST FOR SERVICE
 
@@ -915,96 +894,83 @@ This section describes the procedure a user follows to request a service.
 
 The User does the following:
 
-    (1) Record the time of access:
-    
-          access_time_period = cur_time_period
-          
-    (2) Self-censoring:
-    
-        1. If cur_time_period = last_authenticated in the entry for
-           server_id in USER_STATE, then terminate as FAILURE.
-           
-        2. If blacklisted[server_id] in USER_STATE is TRUE, then
-           terminate as FAILURE.
-           
-    (3) Getting Blacklist:
-    
-        Invoke GET_BLACKLIST(server_id, access_time_period). If it
-        returns FAILURE, the User terminates as FAILURE.
+  1.  Record the time of access:
+  
+        access_time_period = cur_time_period
         
-    (4) Blacklist Inspection:
-    
-          IF:
-             I_AM_BLACKLISTED(blacklist, credential[server_id])
-          THEN:
-             Terminate as FAILURE
-           
-    (5) Ready to be authenticated
-    
-        If the blacklist for access_time_period has been verified for
-        integrity and freshness, and the user is not on the blacklist,
-        the user authenticates with the server
-        
-        User invokes AUTHENTICATE(server_id, access_time_period)
+  2.  Self-censoring:
+  
+      1. If `cur_time_period = last_authenticated` in the entry for `server_id` in `USER_STATE`, then terminate as `FAILURE`.
+         
+      2. If `blacklisted[server_id]` in `USER_STATE` is `TRUE`, then terminate as `FAILURE`.
+         
+  3.  Getting Blacklist:
+  
+      Invoke `GET_BLACKLIST(server_id, access_time_period)`. If it returns `FAILURE`, the User terminates as `FAILURE`.
+      
+  4.  Blacklist Inspection:
+  
+      If `I_AM_BLACKLISTED(blacklist, credential[server_id])`, then terminate as `FAILURE`.
+         
+  5.  Ready to be authenticated
+  
+      If the blacklist for `access_time_period` has been verified for integrity and freshness, and the user is not on the blacklist, the user authenticates with the server.
+      
+      User invokes `AUTHENTICATE(server_id, access_time_period)`.
 
 ### COMPLAIN and UPDATE
 
 This protocol is executed between a registered Server and the NM over a mutually-authenticated, confidential channel. 
 
-    (0) By authenticating the server, the NM knows the server_id of the server.
-    
-    (1) Server -> NM: REQUEST
-    
-        The payload of REQUEST is:
+  1.  By authenticating the server, the NM knows the server_id of the server.
+  
+  2.  Server -> NM: `REQUEST`
+  
+      The payload of `REQUEST` is:
+      
+        blacklist in SERVER_STATE and a complaint
         
-          blacklist in SERVER_STATE and a complaint
-          
-        where:
+      where:
+      
+        complaint = ticket[1] || ticket[2] || ... || ticket[complaint_size]
         
-          complaint = ticket[1] || ticket[2] || ... || ticket[complaint_size] 
-          
-        where:
+      where:
+      
+        ticket[i] is the ticket associated with the offending access and the blacklist is from SERVER_STATE.
         
-          ticket[i] is the ticket associated with the offending access and the blacklist is from SERVER_STATE.
-          
-        complaint could be NULL.
-        
-    (2) NM does the following:
-    
+      complaint could be `NULL`.
+      
+  3.  NM does the following:
+  
         ASSERT 1 = NM_BL_CHECK_INTEGRITY(blacklist, server_id, hmac_key_n)
         ASSERT 1 = BL_CHECK_FRESHNESS(blacklist, bl_last_updated[server_id], cur_link_window)
-        
         ASSERT NOT bl_last_updated[server_id] = cur_time_period
+      
+      If any of the assertions fail, go to (4), otherwise, go to (5).
+      
+  4.  NM -> Server: `DENY`
+  
+      Both terminate as failure.
+      
+  5.  NM does the following:
+  
+      EXTRACT `tickets` FROM `blacklist`
+      
+        linking_tokens = COMPUTE_TOKENS(nm_state, tickets, complaint, cur_time_period)
+        new_blacklist = UPDATE_BLACKLIST(nm_state, blacklist, complaint, cur_time_period, cur_link_window)
+        bl_last_updated[server_id] = cur_time_period
         
-        If any of the assertions fail, go to (3), otherwise, go to (4).
+  6.  NM -> Server: `GRANT`:
+  
+      The payload of the `GRANT` reply is an blacklist and a list of tokens:
+      
+        complaint_reply = new_blacklist || linking_tokens
         
-    (3) NM -> Server: DENY
-    
-        Both terminate as failure.
-        
-    (4) NM does the following:
-    
-        EXTRACT tickets FROM blacklist
-        
-          linking_tokens = COMPUTE_TOKENS(nm_state, tickets, complaint, cur_time_period)
-          new_blacklist = UPDATE_BLACKLIST(nm_state, blacklist, complaint, cur_time_period, cur_link_window)
-          bl_last_updated[server_id] = cur_time_period
-          
-    (5) NM -> Server: GRANT:
-    
-        The payload of the GRANT reply is an blacklist and a list of tokens:
-        
-          complaint_reply = new_blacklist || linking_tokens
-          
-    (6) Upon receiving a GRANT reply, the server replaces blacklist in
-        SERVER_STATE with new_blacklist, and appends each linking
-        token to linking_list in SERVER_STATE as an LL_ENTRY:
-        
-    For each linking_token[i], the server creates a linking list
-    entry as time_period[i] || trapdoor[i] || nymble[i]. All these
-    entries can be extracted from linking_token[i]. 
-    
-    The SERVER sets finalized[server_id] = true
+  7.  Upon receiving a `GRANT` reply, the server replaces blacklist in `SERVER_STATE` with `new_blacklist`, and appends each linking token to `linking_list` in `SERVER_STATE` as an `LL_ENTRY`:
+      
+      For each `linking_token[i]`, the server creates a linking list entry as `time_period[i] || trapdoor[i] || nymble[i]`. All these entries can be extracted from `linking_token[i]`.
+  
+      The SERVER sets `finalized[server_id] = true`.
 
 State Update
 ------------
