@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
-$: << File.join(File.dirname(__FILE__), "..")
-require 'rubygems'
-require 'ramaze/spec/helper'
-require 'active_support'
 
-if __FILE__ == $0
-  require 'libnymble'
-end
+require 'rubygems'
+require 'test/spec'
+require 'active_support'
+require 'libnymble'
 
 describe 'Nymble' do
   before do
@@ -46,32 +43,32 @@ describe 'Nymble' do
     nm_state2 = Nymble.nm_initialize(@hmac_key_np.reverse)
     
     Nymble.should.respond_to(:nm_entry_exists)
-    Nymble.nm_entry_exists(nil, @server_id).should.be.false
-    Nymble.nm_entry_exists(nm_state, nil).should.be.false
-    Nymble.nm_entry_exists(nm_state, @server_id).should.be.false
+    Nymble.nm_entry_exists(nil, @server_id).should.be(false)
+    Nymble.nm_entry_exists(nm_state, nil).should.be(false)
+    Nymble.nm_entry_exists(nm_state, @server_id).should.be(false)
     
     Nymble.should.respond_to(:nm_entry_add)
     Nymble.nm_entry_add(nm_state, nil).should.be.nil
     Nymble.nm_entry_add(nm_state, "").should.be.nil
-    Nymble.nm_entry_exists(nm_state, "").should.be.false
+    Nymble.nm_entry_exists(nm_state, "").should.be(false)
     Nymble.nm_entry_add(nil, @server_id).should.be.nil
-    Nymble.nm_entry_exists(nm_state, nil).should.be.false
+    Nymble.nm_entry_exists(nm_state, nil).should.be(false)
 
     hmac_key_ns = Nymble.nm_entry_add(nm_state, @server_id).should.not.be.nil
-    Nymble.nm_entry_exists(nm_state, @server_id).should.be.true
-    Nymble.nm_entry_exists(nm_state2, @server_id).should.be.false
+    Nymble.nm_entry_exists(nm_state, @server_id).should.be(true)
+    Nymble.nm_entry_exists(nm_state2, @server_id).should.be(false)
     Nymble.nm_entry_add(nm_state, @server_id.reverse).should.not.equal(hmac_key_ns)
     
     Nymble.should.respond_to(:nm_entry_update)
-    Nymble.nm_entry_update(nil, @server_id, @cur_time_period).should.be.false
-    Nymble.nm_entry_update(nm_state, nil, @cur_time_period).should.be.false
-    Nymble.nm_entry_update(nm_state, @server_id, nil).should.be.false
-    Nymble.nm_entry_exists(nm_state, nil).should.be.false
-    Nymble.nm_entry_update(nm_state, @server_id.reverse, @cur_time_period).should.be.true
-    Nymble.nm_entry_update(nm_state, @server_id, @cur_time_period).should.be.true
-    Nymble.nm_entry_update(nm_state2, @server_id, @cur_time_period).should.be.false
-    Nymble.nm_entry_exists(nm_state, @server_id).should.be.true
-    Nymble.nm_entry_exists(nm_state2, @server_id).should.be.false
+    Nymble.nm_entry_update(nil, @server_id, @cur_time_period).should.be(false)
+    Nymble.nm_entry_update(nm_state, nil, @cur_time_period).should.be(false)
+    Nymble.nm_entry_update(nm_state, @server_id, nil).should.be(false)
+    Nymble.nm_entry_exists(nm_state, nil).should.be(false)
+    Nymble.nm_entry_update(nm_state, @server_id.reverse, @cur_time_period).should.be(true)
+    Nymble.nm_entry_update(nm_state, @server_id, @cur_time_period).should.be(true)
+    Nymble.nm_entry_update(nm_state2, @server_id, @cur_time_period).should.be(false)
+    Nymble.nm_entry_exists(nm_state, @server_id).should.be(true)
+    Nymble.nm_entry_exists(nm_state2, @server_id).should.be(false)
   end
 
   it 'should allow a PM to create psuedonyms' do
@@ -124,22 +121,22 @@ describe 'Nymble' do
     blacklist.should.not.be.nil
     
     Nymble.should.respond_to(:nm_blacklist_verify)
-    Nymble.nm_blacklist_verify(nil, blacklist, @server_id, @cur_link_window).should.be.false
-    Nymble.nm_blacklist_verify(nm_state, nil, @server_id, @cur_link_window).should.be.false
-    Nymble.nm_blacklist_verify(nm_state, blacklist, nil, @cur_link_window).should.be.false
-    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, nil).should.be.false
+    Nymble.nm_blacklist_verify(nil, blacklist, @server_id, @cur_link_window).should.be(false)
+    Nymble.nm_blacklist_verify(nm_state, nil, @server_id, @cur_link_window).should.be(false)
+    Nymble.nm_blacklist_verify(nm_state, blacklist, nil, @cur_link_window).should.be(false)
+    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, nil).should.be(false)
     
     # FIXME: the following was originally false, but looks to me like it should be true... either fix C 
     # implementation or ruby implementation, but make sure they're consistent and the reasoning behind 
     # this is clear
-    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window).should.be.true
+    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window).should.be(true)
     
-    Nymble.nm_blacklist_verify(nm_state2, blacklist, @server_id, @cur_link_window).should.be.false
+    Nymble.nm_blacklist_verify(nm_state2, blacklist, @server_id, @cur_link_window).should.be(false)
     
     Nymble.nm_entry_update(nm_state, @server_id, @cur_time_period)
-    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window).should.be.true
-    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window + 1).should.be.false
-    Nymble.nm_blacklist_verify(nm_state2, blacklist, @server_id, @cur_link_window).should.be.false
+    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window).should.be(true)
+    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window + 1).should.be(false)
+    Nymble.nm_blacklist_verify(nm_state2, blacklist, @server_id, @cur_link_window).should.be(false)
   end
   
   it 'should manage SERVER state' do
@@ -164,10 +161,10 @@ describe 'Nymble' do
     #Nymble.server_blacklist(server_state).should.equal(blacklist)
     
     Nymble.should.respond_to(:server_blacklist_finalized)
-    Nymble.server_blacklist_finalized(nil).should.be.false
-    Nymble.server_blacklist_finalized(server_state).should.be.false
-    Nymble.server_blacklist_finalize(server_state).should.be.true
-    Nymble.server_blacklist_finalized(server_state).should.be.true
+    Nymble.server_blacklist_finalized(nil, @cur_time_period).should.be(false)
+    Nymble.server_blacklist_finalized(server_state, @cur_time_period).should.be(false)
+    Nymble.server_blacklist_finalize(server_state).should.be(true)
+    Nymble.server_blacklist_finalized(server_state, @cur_time_period).should.be(true)
   end
 
   it 'should allow a NM to create credentials' do
@@ -179,16 +176,16 @@ describe 'Nymble' do
     blacklist         = Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, @cur_link_window)
     
     Nymble.should.respond_to(:nm_pseudonym_verify)
-    Nymble.nm_pseudonym_verify(nil, pseudonym, @cur_link_window, mac_np).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, nil, @cur_link_window, mac_np).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, nil, mac_np).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, nil).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np.reverse).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window + 1, mac_np).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state2, pseudonym, @cur_link_window, mac_np).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, "", @cur_link_window, mac_np).should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, "").should.be.false
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np).should.be.true
+    Nymble.nm_pseudonym_verify(nil, pseudonym, @cur_link_window, mac_np).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, nil, @cur_link_window, mac_np).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, nil, mac_np).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, nil).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np.reverse).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window + 1, mac_np).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state2, pseudonym, @cur_link_window, mac_np).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, "", @cur_link_window, mac_np).should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, "").should.be(false)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np).should.be(true)
 
     Nymble.should.respond_to(:nm_credential_create)
     Nymble.nm_credential_create(nil, pseudonym, @server_id, @cur_link_window).should.be.nil
@@ -236,10 +233,10 @@ describe 'Nymble' do
     server_state2     = Nymble.server_initialize(@server_id.reverse, hmac_key_ns, blacklist)
     
     Nymble.should.respond_to(:user_entry_initialize)
-    Nymble.user_entry_initialize(nil, @server_id, credential).should.be.false
-    Nymble.user_entry_initialize(user_state, nil, credential).should.be.false
-    Nymble.user_entry_initialize(user_state, @server_id, nil).should.be.false
-    Nymble.user_entry_initialize(user_state, @server_id, credential).should.be.true
+    Nymble.user_entry_initialize(nil, @server_id, credential).should.be(false)
+    Nymble.user_entry_initialize(user_state, nil, credential).should.be(false)
+    Nymble.user_entry_initialize(user_state, @server_id, nil).should.be(false)
+    Nymble.user_entry_initialize(user_state, @server_id, credential).should.be(true)
     
     Nymble.should.respond_to(:user_credential_get)
     $L.times do |time_period|
@@ -247,30 +244,30 @@ describe 'Nymble' do
     end
 
     Nymble.should.respond_to(:user_blacklist_update)
-    Nymble.user_blacklist_update(nil, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be.false
-    Nymble.user_blacklist_update(user_state, nil, blacklist, @cur_link_window, @cur_time_period).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, nil, @cur_link_window, @cur_time_period).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, nil, @cur_time_period).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, nil).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window + 1, @cur_time_period).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, @cur_time_period + 1).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, $L + 1).should.be.false
-    Nymble.user_blacklist_update(user_state2, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be.true
+    Nymble.user_blacklist_update(nil, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be(false)
+    Nymble.user_blacklist_update(user_state, nil, blacklist, @cur_link_window, @cur_time_period).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, nil, @cur_link_window, @cur_time_period).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, blacklist, nil, @cur_time_period).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, nil).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window + 1, @cur_time_period).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, @cur_time_period + 1).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, $L + 1).should.be(false)
+    Nymble.user_blacklist_update(user_state2, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be(true)
 
     Nymble.should.respond_to(:server_ticket_verify)
     $L.times do |time_period|
       time_period  += 1
       nymble_ticket = Nymble.user_credential_get(user_state, @server_id, time_period)
 
-      Nymble.server_ticket_verify(nil, nymble_ticket, @cur_link_window, time_period).should.be.false
-      Nymble.server_ticket_verify(server_state, nil, @cur_link_window, time_period).should.be.false
-      Nymble.server_ticket_verify(server_state, nymble_ticket, nil, time_period).should.be.false
-      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, nil).should.be.false
-      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window + 1, time_period).should.be.false
-      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, time_period + 1).should.be.false
-      Nymble.server_ticket_verify(server_state2, nymble_ticket, @cur_link_window, time_period).should.be.false
-      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, time_period).should.be.true
+      Nymble.server_ticket_verify(nil, nymble_ticket, @cur_link_window, time_period).should.be(false)
+      Nymble.server_ticket_verify(server_state, nil, @cur_link_window, time_period).should.be(false)
+      Nymble.server_ticket_verify(server_state, nymble_ticket, nil, time_period).should.be(false)
+      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, nil).should.be(false)
+      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window + 1, time_period).should.be(false)
+      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, time_period + 1).should.be(false)
+      Nymble.server_ticket_verify(server_state2, nymble_ticket, @cur_link_window, time_period).should.be(false)
+      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, time_period).should.be(true)
     end
   end
   
@@ -317,13 +314,13 @@ describe 'Nymble' do
     #new_blacklist.should.not.equal(blacklist)
     
     Nymble.should.respond_to(:server_update)
-    Nymble.server_update(nil, blacklist, linking_tokens).should.be.false
-    Nymble.server_update(server_state, nil, linking_tokens).should.be.false
+    Nymble.server_update(nil, blacklist, linking_tokens).should.be(false)
+    Nymble.server_update(server_state, nil, linking_tokens).should.be(false)
     
     # We allow the server state to be updated with no tokens now
-    # Nymble.server_update(server_state, blacklist, nil).should.be.false
+    # Nymble.server_update(server_state, blacklist, nil).should.be(false)
     
-    Nymble.server_update(server_state, new_blacklist, linking_tokens).should.be.true
+    Nymble.server_update(server_state, new_blacklist, linking_tokens).should.be(true)
   end
 
   it 'should allow a USER to check if it is blacklisted' do
@@ -344,9 +341,9 @@ describe 'Nymble' do
     Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, @cur_time_period)
     
     Nymble.should.respond_to(:user_blacklist_check)
-    Nymble.user_blacklist_check(user_state, @server_id).should.be.false
-    Nymble.user_blacklist_update(user_state, @server_id, new_blacklist, @cur_link_window, @cur_time_period).should.be.true
-    Nymble.user_blacklist_check(user_state, @server_id).should.be.true
+    Nymble.user_blacklist_check(user_state, @server_id).should.be(false)
+    Nymble.user_blacklist_update(user_state, @server_id, new_blacklist, @cur_link_window, @cur_time_period).should.be(true)
+    Nymble.user_blacklist_check(user_state, @server_id).should.be(true)
   end
   
   #it 'should marshall and unmarshall all shared structures to s-expressions correctly' do
