@@ -77,8 +77,8 @@ void server_blacklist_finalize(server_t *server) {
   server->finalized = 1;
 }
  
-u_int server_blacklist_finalized(server_t *server) {
-  return server->finalized;
+u_int server_blacklist_finalized(server_t *server, u_int cur_time_period) {
+  return server->finalized && server->blacklist->cert.time_period == cur_time_period;
 }
  
 void server_iterate(server_t *server, u_int time_period_delta) {

@@ -23,7 +23,7 @@ server_t* server_initialize(u_char *server_id, u_char *hmac_key_ns, blacklist_t 
 u_int server_ticket_verify(server_t *server, ticket_t *nymble_ticket, u_int link_window, u_int time_period); 
 blacklist_t* server_blacklist(server_t *server); 
 void server_blacklist_finalize(server_t *server); 
-u_int server_blacklist_finalized(server_t *server); 
+u_int server_blacklist_finalized(server_t *server, u_int cur_time_period); 
 void server_iterate(server_t *server, u_int time_period_delta); 
 void server_update(server_t *server, blacklist_t *blacklist, linking_token_t *linking_tokens); 
 void server_update_cert(server_t *server, blacklist_cert_t *blacklist_cert);

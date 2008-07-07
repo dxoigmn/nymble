@@ -621,14 +621,16 @@ static VALUE rb_server_blacklist_finalize(VALUE rb_self, VALUE rb_server_state) 
   return Qtrue;
 }
 
-static VALUE rb_server_blacklist_finalized(VALUE rb_self, VALUE rb_server_state) { 
-  if ((TYPE(rb_server_state) != T_DATA)) {
+static VALUE rb_server_blacklist_finalized(VALUE rb_self, VALUE rb_server_state, VALUE rb_cur_time_period) { 
+  if ((TYPE(rb_server_state) != T_DATA) ||
+      (TYPE(rb_cur_time_period) != T_FIXNUM)) {
     return Qfalse;
   }
 
   server_t *server; Data_Get_Struct(rb_server_state, server_t, server);
-
-  if (server_blacklist_finalized(server)) {
+  u_int cur_time_period = NUM2UINT(rb_cur_time_period);
+  
+  if (server_blacklist_finalized(server, cur_time_period)) {
     return Qtrue;
   } else {
     return Qfalse;
@@ -900,7 +902,7 @@ void Init_libnymble() {
   rb_define_singleton_method(rb_cNymble, "server_ticket_verify", rb_server_ticket_verify, 4);
   rb_define_singleton_method(rb_cNymble, "server_blacklist", rb_server_blacklist, 1);
   rb_define_singleton_method(rb_cNymble, "server_blacklist_finalize", rb_server_blacklist_finalize, 1);
-  rb_define_singleton_method(rb_cNymble, "server_blacklist_finalized", rb_server_blacklist_finalized, 1);
+  rb_define_singleton_method(rb_cNymble, "server_blacklist_finalized", rb_server_blacklist_finalized, 2);
   rb_define_singleton_method(rb_cNymble, "server_iterate", rb_server_iterate, 2);
   rb_define_singleton_method(rb_cNymble, "server_update", rb_server_update, 3);
   rb_define_singleton_method(rb_cNymble, "server_update_cert", rb_server_update_cert, 2);
