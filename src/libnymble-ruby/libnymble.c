@@ -242,6 +242,11 @@ static VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_s
   u_char  *server_id  = (u_char *)RSTRING(rb_server_id)->ptr;
   u_int   time_period = NUM2UINT(rb_time_period);
   u_int   link_window = NUM2UINT(rb_link_window);
+  u_int   L           = NUM2UINT(rb_gv_get("L"));
+  
+  if (time_period > L) {
+    return Qnil;
+  }
 
   blacklist_t *blacklist = nm_blacklist_create(nm, server_id, time_period, link_window);
   //printf("Data_Wrap_Struct(nm_blacklist_create = %x)\n", (u_int)blacklist);

@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'test/spec'
-require 'active_support'
 require 'libnymble'
 
 describe 'Nymble' do
@@ -12,7 +11,7 @@ describe 'Nymble' do
     @user_id          = Nymble.digest('user_id')
     @cur_time_period  = 1
     @cur_link_window  = 1
-    $L                = 1.day / 5.minutes # TODO: This should really be a parameter of libnymble some how.
+    $L                = 288
   end
 
   it 'should have a hash function' do
@@ -113,8 +112,8 @@ describe 'Nymble' do
     Nymble.nm_blacklist_create(nil, @server_id, @cur_time_period, @cur_link_window).should.be.nil
     Nymble.nm_blacklist_create(nm_state, nil, @cur_time_period, @cur_link_window).should.be.nil
     Nymble.nm_blacklist_create(nm_state, @server_id, nil, @cur_link_window).should.be.nil
-    #Nymble.nm_blacklist_create(nm_state, @server_id, $L, @cur_link_window).should.not.be.nil
-    #Nymble.nm_blacklist_create(nm_state, @server_id, $L + 1, @cur_link_window).should.be.nil
+    Nymble.nm_blacklist_create(nm_state, @server_id, $L, @cur_link_window).should.not.be.nil
+    Nymble.nm_blacklist_create(nm_state, @server_id, $L + 1, @cur_link_window).should.be.nil
     Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, nil).should.be.nil
 
     blacklist = Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, @cur_link_window)
@@ -307,19 +306,13 @@ describe 'Nymble' do
 
     new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, nil, @cur_time_period, @cur_link_window)
     new_blacklist.should.not.be.nil
-    #new_blacklist.should.equal(blacklist)
 
     new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, complaints, @cur_time_period, @cur_link_window)
     new_blacklist.should.not.be.nil
-    #new_blacklist.should.not.equal(blacklist)
     
     Nymble.should.respond_to(:server_update)
     Nymble.server_update(nil, blacklist, linking_tokens).should.be(false)
     Nymble.server_update(server_state, nil, linking_tokens).should.be(false)
-    
-    # We allow the server state to be updated with no tokens now
-    # Nymble.server_update(server_state, blacklist, nil).should.be(false)
-    
     Nymble.server_update(server_state, new_blacklist, linking_tokens).should.be(true)
   end
 
