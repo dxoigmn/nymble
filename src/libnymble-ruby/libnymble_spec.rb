@@ -124,12 +124,7 @@ describe 'Nymble' do
     Nymble.nm_blacklist_verify(nm_state, nil, @server_id, @cur_link_window).should.be(false)
     Nymble.nm_blacklist_verify(nm_state, blacklist, nil, @cur_link_window).should.be(false)
     Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, nil).should.be(false)
-    
-    # FIXME: the following was originally false, but looks to me like it should be true... either fix C 
-    # implementation or ruby implementation, but make sure they're consistent and the reasoning behind 
-    # this is clear
     Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window).should.be(true)
-    
     Nymble.nm_blacklist_verify(nm_state2, blacklist, @server_id, @cur_link_window).should.be(false)
     
     Nymble.nm_entry_update(nm_state, @server_id, @cur_time_period)
@@ -157,7 +152,6 @@ describe 'Nymble' do
     
     Nymble.should.respond_to(:server_blacklist)
     Nymble.server_blacklist(nil).should.be.nil
-    #Nymble.server_blacklist(server_state).should.equal(blacklist)
     
     Nymble.should.respond_to(:server_blacklist_finalized)
     Nymble.server_blacklist_finalized(nil, @cur_time_period).should.be(false)
