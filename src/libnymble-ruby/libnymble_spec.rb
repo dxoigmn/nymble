@@ -332,8 +332,100 @@ describe 'Nymble' do
     Nymble.user_blacklist_update(user_state, @server_id, new_blacklist, @cur_link_window, @cur_time_period).should.be(true)
     Nymble.user_blacklist_check(user_state, @server_id).should.be(true)
   end
-  
-  #it 'should marshall and unmarshall all shared structures to s-expressions correctly' do
+
+  it 'should actually work' do
+    # System parameters
+    hmac_key_np     = Nymble.digest('hmac_key_np')
+    server_id       = Nymble.digest('server_id')
+    user_id         = Nymble.digest('user_id')
+    cur_time_period = 1
+    cur_link_window = 1
     
-  #end
+    # PM initialize
+    pm_state = Nymble.pm_initialize(hmac_key_np)
+    
+    pm_state.should.not.be.nil
+    
+    # NM initialize
+    nm_state    = Nymble.nm_initialize(hmac_key_np)
+    verify_key  = Nymble.nm_verify_key(nm_state)
+    
+    nm_state.should.not.be.nil
+    verify_key.should.not.be.nil
+    
+    # SERVER initialize
+    hmac_key_ns   = Nymble.nm_entry_add(nm_state, server_id)
+                    Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
+    blacklist     = Nymble.nm_blacklist_create(nm_state, server_id, cur_time_period, cur_link_window)
+    server_state  = Nymble.server_initialize(server_id, hmac_key_ns, blacklist)
+
+    server_state.should.not.be.nil
+    
+    # SERVER update blacklist
+    Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(false)
+    
+    blacklist = Nymble.server_blacklist(server_state)
+
+    Nymble.nm_entry_exists(nm_state, server_id).should.be(true)
+    Nymble.nm_blacklist_verify(nm_state, blacklist, server_id, cur_link_window).should.be(true)
+
+    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, nil, cur_time_period, cur_link_window)
+                    Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
+    
+    Nymble.server_update(server_state, new_blacklist, nil)
+    Nymble.server_blacklist_finalize(server_state)
+    
+    Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(true)
+    
+    # USER initialize
+    pseudonym, mac_np = Nymble.pm_pseudonym_create(pm_state, user_id, cur_link_window)
+    user_state = Nymble.user_initialize(pseudonym, mac_np, verify_key)
+    
+    user_state.should.not.be.nil
+    
+    # USER get credential
+    Nymble.nm_entry_exists(nm_state, server_id).should.be(true)
+    Nymble.nm_pseudonym_verify(nm_state, pseudonym, cur_link_window, mac_np).should.be(true)
+    
+    credential = Nymble.nm_credential_create(nm_state, pseudonym, server_id, cur_link_window)
+
+    credential.should.not.be.nil
+    
+    Nymble.user_entry_initialize(user_state, server_id, credential)
+    Nymble.user_blacklist_update(user_state, server_id, new_blacklist, cur_link_window, cur_time_period).should.be(true)
+    Nymble.user_blacklist_check(user_state, server_id).should.be(false)
+
+    # USER authenticate
+    ticket = Nymble.user_credential_get(user_state, server_id, cur_time_period)
+    
+    ticket.should.not.be.nil
+    
+    Nymble.server_ticket_verify(server_state, ticket, cur_link_window, cur_time_period).should.be(true)
+    
+    # time_period change!
+    cur_time_period += 1
+    
+    # SERVER update blacklist
+    Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(false)
+    
+    blacklist = Nymble.server_blacklist(server_state)
+
+    Nymble.nm_entry_exists(nm_state, server_id).should.be(true)
+    Nymble.nm_blacklist_verify(nm_state, blacklist, server_id, cur_link_window).should.be(true)
+
+    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, nil, cur_time_period, cur_link_window)
+                    Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
+    
+    Nymble.server_update(server_state, new_blacklist, nil)
+    Nymble.server_blacklist_finalize(server_state)
+    
+    Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(true)
+    
+    # USER authenticate
+    ticket = Nymble.user_credential_get(user_state, server_id, cur_time_period)
+    
+    ticket.should.not.be.nil
+    
+    Nymble.server_ticket_verify(server_state, ticket, cur_link_window, cur_time_period).should.be(true)
+  end
 end

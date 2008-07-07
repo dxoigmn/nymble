@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'uri'
-require 'net/http'
-require 'cgi'
-require 'optparse'
 require 'openssl'
-
+require 'yaml'
+require 'rest_client'
 require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
+
+
+$L = 288
 
 def cur_link_window
   cur_time = Time.now.getutc
@@ -19,46 +19,52 @@ def cur_time_period
   (cur_time.hour * 60 + cur_time.min) / 5
 end
 
-SERVER_ID = Nymble.digest('localhost:3003')
-$L        = 288
+def hexencode(value)
+  ret = ""
+  value.each_byte { |byte| ret << ("00" + byte.to_s(16))[-2..-1] }
+  ret
+end
 
-response = Net::HTTP.get_response(URI.parse("http://localhost:3000/pseudonym"))
+def hexdecode(value)
+  ret = ""
+  value = value.dup
+  ret << value.slice!(0, 2).to_i(16).chr while value.size > 0
+  ret
+end
 
-fail(response.body) unless response.kind_of?(Net::HTTPOK) || response.kind_of?(String)
+def acquire_pseudonym
+  @pseudonym = RestClient.post('http://localhost:3000/pseudonym', '')
 
-verify_key = File.read('nm.pub')
-pseudonym, mac_np = Nymble.pseudonym_unmarshall(response.body)
+  pseudonym   = hexdecode(@pseudonym)[0..31]
+  mac_np      = hexdecode(@pseudonym)[32..63]
+  verify_key  = File.read('nm.pub')
 
-USER_STATE = Nymble.user_initialize(pseudonym, mac_np, verify_key)
+  @user_state = Nymble.user_initialize(pseudonym, mac_np, verify_key)
+end
 
-fail "Bad user state" unless USER_STATE
+def acquire_blacklist
+  response = YAML.parse(RestClient.get('http://localhost:3002/nymble/')).transform
+  
+  @server_id  = response[:server_id]
+  @blacklist  = Nymble.blacklist_unmarshall(response[:blacklist])
+end
 
-data = {
-  :pseudonym  => Nymble.pseudonym_marshall(pseudonym, mac_np),
-  :server_id  => SERVER_ID,
-}
+def acquire_credential
+  response = YAML.parse(RestClient.get("http://localhost:3001/server/#{hexencode(@server_id)}/?pseudonym=#{@pseudonym}")).transform
+  
+  @credential = Nymble.user_credential_unmarshall(response[:credential])
 
-response = Net::HTTP.post_form(URI.parse("http://localhost:3001/credential"), data)
+  Nymble.user_entry_initialize(@user_state, @server_id, @credential)
+  Nymble.user_blacklist_update(@user_state, @server_id, @blacklist, cur_link_window, cur_time_period) &&
+  !Nymble.user_blacklist_check(@user_state, @server_id)
+end
 
-fail(response.body) unless response.kind_of?(Net::HTTPOK) || response.kind_of?(String)
+def authenticate
+  fail "Unable to acquire pseudonym"  unless acquire_pseudonym
+  fail "Unable to acquire blacklist"  unless acquire_blacklist
+  fail "Unable to acquire credential" unless acquire_credential
+  
+  RestClient.post('http://localhost:3002/nymble/', { :ticket => Nymble.ticket_marshall(Nymble.user_credential_get(@user_state, @server_id, cur_time_period)) })
+end
 
-credential = Nymble.user_credential_unmarshall(response.body)
-
-Nymble.user_entry_initialize(USER_STATE, SERVER_ID, credential)
-
-response = Net::HTTP.get_response(URI.parse("http://localhost:3003/blacklist"))
-
-fail(response.body) unless response.kind_of?(Net::HTTPOK) || response.kind_of?(String)
-
-blacklist = Nymble.blacklist_unmarshall(response.body)
-
-fail "Unable to verify blacklist" unless Nymble.user_blacklist_update(USER_STATE, SERVER_ID, blacklist, cur_link_window, cur_time_period)
-fail "Client is blacklisted" if Nymble.user_blacklist_check(USER_STATE, SERVER_ID)
-
-data = {
-  :ticket => Nymble.ticket_marshall(Nymble.user_credential_get(USER_STATE, SERVER_ID, cur_time_period))
-}
-
-response = Net::HTTP.post_form(URI.parse("http://localhost:3003/authenticate"), data)
-
-puts response.body
+puts authenticate
