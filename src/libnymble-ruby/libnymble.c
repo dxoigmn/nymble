@@ -18,6 +18,19 @@ static VALUE rb_nymble_hash(VALUE rb_self, VALUE rb_value) {
   return rb_str_new((char *)&buffer, sizeof(buffer));
 }
 
+static VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count) {
+  if (TYPE(rb_count) != T_FIXNUM) {
+    return Qnil;
+  }
+
+  u_int size = NUM2UINT(rb_count);
+  u_char buffer[size];
+  
+  random_bytes(buffer, size);
+  
+  return rb_str_new((char *)buffer, sizeof(buffer));
+}
+
 static VALUE rb_pm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) {
   if (TYPE(rb_hmac_key_np) != T_STRING) {
     return Qnil;
@@ -846,6 +859,7 @@ void Init_libnymble() {
   rb_cNymble = rb_define_class("Nymble", rb_cObject);
   
   rb_define_singleton_method(rb_cNymble, "digest", rb_nymble_hash, 1);
+  rb_define_singleton_method(rb_cNymble, "random_bytes", rb_nymble_random_bytes, 1);
   
   rb_define_singleton_method(rb_cNymble, "pm_initialize", rb_pm_initialize, 1);
   rb_define_singleton_method(rb_cNymble, "pm_pseudonym_create", rb_pm_pseudonym_create, 3);

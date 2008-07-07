@@ -10,8 +10,6 @@
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/bn.h>
-
-
 #include <string.h>
 
 #define DIGEST_SIZE         SHA256_DIGEST_LENGTH
