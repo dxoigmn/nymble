@@ -392,10 +392,11 @@ describe 'Nymble' do
     credential.should.not.be.nil
     
     Nymble.user_entry_initialize(user_state, server_id, credential)
-    Nymble.user_blacklist_update(user_state, server_id, new_blacklist, cur_link_window, cur_time_period).should.be(true)
-    Nymble.user_blacklist_check(user_state, server_id).should.be(false)
 
     # USER authenticate
+    Nymble.user_blacklist_update(user_state, server_id, new_blacklist, cur_link_window, cur_time_period).should.be(true)
+    Nymble.user_blacklist_check(user_state, server_id).should.be(false)
+    
     ticket = Nymble.user_credential_get(user_state, server_id, cur_time_period)
     
     ticket.should.not.be.nil
@@ -418,14 +419,47 @@ describe 'Nymble' do
     
     Nymble.server_update(server_state, new_blacklist, nil)
     Nymble.server_blacklist_finalize(server_state)
-    
     Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(true)
     
     # USER authenticate
+    Nymble.user_blacklist_update(user_state, server_id, new_blacklist, cur_link_window, cur_time_period).should.be(true)
+    Nymble.user_blacklist_check(user_state, server_id).should.be(false)
+    
     ticket = Nymble.user_credential_get(user_state, server_id, cur_time_period)
     
     ticket.should.not.be.nil
     
     Nymble.server_ticket_verify(server_state, ticket, cur_link_window, cur_time_period).should.be(true)
+    
+    # time_period change!
+    cur_time_period += 1
+    
+    # SERVER complain and update blacklist
+    Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(false)
+    
+    blacklist   = Nymble.server_blacklist(server_state)
+    complaints  = [ ticket ]
+    
+    Nymble.nm_entry_exists(nm_state, server_id).should.be(true)
+    Nymble.nm_blacklist_verify(nm_state, blacklist, server_id, cur_link_window).should.be(true)
+
+    linking_tokens  = Nymble.nm_tokens_create(nm_state, server_id, blacklist, complaints, cur_time_period, cur_link_window)
+    new_blacklist   = Nymble.nm_blacklist_update(nm_state, blacklist, complaints, cur_time_period, cur_link_window)
+                      Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
+    
+    Nymble.server_update(server_state, new_blacklist, linking_tokens)
+    Nymble.server_blacklist_finalize(server_state)
+    Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(true)
+    
+    # USER authenticate
+    Nymble.user_blacklist_update(user_state, server_id, new_blacklist, cur_link_window, cur_time_period).should.be(true)
+    Nymble.user_blacklist_check(user_state, server_id).should.be(true)
+    
+    ticket = Nymble.user_credential_get(user_state, server_id, cur_time_period)
+    
+    ticket.should.not.be.nil
+    
+    Nymble.server_ticket_verify(server_state, ticket, cur_link_window, cur_time_period).should.be(true)
+    
   end
 end
