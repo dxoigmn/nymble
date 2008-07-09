@@ -9,28 +9,21 @@ void server_free(server_t *server) {
   
   while (ll_entry) {
     linking_list_entry_t *next = ll_entry->next;
-    //printf("free(%x,ll_entry)\n", (u_int)ll_entry);
     free(ll_entry);
     ll_entry = next;
   }
   
   blacklist_free(server->blacklist);
-  
-  //printf("free(%x,server)\n", (u_int)server);
   free(server);
 }
 
 server_t* server_initialize(u_char *server_id, u_char *hmac_key_ns, blacklist_t *blacklist) {
   server_t *server = malloc(sizeof(server_t));
-  //printf("malloc(%x,server)\n", (u_int)server);
-  
   memcpy(server->server_id, server_id, DIGEST_SIZE);
   memcpy(server->hmac_key_ns, hmac_key_ns, DIGEST_SIZE);
   server->finalized     = 0;
   server->linking_list  = NULL;
   server->blacklist     = malloc(sizeof(blacklist_t));
-  //printf("malloc(%x,blacklist)\n", (u_int)server->blacklist);
-  
   blacklist_cpy(server->blacklist, blacklist);
 
   return server;
@@ -108,16 +101,12 @@ void server_update_cert(server_t *server, blacklist_cert_t *blacklist_cert) {
 void server_update(server_t *server, blacklist_t *blacklist, linking_token_t *linking_tokens) {
   blacklist_free(server->blacklist);
   server->blacklist = malloc(sizeof(blacklist_t));
-  //printf("malloc(%x,blacklist)\n", (u_int)server->blacklist);
-
   blacklist_cpy(server->blacklist, blacklist);
 
   linking_token_t *linking_token = linking_tokens;
   
   while (linking_token) {
     linking_list_entry_t *ll_entry = malloc(sizeof(linking_list_entry_t));
-    //printf("malloc(%x,ll_entry)\n", (u_int)ll_entry);
-    
     ll_entry->time_period = linking_token->time_period;
     memcpy(ll_entry->trapdoor, linking_token->trapdoor, DIGEST_SIZE);
     memcpy(ll_entry->nymble, linking_token->nymble_ticket->nymble, DIGEST_SIZE);

@@ -40,7 +40,6 @@ static VALUE rb_pm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) {
 
   pm_t *pm = pm_initialize(hmac_key_np);
 
-  //printf("Data_Wrap_Struct(pm_initialize = %x)\n", (u_int)pm);
   return Data_Wrap_Struct(rb_self, NULL, pm_free, pm);
 }
 
@@ -62,7 +61,6 @@ static VALUE rb_pm_pseudonym_create(VALUE rb_self, VALUE rb_pm_state, VALUE rb_u
   rb_ary_push(ret, rb_str_new((char *)pseudonym, sizeof(pseudonym_t) / 2));
   rb_ary_push(ret, rb_str_new((char *)pseudonym + sizeof(pseudonym_t) / 2, sizeof(pseudonym_t) / 2));
   
-  //printf("free(%x,pseudonym)\n", (u_int)pseudonym);
   free(pseudonym);
   
   return ret;
@@ -115,7 +113,6 @@ static VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) {
 
   nm_t *nm = nm_initialize(hmac_key_np);
 
-  //printf("Data_Wrap_Struct(nm_initialize = %x)\n", (u_int)nm);
   return Data_Wrap_Struct(rb_self, NULL, nm_free, nm);
 }
 
@@ -132,7 +129,6 @@ static VALUE rb_nm_verify_key(VALUE rb_self, VALUE rb_nm_state) {
   
   u_int len = i2d_RSAPublicKey(rsa, &der);
 
-  //printf("Data_Wrap_Struct(nm_verify_key_n = %x)\n", (u_int)rsa);
   return rb_str_new((char *)der, len);
 }
 
@@ -149,7 +145,6 @@ static VALUE rb_nm_verify_private_key(VALUE rb_self, VALUE rb_nm_state) {
   
   u_int len = i2d_RSAPrivateKey(rsa, &der);
 
-  //printf("Data_Wrap_Struct(nm_verify_key_n = %x)\n", (u_int)rsa);
   return rb_str_new((char *)der, len);
 }
 
@@ -249,7 +244,6 @@ static VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_s
   }
 
   blacklist_t *blacklist = nm_blacklist_create(nm, server_id, time_period, link_window);
-  //printf("Data_Wrap_Struct(nm_blacklist_create = %x)\n", (u_int)blacklist);
   return Data_Wrap_Struct(rb_self, NULL, blacklist_free, blacklist);
 }
 
@@ -330,7 +324,6 @@ static VALUE rb_nm_blacklist_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_b
   }
   
   blacklist_t *new_blacklist = nm_blacklist_update(nm, blacklist, complaints, time_period, link_window);
-  //printf("Data_Wrap_Struct(nm_blacklist_update = %x)\n", (u_int)new_blacklist);
   return Data_Wrap_Struct(rb_self, NULL, blacklist_free, new_blacklist);
 }
 
@@ -492,7 +485,6 @@ static VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_
   credential_t *credential = nm_credential_create(nm, &pseudonym, server_id, link_window, L);
 
   if (credential) {
-    //printf("Data_Wrap_Struct(nm_credential_create = %x)\n", (u_int)credential);
     return Data_Wrap_Struct(rb_self, NULL, credential_free, credential);
   } else {
     return Qnil;
@@ -554,7 +546,6 @@ static VALUE rb_nm_tokens_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_serv
   VALUE rb_linking_tokens = rb_ary_new();
 
   while (linking_token) {
-    //printf("Data_Wrap_Struct(nm_tokens_create = %x)\n", (u_int)linking_token);
     rb_ary_push(rb_linking_tokens, Data_Wrap_Struct(rb_self, NULL, token_free, linking_token));
 
     linking_token = linking_token->next;
@@ -578,7 +569,6 @@ static VALUE rb_server_initialize(VALUE rb_self, VALUE rb_server_id, VALUE rb_hm
 
   server_t *server = server_initialize(server_id, hmac_key_ns, blacklist);
 
-  //printf("Data_Wrap_Struct(server_initialize = %x)\n", (u_int)server);
   return Data_Wrap_Struct(rb_self, NULL, server_free, server);
 }
 
@@ -610,7 +600,6 @@ static VALUE rb_server_blacklist(VALUE rb_self, VALUE rb_server_state) {
   server_t *server; Data_Get_Struct(rb_server_state, server_t, server);
 
   blacklist_t *blacklist = server_blacklist(server);
-  //printf("Data_Wrap_Struct(server_blacklist = %x)\n", (u_int)blacklist);
   return Data_Wrap_Struct(rb_self, NULL, NULL, blacklist);
 }
 
@@ -718,7 +707,6 @@ static VALUE rb_user_initialize(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_
 
   user_t *user = user_initialize(&pseudonym, rsa);
 
-  //printf("Data_Wrap_Struct(user_initialize = %x)\n", (u_int)user);
   return Data_Wrap_Struct(rb_self, NULL, user_free, user);
 }
 
@@ -836,7 +824,6 @@ static VALUE rb_user_credential_get(VALUE rb_self, VALUE rb_user_state, VALUE rb
   ticket_t *ticket = user_credential_get(user, server_id, time_period);
   
   if (ticket) {
-    //printf("Data_Wrap_Struct(user_credential_get = %x)\n", (u_int)ticket);
     return Data_Wrap_Struct(rb_self, NULL, NULL, ticket);
   } else {
     return Qnil;

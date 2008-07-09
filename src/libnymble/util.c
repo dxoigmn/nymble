@@ -4,7 +4,7 @@ void printbytes(u_char *bytes, u_int size) {
   int i;
   
   for (i = 0; i < size; i++) {
-    printf("%02x ", *(bytes + i));
+    fprintf(stderr, "%02x ", *(bytes + i));
   }
 }
 

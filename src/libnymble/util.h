@@ -21,7 +21,7 @@ typedef unsigned int  u_int;
 
 void printbytes(u_char *bytes, u_int size);
 
-#define PB(desc, data, size) printf("%s", (desc)); printbytes((data), (size)); printf("\n");
+#define PB(desc, data, size) fprintf(stderr, "%s", (desc)); printbytes((data), (size)); fprintf(stderr, "\n");
 
 u_int hash(u_char *buffer, u_char *value, u_int size);
 u_int random_bytes(u_char *buffer, u_int size);

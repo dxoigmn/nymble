@@ -9,20 +9,16 @@ void nm_free(nm_t *nm) {
   
   while (nm_entry) {
     nm_entry_t *next = nm_entry->next;
-    //printf("free(%x,nm_entry)\n", (u_int)nm_entry);
     free(nm_entry);
     nm_entry = next;
   }
   
-  //printf("free(%x,nm->sign_key_n)\n", (u_int)nm->sign_key_n);
   RSA_free(nm->sign_key_n);
-  //printf("free(%x,nm)\n", (u_int)nm);
   free(nm);
 }
 
 nm_t* nm_initialize(u_char *hmac_key_np) {
   nm_t  *nm   = malloc(sizeof(nm_t));
-  //printf("malloc(%x,nm)\n", (u_int)nm);
   RSA   *rsa  = RSA_generate_key(SIGNATURE_SIZE * 8, 65537, NULL, NULL);
   
   random_bytes(nm->hmac_key_n, sizeof(nm->hmac_key_n));
@@ -80,8 +76,6 @@ u_int nm_entry_exists(nm_t *nm, u_char *server_id) {
  
 u_char* nm_entry_add(nm_t *nm, u_char *server_id) {
   nm_entry_t  *nm_entry  = malloc(sizeof(nm_entry_t));
-  //printf("malloc(%x,nm_entry)\n", (u_int)nm_entry);
-  
   memcpy(nm_entry->server_id, server_id, sizeof(nm_entry->server_id));
   random_bytes(nm_entry->hmac_key_ns, sizeof(nm_entry->hmac_key_ns));
   nm_entry->bl_last_updated = 1;
@@ -123,8 +117,6 @@ blacklist_t* nm_blacklist_create(nm_t *nm, u_char *server_id, u_int time_period,
   u_char hashed[DIGEST_SIZE];
   
   blacklist_t *blacklist = malloc(sizeof(blacklist_t));
-  //printf("malloc(%x,blacklist)\n", (u_int)blacklist);
-  
   memcpy(blacklist->server_id, server_id, DIGEST_SIZE);
   blacklist->link_window  = link_window;
   blacklist->nymbles      = NULL;
@@ -194,8 +186,6 @@ blacklist_t* nm_blacklist_update(nm_t *nm, blacklist_t *blacklist, ticket_t *com
   u_char hashed[DIGEST_SIZE];
 
   blacklist_t *new_blacklist = malloc(sizeof(blacklist_t));
-  //printf("malloc(%x,blacklist)\n", (u_int)new_blacklist);
-
   memcpy(new_blacklist->server_id, blacklist->server_id, DIGEST_SIZE);
   new_blacklist->link_window  = link_window;
   new_blacklist->nymbles      = NULL;
@@ -204,10 +194,7 @@ blacklist_t* nm_blacklist_update(nm_t *nm, blacklist_t *blacklist, ticket_t *com
 
   while (nymble) {
     nymblelist_t *new_nymble = malloc(sizeof(nymblelist_t));
-    //printf("malloc(%x,ticket)\n", (u_int)new_ticket);
-    
     memcpy(new_nymble->nymble, nymble->nymble, DIGEST_SIZE);
-
     new_nymble->next = new_blacklist->nymbles;
     new_blacklist->nymbles = new_nymble;
     
@@ -220,7 +207,6 @@ blacklist_t* nm_blacklist_update(nm_t *nm, blacklist_t *blacklist, ticket_t *com
     u_char pseudonym[DIGEST_SIZE];
     u_char seed[DIGEST_SIZE];
     u_char nymble0[DIGEST_SIZE];
-    //printf("malloc(%x,ticket)\n", (u_int)new_complaint);
     
     nymblelist_t *new_complaint = malloc(sizeof(nymblelist_t));
     
@@ -260,11 +246,7 @@ credential_t* nm_credential_create(nm_t *nm, pseudonym_t *pseudonym, u_char *ser
   seed_trapdoor(trapdoor[0], nm->keyedhash_key_n, pseudonym->pseudonym, server_id, link_window);
 
   credential_t *credential  = malloc(sizeof(credential_t));
-  //printf("malloc(%x,credential)\n", (u_int)credential);
-  
   credential->tickets       = malloc(sizeof(ticket_t) * (time_periods + 1));
-  //printf("malloc(%x,tickets)\n", (u_int)credential->tickets);
-
   memcpy(credential->seed, trapdoor[0], DIGEST_SIZE);
 
   int i;
@@ -323,15 +305,11 @@ linking_token_t* nm_tokens_create(nm_t *nm, u_char *server_id, blacklist_t *blac
     }
 
     linking_token_t *cur_linking_token = malloc(sizeof(linking_token_t));
-    //printf("malloc(%x,linking_token)\n", (u_int)cur_linking_token);
-
     memcpy(cur_linking_token->server_id, server_id, DIGEST_SIZE);
     cur_linking_token->link_window = link_window;
     cur_linking_token->time_period = next_time_period;
     memcpy(cur_linking_token->trapdoor, trapdoor_for_next_time_period, DIGEST_SIZE);
     cur_linking_token->nymble_ticket = malloc(sizeof(ticket_t));
-    //printf("malloc(%x,ticket)\n", (u_int)cur_linking_token->nymble_ticket);
-    
     ticket_cpy(cur_linking_token->nymble_ticket, ticket);
     
     cur_linking_token->next = linking_tokens;

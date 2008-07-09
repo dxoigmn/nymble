@@ -17,10 +17,7 @@ void blacklist_cpy(blacklist_t *out, blacklist_t *in) {
   
   while (in_nymble) {
     nymblelist_t *nymble = malloc(sizeof(nymblelist_t));
-    //printf("malloc(%x,ticket)\n", (u_int)ticket);
-    
     memcpy(nymble->nymble, in_nymble->nymble, DIGEST_SIZE);
-
     nymble->next = NULL;
 
     if (out->nymbles) {
@@ -49,7 +46,6 @@ void blacklist_free(blacklist_t *blacklist) {
     nymble = next_nymble;
   }
 
-  //printf("free(%x,blacklist)\n", (u_int)blacklist);
   free(blacklist);
 }
 
@@ -68,7 +64,6 @@ void ticket_free(ticket_t *ticket) {
     return;
   }
   
-  //printf("free(%x,ticket)\n", (u_int)ticket);
   free(ticket);
 }
 
@@ -76,7 +71,6 @@ void credential_cpy(credential_t *out, credential_t *in, u_int time_periods) {
   memcpy(out->seed, in->seed, sizeof(out->seed));
   
   out->tickets = malloc(sizeof(ticket_t) * (time_periods + 1));
-  //printf("malloc(%x,tickets)\n", (u_int)out->tickets);
   
   int i;
   
@@ -90,9 +84,7 @@ void credential_free(credential_t *credential) {
     return;
   }
   
-  //printf("free(%x,tickets)\n", (u_int)credential->tickets);
   free(credential->tickets);
-  //printf("free(%x,credential)\n", (u_int)credential);
   free(credential);
 }
 
@@ -101,10 +93,7 @@ void token_free(linking_token_t *linking_token) {
     return;
   }
   
-  //printf("token_free(%x)\n", (u_int)linking_token);
-  
   ticket_free(linking_token->nymble_ticket);
-  //printf("free(%x,linking_token)\n", (u_int)linking_token);
   free(linking_token);
 }
 
@@ -210,7 +199,6 @@ u_int bl_check_freshness(blacklist_t *blacklist, u_int time_period, u_int link_w
       (blacklist->link_window == link_window)) {
     return 1;
   } else {
-    //printf("%d != %d || %d != %d\n", blacklist->cert.time_period, time_period, blacklist->link_window, link_window);
     return 0;
   }
 }
