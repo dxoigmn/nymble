@@ -219,25 +219,21 @@ void seed_trapdoor(u_char *buffer, u_char *key, u_char *pseudonym, u_char *serve
 }
 
 void evolve_trapdoor(u_char *buffer, u_char *trapdoor, u_int delta) {
-  u_char out[DIGEST_SIZE];
-  u_char trap[DIGEST_SIZE];
-  u_char nonce[1] = "f";
-  
-  memcpy(trap, trapdoor, DIGEST_SIZE);
+  memcpy(buffer, trapdoor, DIGEST_SIZE);
 
   int i;
   for (i = 0; i < delta; i++) {
     SHA256_CTX ctx;
-
+    u_char out[DIGEST_SIZE];
+    u_char nonce[1] = "f";
+    
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, nonce, sizeof(nonce));
-    SHA256_Update(&ctx, trapdoor, DIGEST_SIZE);
+    SHA256_Update(&ctx, buffer, DIGEST_SIZE);
     SHA256_Final(out, &ctx);
 
-    memcpy(trap, out, DIGEST_SIZE);
+    memcpy(buffer, out, DIGEST_SIZE);
   }
-
-  memcpy(buffer, out, DIGEST_SIZE);
 }
 
 void compute_nymble(u_char *buffer, u_char *trapdoor) {

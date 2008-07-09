@@ -109,7 +109,7 @@ void server_update(server_t *server, blacklist_t *blacklist, linking_token_t *li
     linking_list_entry_t *ll_entry = malloc(sizeof(linking_list_entry_t));
     ll_entry->time_period = linking_token->time_period;
     memcpy(ll_entry->trapdoor, linking_token->trapdoor, DIGEST_SIZE);
-    memcpy(ll_entry->nymble, linking_token->nymble_ticket->nymble, DIGEST_SIZE);
+    compute_nymble(ll_entry->nymble, ll_entry->trapdoor);
     ll_entry->next       = server->linking_list;
     server->linking_list = ll_entry;
 
