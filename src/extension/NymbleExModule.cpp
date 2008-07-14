@@ -1,5 +1,5 @@
 #include "nsIGenericFactory.h"
-#include "Nymble.h"
+#include "NymbleEx.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(Nymble)
 

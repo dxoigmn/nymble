@@ -1,4 +1,4 @@
-#include "Nymble.h"
+#include "NymbleEx.h"
 
 NS_IMPL_ISUPPORTS1(Nymble, INymble)
 

@@ -1,7 +1,7 @@
 #include "INymble.h"
 
 extern "C" {
-  #include "libnymble/user.h"
+  #include "user.h"
 }
 
 class Nymble : public INymble

@@ -22,69 +22,71 @@
   {0x9af36a2f, 0x9b04, 0x4936, \
     { 0xac, 0xfc, 0x7b, 0xff, 0xa7, 0x7b, 0xc2, 0x97 }}
 
-class NS_NO_VTABLE INymble : public nsISupports {
+class NS_NO_VTABLE NS_SCRIPTABLE INymble : public nsISupports {
  public: 
 
-  NS_DEFINE_STATIC_IID_ACCESSOR(INYMBLE_IID)
+  NS_DECLARE_STATIC_IID_ACCESSOR(INYMBLE_IID)
 
   /* void user_initialize (in string pseudonym, [array, size_is (aLength)] in PRUint8 aArray, in PRUint32 aLength); */
-  NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength) = 0;
 
   /* void user_set_certificate ([array, size_is (aLength)] in PRUint8 aArray, in PRUint32 aLength); */
-  NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength) = 0;
 
   /* string user_pseudonym (); */
-  NS_IMETHOD User_pseudonym(char **_retval) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_pseudonym(char **_retval) = 0;
 
   /* void user_entry_initialize (in string server_id, in string credential, in unsigned long time_period); */
-  NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period) = 0;
 
   /* boolean user_entry_exists (in string server_id); */
-  NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval) = 0;
 
   /* string user_credential_get (in string server_id, in unsigned long time_period); */
-  NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval) = 0;
 
   /* boolean user_blacklist_update (in string server_id, in string blacklist, in unsigned long link_window, in unsigned long time_period); */
-  NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval) = 0;
 
   /* boolean user_blacklist_check (in string server_id); */
-  NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval) = 0;
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval) = 0;
 
 };
 
+  NS_DEFINE_STATIC_IID_ACCESSOR(INymble, INYMBLE_IID)
+
 /* Use this macro when declaring classes that implement this interface. */
 #define NS_DECL_INYMBLE \
-  NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength); \
-  NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength); \
-  NS_IMETHOD User_pseudonym(char **_retval); \
-  NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period); \
-  NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval); \
-  NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval); \
-  NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval); \
-  NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval); 
+  NS_SCRIPTABLE NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength); \
+  NS_SCRIPTABLE NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength); \
+  NS_SCRIPTABLE NS_IMETHOD User_pseudonym(char **_retval); \
+  NS_SCRIPTABLE NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period); \
+  NS_SCRIPTABLE NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval); \
+  NS_SCRIPTABLE NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval); \
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval); \
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval); 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object. */
 #define NS_FORWARD_INYMBLE(_to) \
-  NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength) { return _to User_initialize(pseudonym, aArray, aLength); } \
-  NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength) { return _to User_set_certificate(aArray, aLength); } \
-  NS_IMETHOD User_pseudonym(char **_retval) { return _to User_pseudonym(_retval); } \
-  NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period) { return _to User_entry_initialize(server_id, credential, time_period); } \
-  NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval) { return _to User_entry_exists(server_id, _retval); } \
-  NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval) { return _to User_credential_get(server_id, time_period, _retval); } \
-  NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval) { return _to User_blacklist_update(server_id, blacklist, link_window, time_period, _retval); } \
-  NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval) { return _to User_blacklist_check(server_id, _retval); } 
+  NS_SCRIPTABLE NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength) { return _to User_initialize(pseudonym, aArray, aLength); } \
+  NS_SCRIPTABLE NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength) { return _to User_set_certificate(aArray, aLength); } \
+  NS_SCRIPTABLE NS_IMETHOD User_pseudonym(char **_retval) { return _to User_pseudonym(_retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period) { return _to User_entry_initialize(server_id, credential, time_period); } \
+  NS_SCRIPTABLE NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval) { return _to User_entry_exists(server_id, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval) { return _to User_credential_get(server_id, time_period, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval) { return _to User_blacklist_update(server_id, blacklist, link_window, time_period, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval) { return _to User_blacklist_check(server_id, _retval); } 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
 #define NS_FORWARD_SAFE_INYMBLE(_to) \
-  NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_initialize(pseudonym, aArray, aLength); } \
-  NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_set_certificate(aArray, aLength); } \
-  NS_IMETHOD User_pseudonym(char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_pseudonym(_retval); } \
-  NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_entry_initialize(server_id, credential, time_period); } \
-  NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_entry_exists(server_id, _retval); } \
-  NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_credential_get(server_id, time_period, _retval); } \
-  NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_blacklist_update(server_id, blacklist, link_window, time_period, _retval); } \
-  NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_blacklist_check(server_id, _retval); } 
+  NS_SCRIPTABLE NS_IMETHOD User_initialize(const char *pseudonym, PRUint8 *aArray, PRUint32 aLength) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_initialize(pseudonym, aArray, aLength); } \
+  NS_SCRIPTABLE NS_IMETHOD User_set_certificate(PRUint8 *aArray, PRUint32 aLength) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_set_certificate(aArray, aLength); } \
+  NS_SCRIPTABLE NS_IMETHOD User_pseudonym(char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_pseudonym(_retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_entry_initialize(const char *server_id, const char *credential, PRUint32 time_period) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_entry_initialize(server_id, credential, time_period); } \
+  NS_SCRIPTABLE NS_IMETHOD User_entry_exists(const char *server_id, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_entry_exists(server_id, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_credential_get(const char *server_id, PRUint32 time_period, char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_credential_get(server_id, time_period, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_update(const char *server_id, const char *blacklist, PRUint32 link_window, PRUint32 time_period, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_blacklist_update(server_id, blacklist, link_window, time_period, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD User_blacklist_check(const char *server_id, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->User_blacklist_check(server_id, _retval); } 
 
 #if 0
 /* Use the code below as a template for the implementation class for this interface. */
