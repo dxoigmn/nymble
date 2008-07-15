@@ -18,7 +18,9 @@ CXXFLAGS += -shared -fPIC -dynamiclib
 VPATH = .:../libnymble/:../libnymble/sexp/
 TARGET = Nymble.dylib
 
-build: $(OBJS)
+build: $(TARGET)
+
+$(TARGET): $(OBJS)
 	$(CXX) -o $(TARGET) $(DEFINES) $(CXXFLAGS) $(LIBPATH) $(LIBS) $^
 
 %.o: %.cpp
