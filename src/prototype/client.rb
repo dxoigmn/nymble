@@ -6,8 +6,7 @@ require 'yaml'
 require 'rest_client'
 require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
 
-
-$L = 288
+$L = 1440
 
 def cur_link_window
   cur_time = Time.now.getutc
@@ -16,7 +15,7 @@ end
 
 def cur_time_period
   cur_time = Time.now.getutc
-  (cur_time.hour * 60 + cur_time.min) / 5
+  (cur_time.hour * 60 + cur_time.min) / 1
 end
 
 def hexencode(value)
@@ -55,8 +54,7 @@ def acquire_credential
   @credential = Nymble.user_credential_unmarshall(response[:credential])
 
   Nymble.user_entry_initialize(@user_state, @server_id, @credential)
-  Nymble.user_blacklist_update(@user_state, @server_id, @blacklist, cur_link_window, cur_time_period) &&
-  !Nymble.user_blacklist_check(@user_state, @server_id)
+  Nymble.user_blacklist_update(@user_state, @server_id, @blacklist, cur_link_window, cur_time_period)
 end
 
 def authenticate

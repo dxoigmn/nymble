@@ -9,7 +9,7 @@ Sinatra::Application.default_options[:port] = 3001
 
 configure do
   NM_STATE  = Nymble.nm_initialize(Nymble.digest('hmac_key_np'))
-  $L        = 288
+  $L        = 1440
   
   File.open('nm.pub', 'w') { |f| f << Nymble.nm_verify_key(NM_STATE) }
 end
@@ -22,7 +22,7 @@ helpers do
   
   def cur_time_period
     cur_time = Time.now.getutc
-    (cur_time.hour * 60 + cur_time.min) / 5
+    (cur_time.hour * 60 + cur_time.min) / 1
   end
   
   def hexencode(value)

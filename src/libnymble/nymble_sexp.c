@@ -1,6 +1,6 @@
 #include "nymble_sexp.h"
-#include "unistd.h"
-#include "assert.h"
+#include <unistd.h>
+#include <assert.h>
 
 extern int characterTablesInitialized;
 extern char upper[256];            /* upper[c] is upper case version of c */
