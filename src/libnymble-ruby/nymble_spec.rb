@@ -28,12 +28,12 @@ describe 'Nymble' do
   
   it 'should manage NM state' do
     Nymble.should.respond_to(:nm_initialize)
-    Nymble.nm_initialize(nil).should.be.nil
+    should.raise(TypeError) { Nymble.nm_initialize(nil) }
     nm_state = Nymble.nm_initialize(@hmac_key_np)
     nm_state.should.not.be.nil
     
     Nymble.should.respond_to(:nm_verify_key)
-    Nymble.nm_verify_key(nil).should.be.nil
+    should.raise(TypeError) { Nymble.nm_verify_key(nil) }
     Nymble.nm_verify_key(nm_state).should.not.be.nil
   end
 
@@ -42,16 +42,16 @@ describe 'Nymble' do
     nm_state2 = Nymble.nm_initialize(@hmac_key_np.reverse)
     
     Nymble.should.respond_to(:nm_entry_exists)
-    Nymble.nm_entry_exists(nil, @server_id).should.be(false)
-    Nymble.nm_entry_exists(nm_state, nil).should.be(false)
+    should.raise(TypeError) { Nymble.nm_entry_exists(nil, @server_id) }
+    should.raise(TypeError) { Nymble.nm_entry_exists(nm_state, nil) }
     Nymble.nm_entry_exists(nm_state, @server_id).should.be(false)
     
     Nymble.should.respond_to(:nm_entry_add)
-    Nymble.nm_entry_add(nm_state, nil).should.be.nil
+    should.raise(TypeError) { Nymble.nm_entry_add(nm_state, nil) }
     Nymble.nm_entry_add(nm_state, "").should.be.nil
     Nymble.nm_entry_exists(nm_state, "").should.be(false)
-    Nymble.nm_entry_add(nil, @server_id).should.be.nil
-    Nymble.nm_entry_exists(nm_state, nil).should.be(false)
+    should.raise(TypeError) { Nymble.nm_entry_add(nil, @server_id) }
+    should.raise(TypeError) { Nymble.nm_entry_exists(nm_state, nil) }
 
     hmac_key_ns = Nymble.nm_entry_add(nm_state, @server_id).should.not.be.nil
     Nymble.nm_entry_exists(nm_state, @server_id).should.be(true)
@@ -59,10 +59,10 @@ describe 'Nymble' do
     Nymble.nm_entry_add(nm_state, @server_id.reverse).should.not.equal(hmac_key_ns)
     
     Nymble.should.respond_to(:nm_entry_update)
-    Nymble.nm_entry_update(nil, @server_id, @cur_time_period).should.be(false)
-    Nymble.nm_entry_update(nm_state, nil, @cur_time_period).should.be(false)
-    Nymble.nm_entry_update(nm_state, @server_id, nil).should.be(false)
-    Nymble.nm_entry_exists(nm_state, nil).should.be(false)
+    should.raise(TypeError) { Nymble.nm_entry_update(nil, @server_id, @cur_time_period) }
+    should.raise(TypeError) { Nymble.nm_entry_update(nm_state, nil, @cur_time_period) }
+    should.raise(TypeError) { Nymble.nm_entry_update(nm_state, @server_id, nil) }
+    should.raise(TypeError) { Nymble.nm_entry_exists(nm_state, nil) }
     Nymble.nm_entry_update(nm_state, @server_id.reverse, @cur_time_period).should.be(true)
     Nymble.nm_entry_update(nm_state, @server_id, @cur_time_period).should.be(true)
     Nymble.nm_entry_update(nm_state2, @server_id, @cur_time_period).should.be(false)
@@ -109,21 +109,21 @@ describe 'Nymble' do
     pseudonym, mac_np = Nymble.pm_pseudonym_create(pm_state, @user_id, @cur_link_window)
     
     Nymble.should.respond_to(:nm_blacklist_create)
-    Nymble.nm_blacklist_create(nil, @server_id, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_blacklist_create(nm_state, nil, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_blacklist_create(nm_state, @server_id, nil, @cur_link_window).should.be.nil
+    should.raise(TypeError) { Nymble.nm_blacklist_create(nil, @server_id, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_create(nm_state, nil, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_create(nm_state, @server_id, nil, @cur_link_window) }
     Nymble.nm_blacklist_create(nm_state, @server_id, $L, @cur_link_window).should.not.be.nil
     Nymble.nm_blacklist_create(nm_state, @server_id, $L + 1, @cur_link_window).should.be.nil
-    Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, nil).should.be.nil
+    should.raise(TypeError) { Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, nil) }
 
     blacklist = Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, @cur_link_window)
     blacklist.should.not.be.nil
     
     Nymble.should.respond_to(:nm_blacklist_verify)
-    Nymble.nm_blacklist_verify(nil, blacklist, @server_id, @cur_link_window).should.be(false)
-    Nymble.nm_blacklist_verify(nm_state, nil, @server_id, @cur_link_window).should.be(false)
-    Nymble.nm_blacklist_verify(nm_state, blacklist, nil, @cur_link_window).should.be(false)
-    Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, nil).should.be(false)
+    should.raise(TypeError) { Nymble.nm_blacklist_verify(nil, blacklist, @server_id, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_verify(nm_state, nil, @server_id, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_verify(nm_state, blacklist, nil, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, nil) }
     Nymble.nm_blacklist_verify(nm_state, blacklist, @server_id, @cur_link_window).should.be(true)
     Nymble.nm_blacklist_verify(nm_state2, blacklist, @server_id, @cur_link_window).should.be(false)
     
@@ -169,10 +169,10 @@ describe 'Nymble' do
     blacklist         = Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, @cur_link_window)
     
     Nymble.should.respond_to(:nm_pseudonym_verify)
-    Nymble.nm_pseudonym_verify(nil, pseudonym, @cur_link_window, mac_np).should.be(false)
-    Nymble.nm_pseudonym_verify(nm_state, nil, @cur_link_window, mac_np).should.be(false)
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, nil, mac_np).should.be(false)
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, nil).should.be(false)
+    should.raise(TypeError) { Nymble.nm_pseudonym_verify(nil, pseudonym, @cur_link_window, mac_np) }
+    should.raise(TypeError) { Nymble.nm_pseudonym_verify(nm_state, nil, @cur_link_window, mac_np) }
+    should.raise(TypeError) { Nymble.nm_pseudonym_verify(nm_state, pseudonym, nil, mac_np) }
+    should.raise(TypeError) { Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, nil) }
     Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np.reverse).should.be(false)
     Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window + 1, mac_np).should.be(false)
     Nymble.nm_pseudonym_verify(nm_state2, pseudonym, @cur_link_window, mac_np).should.be(false)
@@ -181,10 +181,10 @@ describe 'Nymble' do
     Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np).should.be(true)
 
     Nymble.should.respond_to(:nm_credential_create)
-    Nymble.nm_credential_create(nil, pseudonym, @server_id, @cur_link_window).should.be.nil
-    Nymble.nm_credential_create(nm_state, nil, @server_id, @cur_link_window).should.be.nil
-    Nymble.nm_credential_create(nm_state, pseudonym, nil, @cur_link_window).should.be.nil
-    Nymble.nm_credential_create(nm_state, pseudonym, @server_id, nil).should.be.nil
+    should.raise(TypeError) { Nymble.nm_credential_create(nil, pseudonym, @server_id, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_credential_create(nm_state, nil, @server_id, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_credential_create(nm_state, pseudonym, nil, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_credential_create(nm_state, pseudonym, @server_id, nil) }
     Nymble.nm_credential_create(nm_state, pseudonym, @server_id.reverse, @cur_link_window).should.be.nil
     Nymble.nm_credential_create(nm_state, pseudonym, @server_id, @cur_link_window).should.not.be.nil
   end
@@ -280,12 +280,12 @@ describe 'Nymble' do
     complaints        = [ Nymble.user_credential_get(user_state, @server_id, @cur_time_period) ]
 
     Nymble.should.respond_to(:nm_tokens_create)
-    Nymble.nm_tokens_create(nil, @server_id, blacklist, complaints, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_tokens_create(nm_state, nil, blacklist, complaints, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_tokens_create(nm_state, @server_id, nil, complaints, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_tokens_create(nm_state, @server_id, blacklist, complaints, nil, @cur_link_window).should.be.nil
-    Nymble.nm_tokens_create(nm_state, @server_id, blacklist, complaints, @cur_time_period, nil).should.be.nil
-    Nymble.nm_tokens_create(nm_state, @server_id, blacklist, nil, @cur_time_period, @cur_link_window).should.not.be.nil
+    should.raise(TypeError) { Nymble.nm_tokens_create(nil, @server_id, blacklist, complaints, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_tokens_create(nm_state, nil, blacklist, complaints, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_tokens_create(nm_state, @server_id, nil, complaints, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_tokens_create(nm_state, @server_id, blacklist, complaints, nil, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_tokens_create(nm_state, @server_id, blacklist, complaints, @cur_time_period, nil) }
+    Nymble.nm_tokens_create(nm_state, @server_id, blacklist, [], @cur_time_period, @cur_link_window).should.not.be.nil
 
     linking_tokens = Nymble.nm_tokens_create(nm_state, @server_id, blacklist, complaints, @cur_time_period, @cur_link_window)
     linking_tokens.should.not.be.nil
@@ -293,12 +293,12 @@ describe 'Nymble' do
     # TODO: test checking linking tokens
 
     Nymble.should.respond_to(:nm_blacklist_update)
-    Nymble.nm_blacklist_update(nil, blacklist, complaints, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_blacklist_update(nm_state, nil, complaints, @cur_time_period, @cur_link_window).should.be.nil
-    Nymble.nm_blacklist_update(nm_state, blacklist, complaints, nil, @cur_link_window).should.be.nil
-    Nymble.nm_blacklist_update(nm_state, blacklist, complaints, @cur_time_period, nil).should.be.nil
+    should.raise(TypeError) { Nymble.nm_blacklist_update(nil, blacklist, complaints, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_update(nm_state, nil, complaints, @cur_time_period, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_update(nm_state, blacklist, complaints, nil, @cur_link_window) }
+    should.raise(TypeError) { Nymble.nm_blacklist_update(nm_state, blacklist, complaints, @cur_time_period, nil) }
 
-    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, nil, @cur_time_period, @cur_link_window)
+    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, [], @cur_time_period, @cur_link_window)
     new_blacklist.should.not.be.nil
 
     new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, complaints, @cur_time_period, @cur_link_window)
@@ -369,7 +369,7 @@ describe 'Nymble' do
     Nymble.nm_entry_exists(nm_state, server_id).should.be(true)
     Nymble.nm_blacklist_verify(nm_state, blacklist, server_id, cur_link_window).should.be(true)
 
-    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, nil, cur_time_period, cur_link_window)
+    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, [], cur_time_period, cur_link_window)
                     Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
     
     Nymble.server_update(server_state, new_blacklist, nil)
@@ -448,7 +448,7 @@ describe 'Nymble' do
     Nymble.nm_entry_exists(nm_state, server_id).should.be(true)
     Nymble.nm_blacklist_verify(nm_state, blacklist, server_id, cur_link_window).should.be(true)
 
-    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, nil, cur_time_period, cur_link_window)
+    new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, [], cur_time_period, cur_link_window)
                     Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
     
     Nymble.server_update(server_state, new_blacklist, nil)

@@ -1,9 +1,8 @@
 #include "nymble_manager_wrap.h"
 
-VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) { 
-  if (TYPE(rb_hmac_key_np) != T_STRING) {
-    return Qnil;
-  }
+VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np)
+{
+  Check_Type(rb_hmac_key_np, T_STRING);
   
   u_char *hmac_key_np = (u_char *)RSTRING(rb_hmac_key_np)->ptr;
 
@@ -12,10 +11,9 @@ VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) {
   return Data_Wrap_Struct(rb_self, NULL, nm_free, nm);
 }
 
-VALUE rb_nm_verify_key(VALUE rb_self, VALUE rb_nm_state) {
-  if (TYPE(rb_nm_state) != T_DATA) {
-    return Qnil;
-  }
+VALUE rb_nm_verify_key(VALUE rb_self, VALUE rb_nm_state)
+{
+  Check_Type(rb_nm_state, T_DATA);
   
   nm_t  *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
 
@@ -28,10 +26,9 @@ VALUE rb_nm_verify_key(VALUE rb_self, VALUE rb_nm_state) {
   return rb_str_new((char *)der, len);
 }
 
-VALUE rb_nm_verify_private_key(VALUE rb_self, VALUE rb_nm_state) {
-  if (TYPE(rb_nm_state) != T_DATA) {
-    return Qnil;
-  }
+VALUE rb_nm_verify_private_key(VALUE rb_self, VALUE rb_nm_state)
+{
+  Check_Type(rb_nm_state, T_DATA);
   
   nm_t  *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
 
@@ -44,10 +41,12 @@ VALUE rb_nm_verify_private_key(VALUE rb_self, VALUE rb_nm_state) {
   return rb_str_new((char *)der, len);
 }
 
-VALUE rb_nm_entry_exists(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE)) {
+VALUE rb_nm_entry_exists(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_server_id, T_STRING);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qfalse;
   }
   
@@ -61,10 +60,12 @@ VALUE rb_nm_entry_exists(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id) {
   }
 }
 
-VALUE rb_nm_entry_add(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE)) {
+VALUE rb_nm_entry_add(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id)
+{ 
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_server_id, T_STRING);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qnil;
   }
   
@@ -74,11 +75,13 @@ VALUE rb_nm_entry_add(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id) {
   return rb_str_new((char *)nm_entry_add(nm, server_id), DIGEST_SIZE);
 }
 
-VALUE rb_nm_entry_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_time_period) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (TYPE(rb_time_period) != T_FIXNUM)) {
+VALUE rb_nm_entry_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_time_period)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Type(rb_time_period, T_FIXNUM);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qfalse;
   }
   
@@ -93,12 +96,14 @@ VALUE rb_nm_entry_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, V
   }
 }
 
-VALUE rb_nm_pseudonym_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudonym, VALUE rb_link_window, VALUE rb_mac_np) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_pseudonym) != T_STRING) ||
-      (RSTRING(rb_pseudonym)->len != DIGEST_SIZE) ||
-      (TYPE(rb_link_window) != T_FIXNUM) ||
-      (TYPE(rb_mac_np) != T_STRING) ||
+VALUE rb_nm_pseudonym_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudonym, VALUE rb_link_window, VALUE rb_mac_np)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_pseudonym, T_STRING);
+  Check_Type(rb_link_window, T_FIXNUM);
+  Check_Type(rb_mac_np, T_STRING);
+  
+  if ((RSTRING(rb_pseudonym)->len != DIGEST_SIZE) ||
       (RSTRING(rb_mac_np)->len != DIGEST_SIZE)) {
     return Qfalse;
   }
@@ -120,12 +125,14 @@ VALUE rb_nm_pseudonym_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudony
   }
 }
 
-VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_time_period, VALUE rb_link_window) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (TYPE(rb_time_period) != T_FIXNUM) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
+VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_time_period, VALUE rb_link_window)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Type(rb_time_period, T_FIXNUM);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qnil;
   }
   
@@ -143,12 +150,14 @@ VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_i
   return Data_Wrap_Struct(rb_self, NULL, blacklist_free, blacklist);
 }
 
-VALUE rb_nm_blacklist_cert_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklist_cert, VALUE rb_server_id, VALUE rb_link_window) {
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_blacklist_cert) != T_DATA) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
+VALUE rb_nm_blacklist_cert_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklist_cert, VALUE rb_server_id, VALUE rb_link_window)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_blacklist_cert, T_DATA);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qfalse;
   }
 
@@ -164,12 +173,14 @@ VALUE rb_nm_blacklist_cert_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_bla
   }
 }
 
-VALUE rb_nm_blacklist_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklist, VALUE rb_server_id, VALUE rb_link_window) {
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_blacklist) != T_DATA) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
+VALUE rb_nm_blacklist_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklist, VALUE rb_server_id, VALUE rb_link_window)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_blacklist, T_DATA);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qfalse;
   }
 
@@ -185,16 +196,14 @@ VALUE rb_nm_blacklist_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklis
   }
 }
 
-VALUE rb_nm_blacklist_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklist, VALUE rb_complaints, VALUE rb_time_period, VALUE rb_link_window) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_blacklist) != T_DATA) ||
-      ((TYPE(rb_complaints) != T_ARRAY) &&
-       (TYPE(rb_complaints) != T_NIL)) ||
-      (TYPE(rb_time_period) != T_FIXNUM) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
-    return Qnil;
-  }
-
+VALUE rb_nm_blacklist_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklist, VALUE rb_complaints, VALUE rb_time_period, VALUE rb_link_window)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_blacklist, T_DATA);
+  Check_Type(rb_complaints, T_ARRAY);
+  Check_Type(rb_time_period, T_FIXNUM);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);
   u_int   time_period = NUM2UINT(rb_time_period);
@@ -224,12 +233,14 @@ VALUE rb_nm_blacklist_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklis
 }
 
 
-VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudonym, VALUE rb_server_id, VALUE rb_link_window) { 
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_pseudonym) != T_STRING) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
+VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudonym, VALUE rb_server_id, VALUE rb_link_window)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_pseudonym, T_STRING);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qnil;
   }
 
@@ -251,10 +262,9 @@ VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudon
   }
 }
 
-VALUE rb_nm_credential_marshall(VALUE rb_self, VALUE rb_credential) {
-  if (TYPE(rb_credential) != T_DATA) {
-    return Qnil;
-  }
+VALUE rb_nm_credential_marshall(VALUE rb_self, VALUE rb_credential)
+{
+  Check_Type(rb_credential, T_DATA);
   
   credential_t *credential; Data_Get_Struct(rb_credential, credential_t, credential);
   
@@ -263,15 +273,16 @@ VALUE rb_nm_credential_marshall(VALUE rb_self, VALUE rb_credential) {
   return rb_str_new((char *)str->string, str->length);
 }
 
-VALUE rb_nm_tokens_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints, VALUE rb_time_period, VALUE rb_link_window) {
-  if ((TYPE(rb_nm_state) != T_DATA) ||
-      (TYPE(rb_blacklist) != T_DATA) ||
-      ((TYPE(rb_complaints) != T_ARRAY) &&
-       (TYPE(rb_complaints) != T_NIL)) ||
-      (TYPE(rb_server_id) != T_STRING) ||
-      (RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (TYPE(rb_time_period) != T_FIXNUM) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
+VALUE rb_nm_tokens_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints, VALUE rb_time_period, VALUE rb_link_window)
+{
+  Check_Type(rb_nm_state, T_DATA);
+  Check_Type(rb_blacklist, T_DATA);
+  Check_Type(rb_complaints, T_ARRAY);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Type(rb_time_period, T_FIXNUM);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
     return Qnil;
   }
   
