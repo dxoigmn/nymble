@@ -4,7 +4,7 @@ VALUE rb_user_initialize(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np, VAL
 {
   Check_Type(rb_pseudonym, T_STRING);
   Check_Type(rb_mac_np, T_STRING);
-  ChecK_Type(rb_verify_key_n, T_STRING);
+  Check_Type(rb_verify_key_n, T_STRING);
   
   if ((RSTRING(rb_pseudonym)->len != DIGEST_SIZE) ||
       (RSTRING(rb_mac_np)->len != DIGEST_SIZE)) {

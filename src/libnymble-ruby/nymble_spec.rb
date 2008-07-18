@@ -197,19 +197,19 @@ describe 'Nymble' do
     blacklist         = Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, @cur_link_window)
     
     Nymble.should.respond_to(:user_initialize)
-    Nymble.user_initialize(nil, mac_np, Nymble.nm_verify_key(nm_state)).should.be.nil
-    Nymble.user_initialize(pseudonym, nil, Nymble.nm_verify_key(nm_state)).should.be.nil
-    Nymble.user_initialize(pseudonym, mac_np, nil).should.be.nil
+    should.raise(TypeError) { Nymble.user_initialize(nil, mac_np, Nymble.nm_verify_key(nm_state)) }
+    should.raise(TypeError) { Nymble.user_initialize(pseudonym, nil, Nymble.nm_verify_key(nm_state)) }
+    should.raise(TypeError) { Nymble.user_initialize(pseudonym, mac_np, nil) }
     
     user_state = Nymble.user_initialize(pseudonym, mac_np, Nymble.nm_verify_key(nm_state))
     user_state.should.not.be.nil
     
     Nymble.should.respond_to(:user_pseudonym)
-    Nymble.user_pseudonym(nil).should.be.nil
+    should.raise(TypeError) { Nymble.user_pseudonym(nil) }
     Nymble.user_pseudonym(user_state).should.equal(pseudonym)
     
     Nymble.should.respond_to(:user_pseudonym_mac)
-    Nymble.user_pseudonym_mac(nil).should.be.nil
+    should.raise(TypeError) { Nymble.user_pseudonym_mac(nil) }
     Nymble.user_pseudonym_mac(user_state).should.equal(mac_np)
   end
   
@@ -226,9 +226,9 @@ describe 'Nymble' do
     server_state2     = Nymble.server_initialize(@server_id.reverse, hmac_key_ns, blacklist)
     
     Nymble.should.respond_to(:user_entry_initialize)
-    Nymble.user_entry_initialize(nil, @server_id, credential).should.be(false)
-    Nymble.user_entry_initialize(user_state, nil, credential).should.be(false)
-    Nymble.user_entry_initialize(user_state, @server_id, nil).should.be(false)
+    should.raise(TypeError) { Nymble.user_entry_initialize(nil, @server_id, credential) }
+    should.raise(TypeError) { Nymble.user_entry_initialize(user_state, nil, credential) }
+    should.raise(TypeError) { Nymble.user_entry_initialize(user_state, @server_id, nil) }
     Nymble.user_entry_initialize(user_state, @server_id, credential).should.be(true)
     
     Nymble.should.respond_to(:user_credential_get)
@@ -237,11 +237,11 @@ describe 'Nymble' do
     end
 
     Nymble.should.respond_to(:user_blacklist_update)
-    Nymble.user_blacklist_update(nil, @server_id, blacklist, @cur_link_window, @cur_time_period).should.be(false)
-    Nymble.user_blacklist_update(user_state, nil, blacklist, @cur_link_window, @cur_time_period).should.be(false)
-    Nymble.user_blacklist_update(user_state, @server_id, nil, @cur_link_window, @cur_time_period).should.be(false)
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, nil, @cur_time_period).should.be(false)
-    Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, nil).should.be(false)
+    should.raise(TypeError) { Nymble.user_blacklist_update(nil, @server_id, blacklist, @cur_link_window, @cur_time_period) }
+    should.raise(TypeError) { Nymble.user_blacklist_update(user_state, nil, blacklist, @cur_link_window, @cur_time_period) }
+    should.raise(TypeError) { Nymble.user_blacklist_update(user_state, @server_id, nil, @cur_link_window, @cur_time_period) }
+    should.raise(TypeError) { Nymble.user_blacklist_update(user_state, @server_id, blacklist, nil, @cur_time_period) }
+    should.raise(TypeError) { Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, nil) }
     Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window + 1, @cur_time_period).should.be(false)
     Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, @cur_time_period + 1).should.be(false)
     Nymble.user_blacklist_update(user_state, @server_id, blacklist, @cur_link_window, $L + 1).should.be(false)
