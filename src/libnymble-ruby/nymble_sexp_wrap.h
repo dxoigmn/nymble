@@ -15,5 +15,6 @@ VALUE rb_ticket_marshall(VALUE rb_self, VALUE rb_ticket);
 VALUE rb_ticket_unmarshall(VALUE rb_self, VALUE rb_ticket_str);
 VALUE rb_linking_token_marshall(VALUE rb_self, VALUE rb_linking_token);
 VALUE rb_linking_token_unmarshall(VALUE rb_self, VALUE rb_linking_token_str);
+VALUE rb_user_credential_unmarshall(VALUE rb_self, VALUE rb_credential_str);
 
 #endif

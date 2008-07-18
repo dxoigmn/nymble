@@ -163,3 +163,20 @@ VALUE rb_linking_token_unmarshall(VALUE rb_self, VALUE rb_linking_token_str)
     return Qnil;
   }
 }
+
+VALUE rb_user_credential_unmarshall(VALUE rb_self, VALUE rb_credential_str) {
+  Check_Type(rb_credential_str, T_DATA);
+  
+  sexpSimpleString *str = malloc(sizeof(sexpSimpleString));
+  
+  str->length = str->allocatedLength = RSTRING(rb_credential_str)->len + 1;
+  str->string = (u_char *)RSTRING(rb_credential_str)->ptr;
+  
+  credential_t *credential = str_to_credential(str);
+  
+  if (credential) {    
+    return Data_Wrap_Struct(rb_self, NULL, credential_free, credential);
+  } else {
+    return Qnil;
+  }
+}

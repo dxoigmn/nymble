@@ -12,6 +12,5 @@ VALUE rb_user_entry_exists(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_i
 VALUE rb_user_blacklist_update(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_link_window, VALUE rb_time_period);
 VALUE rb_user_blacklist_check(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_id);
 VALUE rb_user_credential_get(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_id, VALUE rb_time_period);
-VALUE rb_user_credential_unmarshall(VALUE rb_self, VALUE rb_credential_str);
 
 #endif
