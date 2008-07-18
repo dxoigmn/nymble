@@ -1,4 +1,4 @@
-#include "user.h"
+#include "nymble_user.h"
 
 void user_free(user_t *user) {
   if (!user) {

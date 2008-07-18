@@ -1,4 +1,4 @@
-#include "pseudonym_manager.h"
+#include "nymble_pseudonym_manager.h"
 
 void pm_free(pm_t *pm) {
   if (!pm) {

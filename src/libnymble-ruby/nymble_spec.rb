@@ -2,7 +2,7 @@
 
 require 'rubygems'
 require 'test/spec'
-require 'libnymble'
+require 'nymble'
 
 describe 'Nymble' do
   before do

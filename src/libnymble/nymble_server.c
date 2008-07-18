@@ -1,4 +1,4 @@
-#include "server.h"
+#include "nymble_server.h"
 
 void server_free(server_t *server) {
   if (!server) {

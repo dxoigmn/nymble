@@ -1,4 +1,4 @@
-#include "util.h"
+#include "nymble_util.h"
 
 void printbytes(u_char *bytes, u_int size) {
   int i;

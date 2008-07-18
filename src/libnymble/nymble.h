@@ -1,7 +1,7 @@
 #ifndef __NYMBLE_H__
 #define __NYMBLE_H__
 
-#include "util.h"
+#include "nymble_util.h"
 
 #include <string.h>
 
