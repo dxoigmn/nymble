@@ -3,7 +3,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'digest'
-require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'nymble')
 
 Sinatra::Application.default_options[:port] = 3000
 

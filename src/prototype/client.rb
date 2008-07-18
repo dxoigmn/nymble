@@ -4,7 +4,7 @@ require 'rubygems'
 require 'openssl'
 require 'yaml'
 require 'rest_client'
-require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'nymble')
 
 $L = 1440
 
@@ -51,7 +51,7 @@ end
 def acquire_credential
   response = YAML.parse(RestClient.get("http://localhost:3001/server/#{hexencode(@server_id)}/?pseudonym=#{@pseudonym}")).transform
   
-  @credential = Nymble.user_credential_unmarshall(response[:credential])
+  @credential = Nymble.credential_unmarshall(response[:credential])
 
   Nymble.user_entry_initialize(@user_state, @server_id, @credential)
   Nymble.user_blacklist_update(@user_state, @server_id, @blacklist, cur_link_window, cur_time_period)

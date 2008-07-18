@@ -3,7 +3,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'yaml'
-require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'nymble')
 
 Sinatra::Application.default_options[:port] = 3001
 
@@ -60,7 +60,7 @@ get '/server/:server_id/' do
   fail 'invalid server_id' unless Nymble.nm_entry_exists(NM_STATE, server_id)
   fail 'invalid pseudonym' unless Nymble.nm_pseudonym_verify(NM_STATE, pseudonym, cur_link_window, mac_np)
 
-  credential = Nymble.nm_credential_marshall(Nymble.nm_credential_create(NM_STATE, pseudonym, server_id, cur_link_window))
+  credential = Nymble.credential_marshall(Nymble.nm_credential_create(NM_STATE, pseudonym, server_id, cur_link_window))
   
   { :credential => credential }.to_yaml
 end

@@ -5,7 +5,7 @@ require 'sinatra'
 require 'rest_client'
 require 'yaml'
 require 'digest'
-require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'libnymble')
+require File.join(File.dirname(__FILE__), '..', 'libnymble-ruby', 'nymble')
 
 Sinatra::Application.default_options[:port] = 3002
 
