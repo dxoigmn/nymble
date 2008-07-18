@@ -4,8 +4,8 @@ GECKO_SDK_PATH = $(GECKO_PATH)/sdk
 CXX = g++
 CC = gcc
 
-SRCS = user.c util.c nymble_sexp.c sexp-basic.c sexp-input.c sexp-output.c nymble.c NymbleExModule.cpp NymbleEx.cpp
-OBJS = user.o util.o nymble_sexp.o sexp-basic.o sexp-input.o sexp-output.o nymble.o NymbleEx.o
+SRCS = nymble_user.c nymble_util.c nymble_sexp.c sexp-basic.c sexp-input.c sexp-output.c nymble.c NymbleExModule.cpp NymbleEx.cpp
+OBJS = nymble_user.o nymble_util.o nymble_sexp.o sexp-basic.o sexp-input.o sexp-output.o nymble.o NymbleEx.o
 
 INCFLAGS = -I../libnymble/ -I../libnymble/sexp/ -I/opt/local/include/ -I$(GECKO_SDK_PATH)/include/
 LIBPATH =  -L"." -L/opt/local/lib/ -L$(GECKO_SDK_PATH)/lib/

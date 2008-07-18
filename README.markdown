@@ -40,6 +40,6 @@ Once you have a Makefile it is all standard from there:
 ### extension
 
   1. Download the Gecko SDK from <http://developer.mozilla.org/en/docs/Gecko_SDK> and install it.
-  2. Edit the `GECKO_SDK` variable in the Makefile to reflect the location of the Gecko SDK.
+  2. Edit the `GECKO_PATH` variable in the Makefile to reflect the location of the Gecko SDK.
   3. Run `make` in the extension directory.
   4. The `build.sh` in the `extension/nymble` directory will make the extension into an XPI that can be installed in Firefox.
