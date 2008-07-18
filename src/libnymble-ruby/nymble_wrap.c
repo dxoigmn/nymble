@@ -6,10 +6,8 @@
 #include "nymble_server_wrap.h"
 #include "nymble_user_wrap.h"
 
-static VALUE rb_cNymble;
-
 void Init_nymble() {
-  rb_cNymble = rb_define_class("Nymble", rb_cObject);
+  VALUE rb_cNymble = rb_define_class("Nymble", rb_cObject);
   
   rb_define_singleton_method(rb_cNymble, "digest", rb_nymble_hash, 1);
   rb_define_singleton_method(rb_cNymble, "random_bytes", rb_nymble_random_bytes, 1);
