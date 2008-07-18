@@ -24,3 +24,12 @@ VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count)
   
   return rb_str_new((char *)buffer, sizeof(buffer));
 }
+
+VALUE rb_blacklist_cert(VALUE rb_self, VALUE rb_blacklist)
+{
+  Check_Type(rb_blacklist, T_DATA);
+
+  blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);
+  
+  return Data_Wrap_Struct(rb_self, NULL, NULL, &blacklist->cert);
+}

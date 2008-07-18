@@ -37,15 +37,6 @@ VALUE rb_pseudonym_unmarshall(VALUE rb_self, VALUE rb_pseudonym_str)
   }
 }
 
-VALUE rb_blacklist_cert(VALUE rb_self, VALUE rb_blacklist)
-{
-  Check_Type(rb_blacklist, T_DATA);
-
-  blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);
-  
-  return Data_Wrap_Struct(rb_self, NULL, NULL, &blacklist->cert);
-}
-
 VALUE rb_blacklist_cert_marshall(VALUE rb_self, VALUE rb_blacklist_cert)
 {
   Check_Type(rb_blacklist_cert, T_DATA);
@@ -164,7 +155,18 @@ VALUE rb_linking_token_unmarshall(VALUE rb_self, VALUE rb_linking_token_str)
   }
 }
 
-VALUE rb_user_credential_unmarshall(VALUE rb_self, VALUE rb_credential_str) {
+VALUE rb_credential_marshall(VALUE rb_self, VALUE rb_credential)
+{
+  Check_Type(rb_credential, T_DATA);
+  
+  credential_t *credential; Data_Get_Struct(rb_credential, credential_t, credential);
+  
+  sexpSimpleString *str = credential_to_str(credential, ADVANCED);
+  
+  return rb_str_new((char *)str->string, str->length);
+}
+
+VALUE rb_credential_unmarshall(VALUE rb_self, VALUE rb_credential_str) {
   Check_Type(rb_credential_str, T_DATA);
   
   sexpSimpleString *str = malloc(sizeof(sexpSimpleString));

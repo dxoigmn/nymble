@@ -262,17 +262,6 @@ VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudon
   }
 }
 
-VALUE rb_nm_credential_marshall(VALUE rb_self, VALUE rb_credential)
-{
-  Check_Type(rb_credential, T_DATA);
-  
-  credential_t *credential; Data_Get_Struct(rb_credential, credential_t, credential);
-  
-  sexpSimpleString *str = credential_to_str(credential, ADVANCED);
-  
-  return rb_str_new((char *)str->string, str->length);
-}
-
 VALUE rb_nm_tokens_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints, VALUE rb_time_period, VALUE rb_link_window)
 {
   Check_Type(rb_nm_state, T_DATA);
