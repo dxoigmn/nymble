@@ -1,7 +1,10 @@
 #include "nymble_pseudonym_manager_wrap.h"
 
-VALUE rb_pm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) {
-  if (TYPE(rb_hmac_key_np) != T_STRING) {
+VALUE rb_pm_initialize(VALUE rb_self, VALUE rb_hmac_key_np)
+{
+  Check_Type(rb_hmac_key_np, T_STRING);
+  
+  if (RSTRING(rb_hmac_key_np)->len != DIGEST_SIZE) {
     return Qnil;
   }
 
@@ -12,10 +15,13 @@ VALUE rb_pm_initialize(VALUE rb_self, VALUE rb_hmac_key_np) {
   return Data_Wrap_Struct(rb_self, NULL, pm_free, pm);
 }
 
-VALUE rb_pm_pseudonym_create(VALUE rb_self, VALUE rb_pm_state, VALUE rb_user_id, VALUE rb_link_window) {
-  if ((TYPE(rb_pm_state) != T_DATA) ||
-      (TYPE(rb_user_id) != T_STRING) ||
-      (TYPE(rb_link_window) != T_FIXNUM)) {
+VALUE rb_pm_pseudonym_create(VALUE rb_self, VALUE rb_pm_state, VALUE rb_user_id, VALUE rb_link_window)
+{
+  Check_Type(rb_pm_state, T_DATA);
+  Check_Type(rb_user_id, T_STRING);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  if (RSTRING(rb_user_id)->len != DIGEST_SIZE) {
     return Qnil;
   }
     

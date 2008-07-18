@@ -23,7 +23,7 @@ describe 'Nymble' do
   it 'should manage PM state' do
     Nymble.should.respond_to(:pm_initialize)
     Nymble.pm_initialize(@hmac_key_np).should.not.be.nil
-    Nymble.pm_initialize(nil).should.be.nil
+    should.raise(TypeError) { Nymble.pm_initialize(nil) }
   end
   
   it 'should manage NM state' do
@@ -76,9 +76,9 @@ describe 'Nymble' do
     pm_state2 = Nymble.pm_initialize(@hmac_key_np.reverse)
     
     Nymble.should.respond_to(:pm_pseudonym_create)
-    Nymble.pm_pseudonym_create(nil, @user_id, @cur_link_window).should.be.nil
-    Nymble.pm_pseudonym_create(pm_state, nil, @cur_link_window).should.be.nil
-    Nymble.pm_pseudonym_create(pm_state, @user_id, nil).should.be.nil
+    should.raise(TypeError) { Nymble.pm_pseudonym_create(nil, @user_id, @cur_link_window) }
+    should.raise(TypeError) { Nymble.pm_pseudonym_create(pm_state, nil, @cur_link_window) }
+    should.raise(TypeError) { Nymble.pm_pseudonym_create(pm_state, @user_id, nil) }
     
     pseudonym, mac_np   = Nymble.pm_pseudonym_create(pm_state, @user_id, @cur_link_window)
     pseudonym.should.not.be.nil
