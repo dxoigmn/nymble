@@ -141,9 +141,9 @@ describe 'Nymble' do
     blacklist         = Nymble.nm_blacklist_create(nm_state, @server_id, @cur_time_period, @cur_link_window)
 
     Nymble.should.respond_to(:server_initialize)
-    Nymble.server_initialize(nil, hmac_key_ns, blacklist).should.be.nil
-    Nymble.server_initialize(@server_id, nil, blacklist).should.be.nil
-    Nymble.server_initialize(@server_id, hmac_key_ns, nil).should.be.nil
+    should.raise(TypeError) { Nymble.server_initialize(nil, hmac_key_ns, blacklist) }
+    should.raise(TypeError) { Nymble.server_initialize(@server_id, nil, blacklist) }
+    should.raise(TypeError) { Nymble.server_initialize(@server_id, hmac_key_ns, nil) }
     Nymble.server_initialize("", hmac_key_ns, blacklist)
     Nymble.server_initialize(@server_id, "", blacklist)
 
@@ -151,10 +151,10 @@ describe 'Nymble' do
     server_state.should.not.be.nil
     
     Nymble.should.respond_to(:server_blacklist)
-    Nymble.server_blacklist(nil).should.be.nil
+    should.raise(TypeError) { Nymble.server_blacklist(nil) }
     
     Nymble.should.respond_to(:server_blacklist_finalized)
-    Nymble.server_blacklist_finalized(nil, @cur_time_period).should.be(false)
+    should.raise(TypeError) { Nymble.server_blacklist_finalized(nil, @cur_time_period) }
     Nymble.server_blacklist_finalized(server_state, @cur_time_period).should.be(false)
     Nymble.server_blacklist_finalize(server_state).should.be(true)
     Nymble.server_blacklist_finalized(server_state, @cur_time_period).should.be(true)
@@ -253,10 +253,10 @@ describe 'Nymble' do
       time_period  += 1
       nymble_ticket = Nymble.user_credential_get(user_state, @server_id, time_period)
 
-      Nymble.server_ticket_verify(nil, nymble_ticket, @cur_link_window, time_period).should.be(false)
-      Nymble.server_ticket_verify(server_state, nil, @cur_link_window, time_period).should.be(false)
-      Nymble.server_ticket_verify(server_state, nymble_ticket, nil, time_period).should.be(false)
-      Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, nil).should.be(false)
+      should.raise(TypeError) { Nymble.server_ticket_verify(nil, nymble_ticket, @cur_link_window, time_period) }
+      should.raise(TypeError) { Nymble.server_ticket_verify(server_state, nil, @cur_link_window, time_period) }
+      should.raise(TypeError) { Nymble.server_ticket_verify(server_state, nymble_ticket, nil, time_period) }
+      should.raise(TypeError) { Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, nil) }
       Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window + 1, time_period).should.be(false)
       Nymble.server_ticket_verify(server_state, nymble_ticket, @cur_link_window, time_period + 1).should.be(false)
       Nymble.server_ticket_verify(server_state2, nymble_ticket, @cur_link_window, time_period).should.be(false)
@@ -305,8 +305,8 @@ describe 'Nymble' do
     new_blacklist.should.not.be.nil
     
     Nymble.should.respond_to(:server_update)
-    Nymble.server_update(nil, blacklist, linking_tokens).should.be(false)
-    Nymble.server_update(server_state, nil, linking_tokens).should.be(false)
+    should.raise(TypeError) { Nymble.server_update(nil, blacklist, linking_tokens) }
+    should.raise(TypeError) { Nymble.server_update(server_state, nil, linking_tokens) }
     Nymble.server_update(server_state, new_blacklist, linking_tokens).should.be(true)
   end
 
@@ -372,7 +372,7 @@ describe 'Nymble' do
     new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, [], cur_time_period, cur_link_window)
                     Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
     
-    Nymble.server_update(server_state, new_blacklist, nil)
+    Nymble.server_update(server_state, new_blacklist, [])
     Nymble.server_iterate(server_state, 1)
     Nymble.server_blacklist_finalize(server_state)
     
@@ -451,7 +451,7 @@ describe 'Nymble' do
     new_blacklist = Nymble.nm_blacklist_update(nm_state, blacklist, [], cur_time_period, cur_link_window)
                     Nymble.nm_entry_update(nm_state, server_id, cur_time_period)
     
-    Nymble.server_update(server_state, new_blacklist, nil)
+    Nymble.server_update(server_state, new_blacklist, [])
     Nymble.server_blacklist_finalize(server_state)
     Nymble.server_blacklist_finalized(server_state, cur_time_period).should.be(true)
     
