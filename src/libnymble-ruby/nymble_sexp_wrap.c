@@ -4,6 +4,8 @@ VALUE rb_pseudonym_marshall(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np)
 {
   Check_Type(rb_pseudonym, T_STRING);
   Check_Type(rb_mac_np, T_STRING);
+  Check_Size(rb_pseudonym, DIGEST_SIZE);
+  Check_Size(rb_mac_np, DIGEST_SIZE);
   
   pseudonym_t pseudonym;
   

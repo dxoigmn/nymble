@@ -3,6 +3,7 @@
 
 #include "ruby.h"
 #include "nymble_sexp.h"
+#include "nymble_wrap_util.h"
 
 VALUE rb_pseudonym_marshall(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np);
 VALUE rb_pseudonym_unmarshall(VALUE rb_self, VALUE rb_pseudonym_str);

@@ -5,11 +5,8 @@ VALUE rb_server_initialize(VALUE rb_self, VALUE rb_server_id, VALUE rb_hmac_key_
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_hmac_key_ns, T_STRING);
   Check_Type(rb_blacklist, T_DATA);
-  
-  if ((RSTRING(rb_server_id)->len != DIGEST_SIZE) ||
-      (RSTRING(rb_hmac_key_ns)->len != DIGEST_SIZE)) {
-    return Qnil;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
+  Check_Size(rb_hmac_key_ns, DIGEST_SIZE);
 
   u_char  *server_id    = (u_char *)RSTRING(rb_server_id)->ptr;
   u_char  *hmac_key_ns  = (u_char *)RSTRING(rb_hmac_key_ns)->ptr;

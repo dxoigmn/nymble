@@ -3,6 +3,7 @@
 VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np)
 {
   Check_Type(rb_hmac_key_np, T_STRING);
+  Check_Size(rb_hmac_key_np, DIGEST_SIZE);
   
   u_char *hmac_key_np = (u_char *)RSTRING(rb_hmac_key_np)->ptr;
 
@@ -45,10 +46,7 @@ VALUE rb_nm_entry_exists(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id)
 {
   Check_Type(rb_nm_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t   *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -64,10 +62,7 @@ VALUE rb_nm_entry_add(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id)
 { 
   Check_Type(rb_nm_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qnil;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   u_char  *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -80,10 +75,7 @@ VALUE rb_nm_entry_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, V
   Check_Type(rb_nm_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_time_period, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   u_char  *server_id  = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -102,12 +94,9 @@ VALUE rb_nm_pseudonym_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudony
   Check_Type(rb_pseudonym, T_STRING);
   Check_Type(rb_link_window, T_FIXNUM);
   Check_Type(rb_mac_np, T_STRING);
+  Check_Size(rb_pseudonym, DIGEST_SIZE);
+  Check_Size(rb_mac_np, DIGEST_SIZE);
   
-  if ((RSTRING(rb_pseudonym)->len != DIGEST_SIZE) ||
-      (RSTRING(rb_mac_np)->len != DIGEST_SIZE)) {
-    return Qfalse;
-  }
-
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   u_char  *pseudo       = (u_char *)RSTRING(rb_pseudonym)->ptr;
   u_int   link_window   = NUM2UINT(rb_link_window);
@@ -131,10 +120,7 @@ VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_i
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_time_period, T_FIXNUM);
   Check_Type(rb_link_window, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qnil;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   u_char  *server_id  = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -156,10 +142,7 @@ VALUE rb_nm_blacklist_cert_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_bla
   Check_Type(rb_blacklist_cert, T_DATA);
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_link_window, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   blacklist_cert_t *blacklist_cert; Data_Get_Struct(rb_blacklist_cert, blacklist_cert_t, blacklist_cert);
@@ -179,10 +162,7 @@ VALUE rb_nm_blacklist_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklis
   Check_Type(rb_blacklist, T_DATA);
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_link_window, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);
@@ -239,10 +219,8 @@ VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudon
   Check_Type(rb_pseudonym, T_STRING);
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_link_window, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qnil;
-  }
+  Check_Size(rb_pseudonym, DIGEST_SIZE);
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   u_char  *pseudo = (u_char *)RSTRING(rb_pseudonym)->ptr;
@@ -270,10 +248,7 @@ VALUE rb_nm_tokens_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, 
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_time_period, T_FIXNUM);
   Check_Type(rb_link_window, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qnil;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t    *nm; Data_Get_Struct(rb_nm_state, nm_t, nm);
   blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);

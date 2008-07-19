@@ -5,12 +5,9 @@ VALUE rb_user_initialize(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np, VAL
   Check_Type(rb_pseudonym, T_STRING);
   Check_Type(rb_mac_np, T_STRING);
   Check_Type(rb_verify_key_n, T_STRING);
+  Check_Size(rb_pseudonym, DIGEST_SIZE);
+  Check_Size(rb_mac_np, DIGEST_SIZE);
   
-  if ((RSTRING(rb_pseudonym)->len != DIGEST_SIZE) ||
-      (RSTRING(rb_mac_np)->len != DIGEST_SIZE)) {
-    return Qnil;
-  }
-
   pseudonym_t pseudonym;
   memcpy(pseudonym.pseudonym, RSTRING(rb_pseudonym)->ptr, DIGEST_SIZE);
   memcpy(pseudonym.mac_np, RSTRING(rb_mac_np)->ptr, DIGEST_SIZE);
@@ -52,10 +49,7 @@ VALUE rb_user_entry_initialize(VALUE rb_self, VALUE rb_user_state, VALUE rb_serv
   Check_Type(rb_user_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_credential, T_DATA);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
   
   user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
   u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -71,10 +65,7 @@ VALUE rb_user_entry_exists(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_i
 {
   Check_Type(rb_user_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
-
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
   u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -93,10 +84,7 @@ VALUE rb_user_blacklist_update(VALUE rb_self, VALUE rb_user_state, VALUE rb_serv
   Check_Type(rb_blacklist, T_DATA);
   Check_Type(rb_link_window, T_FIXNUM);
   Check_Type(rb_time_period, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qfalse;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
   u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -115,10 +103,7 @@ VALUE rb_user_blacklist_check(VALUE rb_self, VALUE rb_user_state, VALUE rb_serve
 {
   Check_Type(rb_user_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qnil;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
   u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
@@ -135,10 +120,7 @@ VALUE rb_user_credential_get(VALUE rb_self, VALUE rb_user_state, VALUE rb_server
   Check_Type(rb_user_state, T_DATA);
   Check_Type(rb_server_id, T_STRING);
   Check_Type(rb_time_period, T_FIXNUM);
-  
-  if (RSTRING(rb_server_id)->len != DIGEST_SIZE) {
-    return Qnil;
-  }
+  Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
   u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;

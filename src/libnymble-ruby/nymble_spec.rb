@@ -24,6 +24,8 @@ describe 'Nymble' do
     Nymble.should.respond_to(:pm_initialize)
     Nymble.pm_initialize(@hmac_key_np).should.not.be.nil
     should.raise(TypeError) { Nymble.pm_initialize(nil) }
+    should.raise(ArgumentError) { Nymble.pm_initialize(@hmac_key_np * 2) }
+    should.raise(ArgumentError) { Nymble.pm_initialize("") }
   end
   
   it 'should manage NM state' do
@@ -48,8 +50,8 @@ describe 'Nymble' do
     
     Nymble.should.respond_to(:nm_entry_add)
     should.raise(TypeError) { Nymble.nm_entry_add(nm_state, nil) }
-    Nymble.nm_entry_add(nm_state, "").should.be.nil
-    Nymble.nm_entry_exists(nm_state, "").should.be(false)
+    should.raise(ArgumentError) { Nymble.nm_entry_add(nm_state, "") }
+    should.raise(ArgumentError) { Nymble.nm_entry_exists(nm_state, "") }
     should.raise(TypeError) { Nymble.nm_entry_add(nil, @server_id) }
     should.raise(TypeError) { Nymble.nm_entry_exists(nm_state, nil) }
 
@@ -144,8 +146,8 @@ describe 'Nymble' do
     should.raise(TypeError) { Nymble.server_initialize(nil, hmac_key_ns, blacklist) }
     should.raise(TypeError) { Nymble.server_initialize(@server_id, nil, blacklist) }
     should.raise(TypeError) { Nymble.server_initialize(@server_id, hmac_key_ns, nil) }
-    Nymble.server_initialize("", hmac_key_ns, blacklist)
-    Nymble.server_initialize(@server_id, "", blacklist)
+    should.raise(ArgumentError) { Nymble.server_initialize("", hmac_key_ns, blacklist) }
+    should.raise(ArgumentError) { Nymble.server_initialize(@server_id, "", blacklist) }
 
     server_state = Nymble.server_initialize(@server_id, hmac_key_ns, blacklist)
     server_state.should.not.be.nil
@@ -176,8 +178,8 @@ describe 'Nymble' do
     Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np.reverse).should.be(false)
     Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window + 1, mac_np).should.be(false)
     Nymble.nm_pseudonym_verify(nm_state2, pseudonym, @cur_link_window, mac_np).should.be(false)
-    Nymble.nm_pseudonym_verify(nm_state, "", @cur_link_window, mac_np).should.be(false)
-    Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, "").should.be(false)
+    should.raise(ArgumentError) { Nymble.nm_pseudonym_verify(nm_state, "", @cur_link_window, mac_np) }
+    should.raise(ArgumentError) { Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, "") }
     Nymble.nm_pseudonym_verify(nm_state, pseudonym, @cur_link_window, mac_np).should.be(true)
 
     Nymble.should.respond_to(:nm_credential_create)

@@ -3,6 +3,7 @@
 
 #include "ruby.h"
 #include "nymble_manager.h"
+#include "nymble_wrap_util.h"
 
 VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np);
 VALUE rb_nm_verify_key(VALUE rb_self, VALUE rb_nm_state);

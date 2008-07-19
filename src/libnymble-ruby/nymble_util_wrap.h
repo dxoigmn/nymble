@@ -3,6 +3,7 @@
 
 #include "ruby.h"
 #include "nymble_util.h"
+#include "nymble_wrap_util.h"
 
 VALUE rb_nymble_hash(VALUE rb_self, VALUE rb_value);
 VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count);

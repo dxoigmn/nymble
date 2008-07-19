@@ -3,6 +3,7 @@
 
 #include "ruby.h"
 #include "nymble_user.h"
+#include "nymble_wrap_util.h"
 
 VALUE rb_user_initialize(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np, VALUE rb_verify_key_n);
 VALUE rb_user_pseudonym(VALUE rb_self, VALUE rb_user_state);

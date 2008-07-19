@@ -3,6 +3,7 @@
 
 #include "ruby.h"
 #include "nymble_server.h"
+#include "nymble_wrap_util.h"
 
 VALUE rb_server_initialize(VALUE rb_self, VALUE rb_server_id, VALUE rb_hmac_key_ns, VALUE rb_blacklist);
 VALUE rb_server_ticket_verify(VALUE rb_self, VALUE rb_server_state, VALUE rb_nymble_ticket, VALUE rb_link_window, VALUE rb_time_period);
