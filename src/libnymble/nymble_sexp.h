@@ -1,7 +1,7 @@
 #ifndef __NYMBLE_SEXP_H__
 #define __NYMBLE_SEXP_H__
 
-#include "nymble.h"
+#include "nymble_util.h"
 #include "sexp/sexp.h"
 
 #define OBJ_TO_SEXP_FN_START(TYPE) \

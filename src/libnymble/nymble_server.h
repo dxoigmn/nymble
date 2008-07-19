@@ -1,7 +1,7 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
-#include "nymble.h"
+#include "nymble_util.h"
 #include "nymble_sexp.h"
 
 typedef struct {

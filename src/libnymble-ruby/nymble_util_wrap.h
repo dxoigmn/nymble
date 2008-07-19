@@ -2,7 +2,6 @@
 #define __UTIL_WRAP_H__
 
 #include "ruby.h"
-#include "nymble.h"
 #include "nymble_util.h"
 
 VALUE rb_nymble_hash(VALUE rb_self, VALUE rb_value);

@@ -1,7 +1,7 @@
 #ifndef __NYMBLE_MANAGER_H__
 #define __NYMBLE_MANAGER_H__
 
-#include "nymble.h"
+#include "nymble_util.h"
 #include "nymble_sexp.h"
 
 typedef struct {

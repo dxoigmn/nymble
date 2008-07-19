@@ -1,7 +1,7 @@
 #ifndef __USER_H__
 #define __USER_H__
 
-#include "nymble.h"
+#include "nymble_util.h"
 #include "nymble_sexp.h"
 
 typedef struct {
