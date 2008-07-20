@@ -9,8 +9,8 @@ VALUE rb_pseudonym_marshall(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np)
   
   pseudonym_t pseudonym;
   
-  memcpy(pseudonym.pseudonym, RSTRING(rb_pseudonym)->ptr, DIGEST_SIZE);
-  memcpy(pseudonym.mac_np, RSTRING(rb_mac_np)->ptr, DIGEST_SIZE);
+  memcpy(pseudonym.pseudonym, RSTRING_PTR(rb_pseudonym), DIGEST_SIZE);
+  memcpy(pseudonym.mac_np, RSTRING_PTR(rb_mac_np), DIGEST_SIZE);
 
   sexpSimpleString* str = pseudonym_to_str(&pseudonym, ADVANCED);
   
@@ -23,8 +23,8 @@ VALUE rb_pseudonym_unmarshall(VALUE rb_self, VALUE rb_pseudonym_str)
   
   sexpSimpleString* str = malloc(sizeof(sexpSimpleString));
   
-  str->length = str->allocatedLength = RSTRING(rb_pseudonym_str)->len + 1;
-  str->string = (u_char*)RSTRING(rb_pseudonym_str)->ptr;
+  str->length = str->allocatedLength = RSTRING_LEN(rb_pseudonym_str) + 1;
+  str->string = (u_char*)RSTRING_PTR(rb_pseudonym_str);
   
   pseudonym_t* pseudonym = str_to_pseudonym(str);
   
@@ -56,8 +56,8 @@ VALUE rb_blacklist_cert_unmarshall(VALUE rb_self, VALUE rb_blacklist_cert_str)
   
   sexpSimpleString* str = malloc(sizeof(sexpSimpleString));
   
-  str->length = str->allocatedLength = RSTRING(rb_blacklist_cert_str)->len + 1;
-  str->string = (u_char*)RSTRING(rb_blacklist_cert_str)->ptr;
+  str->length = str->allocatedLength = RSTRING_LEN(rb_blacklist_cert_str) + 1;
+  str->string = (u_char*)RSTRING_PTR(rb_blacklist_cert_str);
   
   blacklist_cert_t* blacklist_cert = str_to_blacklist_cert(str);
   
@@ -87,8 +87,8 @@ VALUE rb_blacklist_unmarshall(VALUE rb_self, VALUE rb_blacklist_str)
   
   sexpSimpleString* str = malloc(sizeof(sexpSimpleString));
   
-  str->length = str->allocatedLength = RSTRING(rb_blacklist_str)->len + 1;
-  str->string = (u_char*)RSTRING(rb_blacklist_str)->ptr;
+  str->length = str->allocatedLength = RSTRING_LEN(rb_blacklist_str) + 1;
+  str->string = (u_char*)RSTRING_PTR(rb_blacklist_str);
   
   blacklist_t* blacklist = str_to_blacklist(str);
   
@@ -116,8 +116,8 @@ VALUE rb_ticket_unmarshall(VALUE rb_self, VALUE rb_ticket_str)
   
   sexpSimpleString* str = malloc(sizeof(sexpSimpleString));
   
-  str->length = str->allocatedLength = RSTRING(rb_ticket_str)->len + 1;
-  str->string = (u_char*)RSTRING(rb_ticket_str)->ptr;
+  str->length = str->allocatedLength = RSTRING_LEN(rb_ticket_str) + 1;
+  str->string = (u_char*)RSTRING_PTR(rb_ticket_str);
   
   ticket_t* ticket = str_to_ticket(str);
   
@@ -145,8 +145,8 @@ VALUE rb_linking_token_unmarshall(VALUE rb_self, VALUE rb_linking_token_str)
   
   sexpSimpleString* str = malloc(sizeof(sexpSimpleString));
   
-  str->length = str->allocatedLength = RSTRING(rb_linking_token_str)->len + 1;
-  str->string = (u_char*)RSTRING(rb_linking_token_str)->ptr;
+  str->length = str->allocatedLength = RSTRING_LEN(rb_linking_token_str) + 1;
+  str->string = (u_char*)RSTRING_PTR(rb_linking_token_str);
   
   linking_token_t* linking_token = str_to_linking_token(str);
   
@@ -173,8 +173,8 @@ VALUE rb_credential_unmarshall(VALUE rb_self, VALUE rb_credential_str) {
   
   sexpSimpleString* str = malloc(sizeof(sexpSimpleString));
   
-  str->length = str->allocatedLength = RSTRING(rb_credential_str)->len + 1;
-  str->string = (u_char*)RSTRING(rb_credential_str)->ptr;
+  str->length = str->allocatedLength = RSTRING_LEN(rb_credential_str) + 1;
+  str->string = (u_char*)RSTRING_PTR(rb_credential_str);
   
   credential_t* credential = str_to_credential(str);
   

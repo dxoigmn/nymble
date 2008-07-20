@@ -9,12 +9,12 @@ VALUE rb_user_initialize(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np, VAL
   Check_Size(rb_mac_np, DIGEST_SIZE);
   
   pseudonym_t pseudonym;
-  memcpy(pseudonym.pseudonym, RSTRING(rb_pseudonym)->ptr, DIGEST_SIZE);
-  memcpy(pseudonym.mac_np, RSTRING(rb_mac_np)->ptr, DIGEST_SIZE);
+  memcpy(pseudonym.pseudonym, RSTRING_PTR(rb_pseudonym), DIGEST_SIZE);
+  memcpy(pseudonym.mac_np, RSTRING_PTR(rb_mac_np), DIGEST_SIZE);
 
-  const u_char* verify_key_n = (const u_char *)RSTRING(rb_verify_key_n)->ptr;
+  const u_char* verify_key_n = (const u_char *)RSTRING_PTR(rb_verify_key_n);
 
-  RSA* rsa = d2i_RSAPublicKey(NULL, &verify_key_n, RSTRING(rb_verify_key_n)->len);
+  RSA* rsa = d2i_RSAPublicKey(NULL, &verify_key_n, RSTRING_LEN(rb_verify_key_n));
   user_t* user = user_initialize(&pseudonym, rsa);
 
   return Data_Wrap_Struct(rb_self, NULL, user_free, user);
@@ -50,7 +50,7 @@ VALUE rb_user_entry_initialize(VALUE rb_self, VALUE rb_user_state, VALUE rb_serv
   Check_Size(rb_server_id, DIGEST_SIZE);
   
   user_t* user = (user_t*)DATA_PTR(rb_user_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   credential_t* credential = (credential_t*)DATA_PTR(rb_credential);
   u_int L = NUM2UINT(rb_gv_get("L"));
   
@@ -66,7 +66,7 @@ VALUE rb_user_entry_exists(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_i
   Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t* user = (user_t*)DATA_PTR(rb_user_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
 
   if (user_entry_exists(user, server_id)) {
     return Qtrue;
@@ -85,7 +85,7 @@ VALUE rb_user_blacklist_update(VALUE rb_self, VALUE rb_user_state, VALUE rb_serv
   Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t* user = (user_t*)DATA_PTR(rb_user_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   blacklist_t* blacklist = (blacklist_t*)DATA_PTR(rb_blacklist);
   u_int link_window = NUM2UINT(rb_link_window);
   u_int time_period = NUM2UINT(rb_time_period);
@@ -104,7 +104,7 @@ VALUE rb_user_blacklist_check(VALUE rb_self, VALUE rb_user_state, VALUE rb_serve
   Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t* user = (user_t*)DATA_PTR(rb_user_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
 
   if (user_blacklist_check(user, server_id)) {
     return Qtrue;
@@ -121,7 +121,7 @@ VALUE rb_user_credential_get(VALUE rb_self, VALUE rb_user_state, VALUE rb_server
   Check_Size(rb_server_id, DIGEST_SIZE);
 
   user_t* user = (user_t*)DATA_PTR(rb_user_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int time_period = NUM2UINT(rb_time_period);
 
   ticket_t* ticket = user_credential_get(user, server_id, time_period);

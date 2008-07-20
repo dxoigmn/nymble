@@ -5,7 +5,7 @@ VALUE rb_nm_initialize(VALUE rb_self, VALUE rb_hmac_key_np)
   Check_Type(rb_hmac_key_np, T_STRING);
   Check_Size(rb_hmac_key_np, DIGEST_SIZE);
   
-  u_char* hmac_key_np = (u_char*)RSTRING(rb_hmac_key_np)->ptr;
+  u_char* hmac_key_np = (u_char*)RSTRING_PTR(rb_hmac_key_np);
   nm_t*  nm = nm_initialize(hmac_key_np);
 
   return Data_Wrap_Struct(rb_self, NULL, nm_free, nm);
@@ -42,7 +42,7 @@ VALUE rb_nm_entry_exists(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id)
   Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
     
   if (nm_entry_exists(nm, server_id) == 0) {
     return Qfalse;
@@ -58,7 +58,7 @@ VALUE rb_nm_entry_add(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id)
   Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
 
   return rb_str_new((char*)nm_entry_add(nm, server_id), DIGEST_SIZE);
 }
@@ -71,7 +71,7 @@ VALUE rb_nm_entry_update(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, V
   Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int time_period = NUM2UINT(rb_time_period);
   
   if (nm_entry_update(nm, server_id, time_period)) {
@@ -95,8 +95,8 @@ VALUE rb_nm_pseudonym_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudony
 
   pseudonym_t pseudonym;
   
-  memcpy(pseudonym.pseudonym, (u_char*)RSTRING(rb_pseudonym)->ptr, DIGEST_SIZE);
-  memcpy(pseudonym.mac_np, (u_char*)RSTRING(rb_mac_np)->ptr, DIGEST_SIZE);
+  memcpy(pseudonym.pseudonym, (u_char*)RSTRING_PTR(rb_pseudonym), DIGEST_SIZE);
+  memcpy(pseudonym.mac_np, (u_char*)RSTRING_PTR(rb_mac_np), DIGEST_SIZE);
 
   if (nm_pseudonym_verify(nm, &pseudonym, link_window)) {
     return Qtrue;
@@ -114,7 +114,7 @@ VALUE rb_nm_blacklist_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_i
   Check_Size(rb_server_id, DIGEST_SIZE);
   
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int time_period = NUM2UINT(rb_time_period);
   u_int link_window = NUM2UINT(rb_link_window);
   u_int L = NUM2UINT(rb_gv_get("L"));
@@ -137,7 +137,7 @@ VALUE rb_nm_blacklist_cert_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_bla
 
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
   blacklist_cert_t* cert = (blacklist_cert_t*)DATA_PTR(rb_blacklist_cert);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int link_window = NUM2UINT(rb_link_window);
 
   if (nm_blacklist_cert_verify(nm, cert, server_id, link_window)) {
@@ -157,7 +157,7 @@ VALUE rb_nm_blacklist_verify(VALUE rb_self, VALUE rb_nm_state, VALUE rb_blacklis
 
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
   blacklist_t* blacklist = (blacklist_t*)DATA_PTR(rb_blacklist);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int link_window = NUM2UINT(rb_link_window);
 
   if (nm_blacklist_verify(nm, blacklist, server_id, link_window)) {
@@ -210,12 +210,12 @@ VALUE rb_nm_credential_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_pseudon
   Check_Size(rb_server_id, DIGEST_SIZE);
 
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int link_window = NUM2UINT(rb_link_window);
   u_int L = NUM2UINT(rb_gv_get("L"));
 
   pseudonym_t pseudonym;
-  memcpy(pseudonym.pseudonym, (u_char*)RSTRING(rb_pseudonym)->ptr, DIGEST_SIZE);
+  memcpy(pseudonym.pseudonym, (u_char*)RSTRING_PTR(rb_pseudonym), DIGEST_SIZE);
   
   credential_t* credential = nm_credential_create(nm, &pseudonym, server_id, link_window, L);
 
@@ -238,7 +238,7 @@ VALUE rb_nm_tokens_create(VALUE rb_self, VALUE rb_nm_state, VALUE rb_server_id, 
   
   nm_t* nm = (nm_t*)DATA_PTR(rb_nm_state);
   blacklist_t* blacklist = (blacklist_t*)DATA_PTR(rb_blacklist);
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
   u_int link_window = NUM2UINT(rb_link_window);
   u_int time_period = NUM2UINT(rb_time_period);
 

@@ -8,8 +8,8 @@ VALUE rb_server_initialize(VALUE rb_self, VALUE rb_server_id, VALUE rb_hmac_key_
   Check_Size(rb_server_id, DIGEST_SIZE);
   Check_Size(rb_hmac_key_ns, DIGEST_SIZE);
 
-  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
-  u_char* hmac_key_ns = (u_char*)RSTRING(rb_hmac_key_ns)->ptr;
+  u_char* server_id = (u_char*)RSTRING_PTR(rb_server_id);
+  u_char* hmac_key_ns = (u_char*)RSTRING_PTR(rb_hmac_key_ns);
   blacklist_t* blacklist = (blacklist_t*)DATA_PTR(rb_blacklist);
 
   server_t* server = server_initialize(server_id, hmac_key_ns, blacklist);
