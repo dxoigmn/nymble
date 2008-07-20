@@ -12,12 +12,10 @@ VALUE rb_user_initialize(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_mac_np, VAL
   memcpy(pseudonym.pseudonym, RSTRING(rb_pseudonym)->ptr, DIGEST_SIZE);
   memcpy(pseudonym.mac_np, RSTRING(rb_mac_np)->ptr, DIGEST_SIZE);
 
-  const u_char *ptr = (const u_char *)RSTRING(rb_verify_key_n)->ptr;
+  const u_char* verify_key_n = (const u_char *)RSTRING(rb_verify_key_n)->ptr;
 
-  RSA *rsa = d2i_RSAPublicKey(NULL, &ptr, RSTRING(rb_verify_key_n)->len);
-  
-
-  user_t *user = user_initialize(&pseudonym, rsa);
+  RSA* rsa = d2i_RSAPublicKey(NULL, &verify_key_n, RSTRING(rb_verify_key_n)->len);
+  user_t* user = user_initialize(&pseudonym, rsa);
 
   return Data_Wrap_Struct(rb_self, NULL, user_free, user);
 }
@@ -26,22 +24,22 @@ VALUE rb_user_pseudonym(VALUE rb_self, VALUE rb_user_state)
 {
   Check_Type(rb_user_state, T_DATA);
   
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
   
-  pseudonym_t *pseudonym = user_pseudonym(user);
+  pseudonym_t* pseudonym = user_pseudonym(user);
 
-  return rb_str_new((char *)pseudonym->pseudonym, DIGEST_SIZE);
+  return rb_str_new((char*)pseudonym->pseudonym, DIGEST_SIZE);
 }
 
 VALUE rb_user_pseudonym_mac(VALUE rb_self, VALUE rb_user_state)
 {
   Check_Type(rb_user_state, T_DATA);
   
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
   
-  pseudonym_t *pseudonym = user_pseudonym(user);
+  pseudonym_t* pseudonym = user_pseudonym(user);
 
-  return rb_str_new((char *)pseudonym->mac_np, DIGEST_SIZE);
+  return rb_str_new((char*)pseudonym->mac_np, DIGEST_SIZE);
 }
 
 VALUE rb_user_entry_initialize(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_id, VALUE rb_credential)
@@ -51,9 +49,9 @@ VALUE rb_user_entry_initialize(VALUE rb_self, VALUE rb_user_state, VALUE rb_serv
   Check_Type(rb_credential, T_DATA);
   Check_Size(rb_server_id, DIGEST_SIZE);
   
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
-  u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
-  credential_t *credential; Data_Get_Struct(rb_credential, credential_t, credential);
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
+  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  credential_t* credential = (credential_t*)DATA_PTR(rb_credential);
   u_int L = NUM2UINT(rb_gv_get("L"));
   
   user_entry_initialize(user, server_id, credential, L);
@@ -67,8 +65,8 @@ VALUE rb_user_entry_exists(VALUE rb_self, VALUE rb_user_state, VALUE rb_server_i
   Check_Type(rb_server_id, T_STRING);
   Check_Size(rb_server_id, DIGEST_SIZE);
 
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
-  u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
+  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
 
   if (user_entry_exists(user, server_id)) {
     return Qtrue;
@@ -86,9 +84,9 @@ VALUE rb_user_blacklist_update(VALUE rb_self, VALUE rb_user_state, VALUE rb_serv
   Check_Type(rb_time_period, T_FIXNUM);
   Check_Size(rb_server_id, DIGEST_SIZE);
 
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
-  u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
-  blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
+  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
+  blacklist_t* blacklist = (blacklist_t*)DATA_PTR(rb_blacklist);
   u_int link_window = NUM2UINT(rb_link_window);
   u_int time_period = NUM2UINT(rb_time_period);
 
@@ -105,8 +103,8 @@ VALUE rb_user_blacklist_check(VALUE rb_self, VALUE rb_user_state, VALUE rb_serve
   Check_Type(rb_server_id, T_STRING);
   Check_Size(rb_server_id, DIGEST_SIZE);
 
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
-  u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
+  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
 
   if (user_blacklist_check(user, server_id)) {
     return Qtrue;
@@ -122,11 +120,11 @@ VALUE rb_user_credential_get(VALUE rb_self, VALUE rb_user_state, VALUE rb_server
   Check_Type(rb_time_period, T_FIXNUM);
   Check_Size(rb_server_id, DIGEST_SIZE);
 
-  user_t *user; Data_Get_Struct(rb_user_state, user_t, user);
-  u_char *server_id = (u_char *)RSTRING(rb_server_id)->ptr;
+  user_t* user = (user_t*)DATA_PTR(rb_user_state);
+  u_char* server_id = (u_char*)RSTRING(rb_server_id)->ptr;
   u_int time_period = NUM2UINT(rb_time_period);
 
-  ticket_t *ticket = user_credential_get(user, server_id, time_period);
+  ticket_t* ticket = user_credential_get(user, server_id, time_period);
   
   if (ticket) {
     return Data_Wrap_Struct(rb_self, NULL, NULL, ticket);

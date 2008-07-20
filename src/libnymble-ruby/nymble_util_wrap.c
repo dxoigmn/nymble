@@ -2,9 +2,9 @@
 
 VALUE rb_nymble_hash(VALUE rb_self, VALUE rb_value)
 {
-  rb_value      = rb_funcall(rb_value, rb_intern("to_s"), 0);
-  u_char *value = (u_char *)RSTRING(rb_value)->ptr;
-  u_int size    = RSTRING(rb_value)->len;
+  rb_value  = rb_funcall(rb_value, rb_intern("to_s"), 0);
+  u_char* value = (u_char*)RSTRING(rb_value)->ptr;
+  u_int size = RSTRING(rb_value)->len;
   
   u_char buffer[DIGEST_SIZE];
   
@@ -29,7 +29,7 @@ VALUE rb_blacklist_cert(VALUE rb_self, VALUE rb_blacklist)
 {
   Check_Type(rb_blacklist, T_DATA);
 
-  blacklist_t *blacklist; Data_Get_Struct(rb_blacklist, blacklist_t, blacklist);
+  blacklist_t* blacklist = (blacklist_t*)DATA_PTR(rb_blacklist);
   
   return Data_Wrap_Struct(rb_self, NULL, NULL, &blacklist->cert);
 }
