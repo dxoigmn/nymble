@@ -15,10 +15,15 @@ class UserEntry
   Blacklist* blacklist;
   
   public:
-    UserEntry(u_char* server_id, Blacklist* blacklist, Credential* credential);
+    UserEntry(Blacklist* blacklist);
     
     u_char* getServerId();
+    
+    void setCredential(Credential* credential);
     Credential* getCredential();
+    
+    void setBlacklist(Blacklist* blacklist);
+    Blacklist* getBlacklist();
 };
 
 #endif

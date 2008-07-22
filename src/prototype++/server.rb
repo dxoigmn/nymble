@@ -26,11 +26,9 @@ before do
 end
 
 get '/nymble/' do
-  server_id = @@server.server_id
   blacklist = @@server.blacklist
 
   { 
-    :server_id  => Nymble.hexencode(server_id),
     :blacklist  => blacklist.marshall
   }.to_json
 end

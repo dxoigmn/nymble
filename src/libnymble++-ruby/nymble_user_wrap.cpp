@@ -34,23 +34,35 @@ VALUE rb_user_pseudonym(VALUE rb_self)
   return Data_Wrap_Struct(rb_cPseudonym, NULL, NULL, user->getPseudonym());
 }
 
-VALUE rb_user_add_server(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_credential)
+VALUE rb_user_add_blacklist(VALUE rb_self, VALUE rb_blacklist)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cUser);
-  Check_Type(rb_server_id, T_STRING);
-  Check_Size(rb_server_id, DIGEST_SIZE);
   Check_Type(rb_blacklist, T_DATA);
   Check_Class(rb_blacklist, rb_cBlacklist);
+  
+  User* user = (User*) DATA_PTR(rb_self);
+  Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_blacklist);
+  u_char* server_id = user->addBlacklist(blacklist);
+  
+  if (server_id == NULL) {
+    return Qnil;
+  }
+  
+  return rb_str_new((char*) server_id, DIGEST_SIZE);
+}
+
+VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_credential)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
   Check_Type(rb_credential, T_DATA);
   Check_Class(rb_credential, rb_cCredential);
   
   User* user = (User*) DATA_PTR(rb_self);
-  u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
-  Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_blacklist);
   Credential* credential = (Credential*) DATA_PTR(rb_credential);
   
-  if (user->addServer(server_id, blacklist, credential)) {
+  if (user->addCredential(credential)) {
     return Qtrue;
   }
   

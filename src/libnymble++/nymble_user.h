@@ -13,7 +13,7 @@ class User : public Nymble, public UserEntries
   Pseudonym* pseudonym;
   RSA* verify_key_n;
   
-  UserEntry* findServer(u_char* server_id);
+  UserEntry* findEntry(u_char* server_id);
   
   public:
     User();
@@ -24,7 +24,8 @@ class User : public Nymble, public UserEntries
     
     void setVerifyKeyN(u_char** verify_key_n, u_int verify_key_n_len);
     
-    UserEntry* addServer(u_char* server_id, Blacklist* blacklist, Credential* credential);
+    u_char* addBlacklist(Blacklist* blacklist);
+    bool addCredential(Credential* credential);
     Ticket* getTicket(u_char* server_id);
 };
 

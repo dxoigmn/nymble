@@ -32,37 +32,67 @@ void User::setVerifyKeyN(u_char** verify_key_n, u_int verify_key_n_len)
   this->verify_key_n = d2i_RSAPublicKey(NULL, (const u_char**)verify_key_n, verify_key_n_len);
 }
 
-UserEntry* User::addServer(u_char* server_id, Blacklist* blacklist, Credential* credential)
+u_char* User::addBlacklist(Blacklist* blacklist)
 {
-  UserEntry* entry = new UserEntry(server_id, blacklist, credential);
+  // TODO: Check blacklist integrity, return NULL if not
   
-  this->push_back(entry);
+  UserEntry* entry = this->findEntry(blacklist->getServerId());
   
-  return entry;
+  if (entry == NULL) {
+    entry = new UserEntry(blacklist);
+    this->push_back(entry);
+  } else {
+    entry->setBlacklist(blacklist);
+  }
+  
+  return entry->getServerId();
 }
 
-UserEntry* User::findServer(u_char* server_id)
+bool User::addCredential(Credential* credential)
 {
-  for (UserEntries::iterator entry = this->begin(); entry != this->end(); ++entry) {
-    if (memcmp((*entry)->getServerId(), server_id, DIGEST_SIZE) == 0) {
-      return *entry;
+  Ticket* ticket = credential->front();
+  UserEntry* entry = this->findEntry(ticket->getServerId());
+  
+  if (entry == NULL) {
+    return false;
+  }
+  
+  entry->setCredential(credential);
+  
+  return true;
+}
+
+Ticket* User::getTicket(u_char* server_id)
+{
+  UserEntry* entry = this->findEntry(server_id);
+  
+  if (entry == NULL) {
+    return NULL;
+  }
+  
+  Credential* credential = entry->getCredential();
+  Blacklist* blacklist = entry->getBlacklist();
+  
+  if (credential == NULL || blacklist == NULL) {
+    return NULL;
+  }
+  
+  // TODO: Check blacklist, return NULL if on it
+  
+  for (Tickets::iterator ticket = credential->begin(); ticket != credential->end(); ++ticket) {
+    if ((*ticket)->getTimePeriod() == this->cur_time_period) {
+      return *ticket;
     }
   }
   
   return NULL;
 }
 
-Ticket* User::getTicket(u_char* server_id)
+UserEntry* User::findEntry(u_char* server_id)
 {
-  UserEntry* entry = findServer(server_id);
-  
-  if (entry == NULL) {
-    return NULL;
-  }
-  
-  for (Tickets::iterator ticket = entry->getCredential()->begin(); ticket != entry->getCredential()->end(); ++ticket) {
-    if ((*ticket)->getTimePeriod() == this->cur_time_period) {
-      return *ticket;
+  for (UserEntries::iterator entry = this->begin(); entry != this->end(); ++entry) {
+    if (memcmp((*entry)->getServerId(), server_id, DIGEST_SIZE) == 0) {
+      return *entry;
     }
   }
   

@@ -14,7 +14,8 @@ extern VALUE rb_cUser;
 VALUE rb_user_new(VALUE rb_self);
 VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_n);
 VALUE rb_user_pseudonym(VALUE rb_self);
-VALUE rb_user_add_server(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_credential);
+VALUE rb_user_add_blacklist(VALUE rb_self, VALUE rb_blacklist);
+VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_credential);
 VALUE rb_user_ticket(VALUE rb_self, VALUE rb_server_id);
 
 void rb_user_delete(User* user);

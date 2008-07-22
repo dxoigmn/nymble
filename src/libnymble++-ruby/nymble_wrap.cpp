@@ -52,7 +52,6 @@ void Init_nymble() {
   rb_cServer = rb_define_class_under(rb_cNymble, "Server", rb_cNymble);
   rb_define_alloc_func(rb_cServer, rb_server_new);
   rb_define_method(rb_cServer, "initialize", RUBY_METHOD_FUNC(rb_server_init), 3);
-  rb_define_method(rb_cServer, "server_id", RUBY_METHOD_FUNC(rb_server_server_id), 0);
   rb_define_method(rb_cServer, "blacklist", RUBY_METHOD_FUNC(rb_server_blacklist), 0);
   rb_define_method(rb_cServer, "valid_ticket?", RUBY_METHOD_FUNC(rb_server_verify_ticket), 1);
   
@@ -60,7 +59,8 @@ void Init_nymble() {
   rb_define_alloc_func(rb_cUser, rb_user_new);
   rb_define_method(rb_cUser, "initialize", RUBY_METHOD_FUNC(rb_user_init), 2);
   rb_define_method(rb_cUser, "pseudonym", RUBY_METHOD_FUNC(rb_user_pseudonym), 0);
-  rb_define_method(rb_cUser, "add_server", RUBY_METHOD_FUNC(rb_user_add_server), 3);
+  rb_define_method(rb_cUser, "add_blacklist", RUBY_METHOD_FUNC(rb_user_add_blacklist), 1);
+  rb_define_method(rb_cUser, "add_credential", RUBY_METHOD_FUNC(rb_user_add_credential), 1);
   rb_define_method(rb_cUser, "ticket", RUBY_METHOD_FUNC(rb_user_ticket), 1);
 }
 

@@ -14,35 +14,26 @@ def acquire_pseudonym
   Nymble::User.new(pseudonym, verify_key)
 end
 
-def acquire_blacklist_and_credential(user)
+def acquire_blacklist(user)
   data = JSON.parse(RestClient.get('http://localhost:3002/nymble/'))
-  
-  server_id  = Nymble.hexdecode(data['server_id'])
   blacklist  = Nymble::Blacklist.unmarshall(data['blacklist'])
   
-  data = JSON.parse(RestClient.get("http://localhost:3001/server/#{Nymble.hexencode(server_id)}/?pseudonym=#{user.pseudonym.marshall}"))
-  
-  credential = Nymble::Credential.unmarshall(data['credential'])
-  
-  return nil unless user.add_server(server_id, blacklist, credential)
-  
-  server_id
+  user.add_blacklist(blacklist)
 end
 
 def acquire_credential(user, server_id)
+  data = JSON.parse(RestClient.get("http://localhost:3001/server/#{Nymble.hexencode(server_id)}/?pseudonym=#{user.pseudonym.marshall}"))
+  credential = Nymble::Credential.unmarshall(data['credential'])
   
-  
-  entry = user.find_server(server_id)
-  entry.credential = credential
+  user.add_credential(credential)
 end
 
 def authenticate
-  fail 'Unable to acquire pseudonym'                unless (user = acquire_pseudonym)
-  fail 'Unable to acquire blacklist and credential' unless (server_id = acquire_blacklist_and_credential(user))
+  fail 'Unable to acquire pseudonym'  unless (user = acquire_pseudonym)
+  fail 'Unable to acquire blacklist'  unless (server_id = acquire_blacklist(user))
+  fail 'Unable to acquire credential' unless acquire_credential(user, server_id)
   
-  ticket = user.ticket(server_id)
-  
-  fail 'Unable to get ticket' unless ticket
+  fail 'Unable to get ticket' unless (ticket = user.ticket(server_id))
   
   RestClient.post('http://localhost:3002/nymble/', { :ticket => ticket.marshall })
 end
