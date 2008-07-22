@@ -34,7 +34,7 @@ get '/nymble/' do
 end
 
 post '/nymble/' do
-  ticket = Nymble::Ticket.unmarshall(request[:ticket])
+  ticket = Nymble::Ticket.unmarshall(request[:ticket]) if request[:ticket]
   
   if @@server.valid_ticket?(ticket)
     'you are blacklisted'
