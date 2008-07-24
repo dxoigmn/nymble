@@ -1,92 +1,39 @@
-netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-Components.utils.import("resource://gre/modules/JSON.jsm");
+google.load('jquery', '1');
 
-function acquire_pseudonym() {
-  var xpcom = Components.classes['@nymble.cs.dartmouth.edu/nymble/NymbleUser;1'].createInstance();
-  var user = xpcom.QueryInterface(Components.interfaces.nsINymbleUser);
-  var req = new XMLHttpRequest();
+google.setOnLoadCallback(function() {
+  netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
   
-  req.open('POST', 'http://0.0.0.0:3000/pseudonym', false);
-  req.send(null);
-
-  if (req.status != 200) {
-    return null;
-  }
-  
-  response = JSON.fromString(req.responseText);
-  user.setPseudonym(response.pseudonym);
-  
-  return user;
-}
-
-function acquire_blacklist(user) {
-  var req = new XMLHttpRequest();
-  
-  req.open('GET', 'http://localhost:3002/nymble/', false);
-  req.send(null);
-  
-  if (req.status != 200) {
-    return null;
-  }
-  
-  response = JSON.fromString(req.responseText);
-  
-  return user.addBlacklist(response.blacklist);
-}
-
-function acquire_credential(user, server_id) {
-  var req = new XMLHttpRequest();
-  
-  req.open('GET', 'http://localhost:3001/server/' + server_id + '/?pseudonym=' + user.getPseudonym(), false);
-  req.send(null);
-  
-  if (req.status != 200) {
-    return null;
-  }
-  
-  response = JSON.fromString(req.responseText);
-  
-  return user.addCredential(response.credential);
-}
-
-function authenticate() {
-  var user = acquire_pseudonym();
-  
-  if (!user) {
-    return 'Unable to acquire pseudonym';
-  }
-  
-  var server_id = acquire_blacklist(user);
-  
-  if (!server_id) { 
-    return 'Unable to acquire blacklist';
-  }
-  
-  if (!acquire_credential(user, server_id)) {
-    return 'Unable to acquire credential';
-  }
-  
-  var ticket = user.getTicket(server_id);
-
-  if (!ticket) {
-    return 'Unable to get ticket';
-  }
-  
-  var req = new XMLHttpRequest();
-  var params = 'ticket=' + escape(ticket);
-  
-  req.open('POST', 'http://localhost:3002/nymble/', false);
-  req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  req.setRequestHeader("Content-length", params.length);
-  req.setRequestHeader("Connection", "close");
-  
-  req.send(params);
-  
-  if (req.status != 200) {
-    return null;
-  }
-  
-  return req.responseText;
-}
-
-document.write(authenticate());
+  jQuery('form').each(function() {
+    var form = this;
+    var pseudonym_manager = jQuery('link[rel="nymble.pseudonym_manager"]')[0].href;
+    var nymble_manager    = jQuery('link[rel="nymble.manager"]')[0].href;
+    var server_blacklist  = jQuery('link[rel="nymble.blacklist"]')[0].href;
+    
+    var user = Components.classes['@nymble.cs.dartmouth.edu/nymble/NymbleUser;1'].createInstance().QueryInterface(Components.interfaces.nsINymbleUser);
+    
+    jQuery('p.status').append('Getting pseudonym...');
+    
+    jQuery.post(pseudonym_manager, null, function(data, textStatus) {
+      netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+      
+      user.setPseudonym(data.pseudonym);
+      jQuery('p.status').append('done!<br/>Getting blacklist...');
+      
+      jQuery.get(server_blacklist, null, function(data, textStatus) {
+        netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+        
+        server_id = user.addBlacklist(data.blacklist);
+        jQuery('p.status').append('done!</br>Getting credential...');
+        
+        jQuery.get(nymble_manager + server_id + '/', { 'pseudonym': user.getPseudonym() }, function(data, textStatus) {
+          netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+          
+          user.addCredential(data.credential);
+          
+          console.log('done!');
+          jQuery('input[id="nymble_ticket"]')[0].value = user.getTicket(server_id);
+        }, 'json');
+      }, 'json');
+    }, 'json');
+  });
+});
