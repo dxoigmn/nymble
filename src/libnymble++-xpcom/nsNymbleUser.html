@@ -8,10 +8,10 @@
     
     <p>If you have a Nymble enabled browser, then it should prompt you to login with your Nymble credentials.</p>
     
-    <form method="post" action="http://0.0.0.0:3002/nymble/">
-      <link rel="nymble.blacklist" href="http://0.0.0.0:3002/nymble/" />
-      <link rel="nymble.manager" href="http://0.0.0.0:3001/server/" />
-      <link rel="nymble.pseudonym_manager" href="http://0.0.0.0:3000/pseudonym" />
+    <form method="post" action="http://localhost:3002/nymble/">
+      <link rel="nymble.blacklist" href="http://localhost:3002/nymble/" />
+      <link rel="nymble.manager" href="http://localhost:3001/server/" />
+      <link rel="nymble.pseudonym_manager" href="http://localhost:3000/pseudonym" />
       
       <div id="nymble_ticket">
         <label for="nymble_ticket">Ticket: </label><input type="text" id="nymble_ticket" name="ticket" />
@@ -20,6 +20,6 @@
       <input type="submit" value="Login" />
     </form>
     
-    <p id="status" />
+    <p id="status"><strong>Status</strong><br/></p>
   </body>
 </html>

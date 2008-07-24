@@ -20,13 +20,12 @@ before do
   @@nm.time_period = (cur_time.hour * 60 + cur_time.min) / 1
 end
 
-post '/server/' do
-  server_id   = Nymble.random_bytes(Nymble::DIGEST_SIZE)
+post '/server/:server_id' do
+  server_id   = Nymble.hexdecode(params[:server_id])
   hmac_key_ns = @@nm.add_server(server_id)
   blacklist   = @@nm.create_blacklist(server_id)
 
   { 
-    :server_id    => Nymble.hexencode(server_id),
     :hmac_key_ns  => Nymble.hexencode(hmac_key_ns),
     :blacklist    => blacklist.marshall
   }.to_json

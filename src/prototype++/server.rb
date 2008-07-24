@@ -9,9 +9,10 @@ require File.join(File.dirname(__FILE__), '..', 'libnymble++-ruby', 'nymble')
 Sinatra::Application.default_options[:port] = 3002
 
 configure do
-  data = JSON.parse(RestClient.post('http://localhost:3001/server/', ''))
+  server_id = Nymble.digest('http://localhost:3001')
   
-  server_id = Nymble.hexdecode(data['server_id'])
+  data = JSON.parse(RestClient.post("http://localhost:3001/server/#{Nymble.hexencode(server_id)}", ''))
+  
   hmac_key_ns = Nymble.hexdecode(data['hmac_key_ns'])
   blacklist = Nymble::Blacklist.unmarshall(data['blacklist'])
   
