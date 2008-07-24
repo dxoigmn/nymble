@@ -8,6 +8,11 @@ google.setOnLoadCallback(function() {
     var pseudonym_manager = jQuery('link[rel="nymble.pseudonym_manager"]').get(0).href;
     var nymble_manager    = jQuery('link[rel="nymble.manager"]').get(0).href;
     var server_blacklist  = jQuery('link[rel="nymble.blacklist"]').get(0).href;
+    
+    if (!pseudonym_manager || !nymble_manager || !server_blacklist || !confirm("Do you want to acquire a nymble to authenticate with?")) {
+      return null;
+    }
+    
     var user = Components.classes['@nymble.cs.dartmouth.edu/nymble/NymbleUser;1'].createInstance().QueryInterface(Components.interfaces.nsINymbleUser);
     
     jQuery('p.status').append('Getting pseudonym...');
@@ -29,7 +34,6 @@ google.setOnLoadCallback(function() {
           
           user.addCredential(data.credential);
           
-          console.log('done!');
           jQuery('input[id="nymble_ticket"]')[0].value = user.getTicket(server_id);
         }, 'json');
       }, 'json');
