@@ -5,10 +5,9 @@ google.setOnLoadCallback(function() {
   
   jQuery('form').each(function() {
     var form = this;
-    var pseudonym_manager = jQuery('link[rel="nymble.pseudonym_manager"]')[0].href;
-    var nymble_manager    = jQuery('link[rel="nymble.manager"]')[0].href;
-    var server_blacklist  = jQuery('link[rel="nymble.blacklist"]')[0].href;
-    
+    var pseudonym_manager = jQuery('link[rel="nymble.pseudonym_manager"]').get(0).href;
+    var nymble_manager    = jQuery('link[rel="nymble.manager"]').get(0).href;
+    var server_blacklist  = jQuery('link[rel="nymble.blacklist"]').get(0).href;
     var user = Components.classes['@nymble.cs.dartmouth.edu/nymble/NymbleUser;1'].createInstance().QueryInterface(Components.interfaces.nsINymbleUser);
     
     jQuery('p.status').append('Getting pseudonym...');
