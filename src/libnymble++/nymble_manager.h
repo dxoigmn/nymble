@@ -1,8 +1,6 @@
 #ifndef __NYMBLE_MANAGER_H__
 #define __NYMBLE_MANAGER_H__
 
-#include <vector>
-
 #include "nymble.h"
 #include "nymble_manager_entry.h"
 #include "nymble_blacklist.h"

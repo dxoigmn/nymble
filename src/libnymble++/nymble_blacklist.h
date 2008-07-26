@@ -1,11 +1,8 @@
 #ifndef __NYMBLE_BLACKLIST_H__
 #define __NYMBLE_BLACKLIST_H__
 
-#include <vector>
-
 #include "nymble.h"
 #include "nymble_credential.h"
-#include "libjson/json.h"
 
 typedef std::vector<u_char*> Nymbles;
 
@@ -34,7 +31,7 @@ class Blacklist : public Nymbles
     void hmac(u_char* hmac_key_n, u_char* out = NULL);
     void sign(RSA* sign_key_n, u_char* out = NULL);
     
-    u_int marshall(char* out = NULL);
+    char* marshall();
     static Blacklist* unmarshall(char* bytes);
 };
 

@@ -19,12 +19,12 @@ VALUE rb_blacklist_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cBlacklist);
   
   Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_self);
-  u_int bytes_len = blacklist->marshall();
-  char bytes[bytes_len];
+  char* marshalled_blacklist = blacklist->marshall();
+  VALUE rb_marshalled_blacklist = rb_str_new(marshalled_blacklist, strlen(marshalled_blacklist));
   
-  blacklist->marshall(bytes);
+  free(marshalled_blacklist);
   
-  return rb_str_new(bytes, bytes_len);
+  return rb_marshalled_blacklist;
 }
 
 

@@ -40,10 +40,7 @@ NS_IMETHODIMP nsNymbleUser::GetPseudonym(char **_retval)
   if (pseudonym == NULL) {
     *_retval = NULL;
   } else {
-    u_int size = pseudonym->marshall();
-    *_retval = (char*) malloc(size+1);
-    *_retval[size] = 0;
-    pseudonym->marshall(*_retval);
+    *_retval = pseudonym->marshall();
   }
   
   return NS_OK;
@@ -59,9 +56,7 @@ NS_IMETHODIMP nsNymbleUser::AddBlacklist(const char *marshalled_blacklist, char 
   if (server_id == NULL) {
     *_retval = NULL;
   } else {
-    *_retval = (char*) malloc(DIGEST_SIZE*2+1);
-    *_retval[DIGEST_SIZE*2] = 0;
-    Nymble::hexencode(*_retval, server_id, DIGEST_SIZE);
+    *_retval = Nymble::hexencode(server_id, DIGEST_SIZE);
   }
   
   delete blacklist;
@@ -85,18 +80,18 @@ NS_IMETHODIMP nsNymbleUser::AddCredential(const char *marshalled_credential, PRB
 /* string getTicket (in string serverId); */
 NS_IMETHODIMP nsNymbleUser::GetTicket(const char *serverId, char **_retval)
 {
-  u_char server_id[DIGEST_SIZE];
+  u_int server_id_len;
+  u_char* server_id = Nymble::hexdecode((char*) serverId, &server_id_len);
+  Ticket* ticket;
   
-  Nymble::hexdecode(server_id, (char*) serverId, DIGEST_SIZE*2);
-  Ticket* ticket = this->user->getTicket(server_id);
+  if (server_id_len == DIGEST_SIZE) {
+    ticket = this->user->getTicket(server_id);
+  }
   
   if (ticket == NULL) {
     *_retval = NULL;
   } else {
-    u_int size = ticket->marshall();
-    *_retval = (char*) malloc(size+1);
-    (*_retval)[size] = 0;
-    ticket->marshall(*_retval);
+    *_retval = ticket->marshall();
   }
   
   return NS_OK;

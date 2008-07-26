@@ -210,7 +210,7 @@ context 'Credential' do
     nm = Nymble::NymbleManager.new(Nymble.digest('hmac_key_np'))
     nm.add_server(Nymble.digest('server_id'))
     pseudonym = pm.create_pseudonym(Nymble.digest('user_id'))
-    @credential = nm.create_credential(Nymble.digest('server_id'), pseudonym, 1440)
+    @credential = nm.create_credential(Nymble.digest('server_id'), pseudonym, 1)
   end
   
   it 'should be (un)marshallable' do
@@ -271,6 +271,8 @@ context 'User' do
     @pseudonym = Nymble::PseudonymManager.new(hmac_key_np).create_pseudonym(user_id)
     @user = Nymble::User.new(@pseudonym, @nm.verify_key)
     @nm.add_server(@server_id).should.not.be.nil
+    @credential = @nm.create_credential(@server_id, @pseudonym, 1)
+    @blacklist = @nm.create_blacklist(@server_id)
   end
   
   it 'should be defined under Nymble' do
@@ -295,10 +297,15 @@ context 'User' do
     @user.time_period.should.equal(32)
   end
   
-  it 'should manage servers' do
-    @user.should.respond_to?(:add_server)
-    entry = @user.add_server(@server_id)
-    entry.should.blacklist = @nm.create_blacklist(@server_id)
-    entry.credential = @nm.create_credential(@server_id, @pseudonym, 1440)
+  it 'should manage blacklist' do
+    @user.should.respond_to?(:add_blacklist)
+    @user.add_blacklist(@nm.create_blacklist(@server_id)).should.equal(@server_id)
+  end
+  
+  it 'should manage credentials' do
+    @user.should.respond_to?(:add_credential)
+    @user.should.not.add_credential(@credential)
+    @user.add_blacklist(@blacklist).should.equal(@server_id)
+    @user.should.add_credential(@credential)
   end
 end

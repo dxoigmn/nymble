@@ -1,8 +1,6 @@
 #ifndef __NYMBLE_SERVER_H__
 #define __NYMBLE_SERVER_H__
 
-#include <vector>
-
 #include "nymble.h"
 #include "nymble_linking_token.h"
 #include "nymble_blacklist.h"

@@ -19,7 +19,7 @@ class Pseudonym
     void setMacNP(u_char* mac_np);
     u_char* getMacNP();
     
-    u_int marshall(char* out = NULL);
+    char* marshall();
     static Pseudonym* unmarshall(char* bytes);
 };
 

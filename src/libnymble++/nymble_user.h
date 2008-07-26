@@ -1,8 +1,6 @@
 #ifndef __NYMBLE_USER_H__
 #define __NYMBLE_USER_H__
 
-#include <vector>
-
 #include "nymble.h"
 #include "nymble_user_entry.h"
 

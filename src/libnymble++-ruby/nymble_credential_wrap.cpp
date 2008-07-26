@@ -18,12 +18,12 @@ VALUE rb_credential_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cCredential);
   
   Credential* credential = (Credential*) DATA_PTR(rb_self);
-  u_int bytes_len = credential->marshall();
-  char bytes[bytes_len];
+  char* marshalled_credential = credential->marshall();
+  VALUE rb_marshalled_credential = rb_str_new(marshalled_credential, strlen(marshalled_credential));
   
-  credential->marshall(bytes);
+  free(marshalled_credential);
   
-  return rb_str_new(bytes, bytes_len);
+  return rb_marshalled_credential;
 }
 
 void rb_credential_delete(Credential* credential)

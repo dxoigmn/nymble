@@ -2,7 +2,6 @@
 #define __NYMBLE_TICKET_H__
 
 #include "nymble.h"
-#include "libjson/json.h"
 
 class Ticket
 {
@@ -30,10 +29,10 @@ class Ticket
     void encrypt(u_char* encrypt_key_n, u_char* seed, u_char* pseudonym);
     void decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym);
     
-    void marshall(Json::Value* ticket);
-    u_int marshall(char* out = NULL);
+    void marshall(json_object* json_ticket);
+    char* marshall();
     static Ticket* unmarshall(char* bytes);
-    static Ticket* unmarshall(Json::Value ticket);
+    static Ticket* unmarshall(json_object* ticket);
     
     static void computeNymble(u_char *trapdoor, u_char *out);
     static void evolveTrapdoor(u_char* trapdoor, u_int delta, u_char *out);

@@ -18,7 +18,7 @@ Credential::Credential(u_char* seed, u_char* server_id, u_int link_window, u_int
 {
   memcpy(this->seed, seed, DIGEST_SIZE);
   
-  for (u_int time_period = 1; time_period < time_periods; time_period++) {
+  for (u_int time_period = 1; time_period <= time_periods; time_period++) {
     Ticket* ticket = new Ticket(link_window, time_period, server_id, seed);
     
     this->push_back(ticket);
@@ -32,55 +32,40 @@ Credential::~Credential()
   }
 }
 
-u_int Credential::marshall(char* out)
+char* Credential::marshall()
 {
-  Json::FastWriter writer;
-  Json::Value credential;
-  Json::Value tickets;
+  struct json_object* json_credential = json_object_new_object();
+  struct json_object* json_tickets = json_object_new_array();
   
-  char encoded[DIGEST_SIZE*2+1];
-  encoded[DIGEST_SIZE*2] = 0;
-  
-  Nymble::hexencode(encoded, this->seed, DIGEST_SIZE);
-  credential["seed"] = encoded;
+  JSON_MARSHALL_STR(credential, seed, DIGEST_SIZE);
   
   for (Tickets::iterator ticket = this->begin(); ticket != this->end(); ++ticket) {
-    Json::Value json_ticket;
+    struct json_object* json_ticket = json_object_new_object();
     
-    (*ticket)->marshall(&json_ticket);
+    (*ticket)->marshall(json_ticket);
     
-    tickets.append(json_ticket);
+    json_object_array_add(json_tickets, json_ticket);
   }
   
-  credential["tickets"] = tickets;
+  json_object_object_add(json_credential, "tickets", json_tickets);
   
-  std::string json = writer.write(credential);
-  
-  if (out) {
-    strncpy(out, json.c_str(), json.size());
-  }
-  
-  return json.size();
+  return json_object_to_json_string(json_credential);
 }
 
 Credential* Credential::unmarshall(char* bytes)
 {
-  Json::Value json;
-  Json::Reader reader;
-  
-  if (!reader.parse(bytes, json)) {
-    return NULL;
-  }
-  
+  struct json_object* json_credential = json_tokener_parse(bytes);
   Credential* credential = new Credential();
   
-  Nymble::hexdecode(credential->seed, (char*) json["seed"].asCString(), DIGEST_SIZE*2);
+  JSON_UNMARSHALL_STR(credential, seed, DIGEST_SIZE);
   
-  Json::Value json_tickets = json["tickets"];
+  struct json_object* json_tickets = json_object_object_get(json_credential, "tickets");
   
-  for (Json::Value::iterator json_ticket = json_tickets.begin(); json_ticket != json_tickets.end(); ++json_ticket) {
-    credential->push_back(Ticket::unmarshall(*json_ticket));
+  for (int i = 0; i < json_object_array_length(json_tickets); i++) {
+    struct json_object* json_ticket = json_object_array_get_idx(json_tickets, i);
+    
+    credential->push_back(Ticket::unmarshall(json_ticket));
   }
-
+  
   return credential;
 }

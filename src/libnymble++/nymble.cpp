@@ -37,16 +37,31 @@ void Nymble::random_bytes(u_char *out, u_int size) {
   RAND_bytes(out, size);
 }
 
-void Nymble::hexencode(char *out, u_char *in, u_int size)
+char* Nymble::hexencode(u_char *in, u_int size)
 {
+  char* out = (char*) malloc(size*2+1);
+  
   for (u_int i = 0; i < size; i++) {
     sprintf((char*) (out + i*2), "%02x", (u_char) in[i]);
   }
+  
+  out[size*2] = 0;
+  
+  return out;
 }
 
-void Nymble::hexdecode(u_char *out, char *in, u_int size)
+u_char* Nymble::hexdecode(char *in, u_int* size)
 {
-  for (u_int i = 0; i < size / 2; i++) {
+  u_int len = strlen(in) / 2;
+  u_char* out = (u_char*) malloc(len);
+  
+  for (u_int i = 0; i < len; i++) {
     sscanf((char*) (in + i*2), "%02x", (u_int*) (out + i));
   }
+  
+  if (size) {
+    *size = len;
+  }
+  
+  return out;
 }

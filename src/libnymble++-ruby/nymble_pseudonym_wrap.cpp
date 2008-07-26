@@ -18,12 +18,12 @@ VALUE rb_pseudonym_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cPseudonym);
   
   Pseudonym* pseudonym = (Pseudonym*) DATA_PTR(rb_self);
-  u_int bytes_len = pseudonym->marshall();
-  char bytes[bytes_len];
+  char* marshalled_pseudonym = pseudonym->marshall();
+  VALUE rb_marshalled_pseudonym = rb_str_new(marshalled_pseudonym, strlen(marshalled_pseudonym));
   
-  pseudonym->marshall(bytes);
+  free(marshalled_pseudonym);
   
-  return rb_str_new(bytes, bytes_len);
+  return rb_marshalled_pseudonym;
 }
 
 void rb_pseudonym_delete(Pseudonym* pseudonym)

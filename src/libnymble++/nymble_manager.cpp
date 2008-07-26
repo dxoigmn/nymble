@@ -131,7 +131,7 @@ Blacklist* NymbleManager::createBlacklist(u_char* server_id)
     return NULL;
   }
   
-  Blacklist *blacklist = new Blacklist(entry->getServerId(), this->cur_time_period, this->cur_link_window);
+  Blacklist *blacklist = new Blacklist(entry->getServerId(), this->cur_link_window, this->cur_time_period);
   
   blacklist->hash();
   blacklist->hmac(this->hmac_key_n);
@@ -148,7 +148,7 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
     return NULL;
   }
   
-  Blacklist* new_blacklist = new Blacklist(blacklist->getServerId(), this->cur_time_period, this->cur_link_window);
+  Blacklist* new_blacklist = new Blacklist(blacklist->getServerId(), this->cur_link_window, this->cur_time_period);
   
   for (Nymbles::iterator nymble = blacklist->begin(); nymble != blacklist->end(); ++nymble) {
     u_char* new_nymble = (u_char*)malloc(DIGEST_SIZE);

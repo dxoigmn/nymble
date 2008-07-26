@@ -11,9 +11,6 @@ SRCS =  nymble_user.cpp \
         nymble_credential.cpp \
         nymble_ticket.cpp \
         nymble.cpp \
-        json_reader.cpp \
-        json_writer.cpp \
-        json_value.cpp \
         nsNymbleUser.cpp \
         nsNymbleUserModule.cpp
 
@@ -24,16 +21,13 @@ OBJS =  nymble_user.o \
         nymble_credential.o \
         nymble_ticket.o \
         nymble.o \
-        json_reader.o \
-        json_writer.o \
-        json_value.o \
         nsNymbleUser.o \
         nsNymbleUserModule.o
 
 
 INCFLAGS = -I../libnymble++/ -I../libnymble++/libjson/ -I/opt/local/include/ -I$(GECKO_SDK_PATH)/include/
 LIBPATH =  -L"." -L/opt/local/lib/ -L$(GECKO_SDK_PATH)/lib/
-LIBS = -lxpcomglue -lxpcomglue_s -lnspr4 -lplds4 -framework CoreFoundation -lcrypto
+LIBS = -lxpcomglue -lxpcomglue_s -lnspr4 -lplds4 -framework CoreFoundation -lcrypto -ljson
 DEFINES = -DXPCOM_GLUE
 
 CFLAGS += -std=c99

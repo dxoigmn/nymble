@@ -18,12 +18,12 @@ VALUE rb_ticket_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cTicket);
   
   Ticket* ticket = (Ticket*) DATA_PTR(rb_self);
-  u_int bytes_len = ticket->marshall();
-  char bytes[bytes_len];
+  char* marshalled_ticket = ticket->marshall();
+  VALUE rb_marshalled_ticket = rb_str_new(marshalled_ticket, strlen(marshalled_ticket));
   
-  ticket->marshall(bytes);
+  free(marshalled_ticket);
   
-  return rb_str_new(bytes, bytes_len);
+  return rb_marshalled_ticket;
 }
 
 void rb_ticket_delete(Ticket* ticket)

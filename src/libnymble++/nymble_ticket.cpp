@@ -117,76 +117,44 @@ void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
   }
 }
 
-void Ticket::marshall(Json::Value* ticket)
+void Ticket::marshall(json_object* json_ticket)
 {
-  (*ticket)["link_window"] = this->link_window;
-  (*ticket)["time_period"] = this->time_period;
-  
-  char encoded[DIGEST_SIZE*2+1];
-  encoded[DIGEST_SIZE*2] = 0;
-  
-  Nymble::hexencode(encoded, this->server_id, DIGEST_SIZE);
-  (*ticket)["server_id"] = encoded;
-  
-  Nymble::hexencode(encoded, this->nymble, DIGEST_SIZE);
-  (*ticket)["nymble"] = encoded;
-  
-  Nymble::hexencode(encoded, this->mac_n, DIGEST_SIZE);
-  (*ticket)["mac_n"] = encoded;
-  
-  Nymble::hexencode(encoded, this->mac_ns, DIGEST_SIZE);
-  (*ticket)["mac_ns"] = encoded;
-  
-  char trapdoorenc_encoded[TRAPDOORENC_SIZE*2+1];
-  trapdoorenc_encoded[TRAPDOORENC_SIZE*2] = 0;
-  
-  Nymble::hexencode(trapdoorenc_encoded, this->trapdoorenc, TRAPDOORENC_SIZE);
-  (*ticket)["trapdoorenc"] = trapdoorenc_encoded;
+  JSON_MARSHALL_INT(ticket, link_window);
+  JSON_MARSHALL_INT(ticket, time_period);
+  JSON_MARSHALL_STR(ticket, server_id, DIGEST_SIZE);
+  JSON_MARSHALL_STR(ticket, nymble, DIGEST_SIZE);
+  JSON_MARSHALL_STR(ticket, mac_n, DIGEST_SIZE);
+  JSON_MARSHALL_STR(ticket, mac_ns, DIGEST_SIZE);
+  JSON_MARSHALL_STR(ticket, trapdoorenc, TRAPDOORENC_SIZE);
 }
 
-
-u_int Ticket::marshall(char* out)
+char* Ticket::marshall()
 {
-  Json::FastWriter writer;
-  Json::Value ticket;
+  struct json_object* json_ticket = json_object_new_object();
   
-  this->marshall(&ticket);
+  this->marshall(json_ticket);
   
-  std::string json = writer.write(ticket);
-  
-  if (out) {
-    strncpy(out, json.c_str(), json.size());
-  }
-  
-  return json.size();
+  return json_object_to_json_string(json_ticket);
 }
 
-Ticket* Ticket::unmarshall(Json::Value json)
+Ticket* Ticket::unmarshall(json_object* json_ticket)
 {
   Ticket* ticket = new Ticket();
   
-  ticket->link_window = json["link_window"].asUInt();
-  ticket->time_period = json["time_period"].asUInt();
+  JSON_UNMARSHALL_INT(ticket, link_window);
+  JSON_UNMARSHALL_INT(ticket, time_period);
+  JSON_UNMARSHALL_STR(ticket, server_id, DIGEST_SIZE);
+  JSON_UNMARSHALL_STR(ticket, nymble, DIGEST_SIZE);
+  JSON_UNMARSHALL_STR(ticket, mac_n, DIGEST_SIZE);
+  JSON_UNMARSHALL_STR(ticket, mac_ns, DIGEST_SIZE);
+  JSON_UNMARSHALL_STR(ticket, trapdoorenc, TRAPDOORENC_SIZE);
   
-  Nymble::hexdecode(ticket->server_id, (char*) json["server_id"].asCString(), DIGEST_SIZE*2);
-  Nymble::hexdecode(ticket->nymble, (char*) json["nymble"].asCString(), DIGEST_SIZE*2);
-  Nymble::hexdecode(ticket->mac_n, (char*) json["mac_n"].asCString(), DIGEST_SIZE*2);
-  Nymble::hexdecode(ticket->mac_ns, (char*) json["mac_ns"].asCString(), DIGEST_SIZE*2);
-  Nymble::hexdecode(ticket->trapdoorenc, (char*) json["trapdoorenc"].asCString(), TRAPDOORENC_SIZE*2);
-
   return ticket;
 }
 
 Ticket* Ticket::unmarshall(char* bytes)
 {
-  Json::Value json;
-  Json::Reader reader;
-  
-  if (!reader.parse(bytes, json)) {
-    return NULL;
-  }
-  
-  return Ticket::unmarshall(json);
+  return Ticket::unmarshall(json_tokener_parse(bytes));
 }
 
 void Ticket::computeNymble(u_char *trapdoor, u_char *out)

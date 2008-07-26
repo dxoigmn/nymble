@@ -37,25 +37,27 @@ u_char* Pseudonym::getMacNP()
   return this->mac_np;
 }
 
-u_int Pseudonym::marshall(char* out)
+char* Pseudonym::marshall()
 {
-  if (out) {
-    Nymble::hexencode(out, this->pseudonym, DIGEST_SIZE);
-    Nymble::hexencode(out + DIGEST_SIZE*2, this->mac_np, DIGEST_SIZE);
-  }
+  u_char in[DIGEST_SIZE*2];
   
-  return DIGEST_SIZE*4;
+  memcpy(in, this->pseudonym, DIGEST_SIZE);
+  memcpy(in+DIGEST_SIZE, this->mac_np, DIGEST_SIZE);
+
+  return Nymble::hexencode(in, DIGEST_SIZE*2);
 }
 
 Pseudonym* Pseudonym::unmarshall(char* bytes)
 {
-  u_char buffer[DIGEST_SIZE*4];
+  u_int len;
+  u_char* out = Nymble::hexdecode(bytes, &len);
+  Pseudonym* pseudonym = NULL;
   
-  if (strlen(bytes) != DIGEST_SIZE*4) {
-    return NULL;
+  if (len == DIGEST_SIZE*2) {
+    pseudonym = new Pseudonym(out, out + DIGEST_SIZE);
   }
   
-  Nymble::hexdecode(buffer, bytes, DIGEST_SIZE*4);
+  free(out);
   
-  return new Pseudonym(buffer, buffer + DIGEST_SIZE);
+  return pseudonym;
 }
