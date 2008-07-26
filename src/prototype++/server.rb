@@ -21,9 +21,9 @@ end
 
 before do
   cur_time = Time.now.getutc
-
+  
   @@server.link_window = 366 * (cur_time.year - 1970) + cur_time.yday
-  @@server.time_period = cur_time.hour * 60 + cur_time.min
+  @@server.time_period = (cur_time.hour * 60 + cur_time.min) / 1
 end
 
 get '/nymble/' do
@@ -38,8 +38,8 @@ post '/nymble/' do
   ticket = Nymble::Ticket.unmarshall(request[:ticket]) if request[:ticket]
   
   if @@server.valid_ticket?(ticket)
-    'you are blacklisted'
-  else
     'you are authenticated'
+  else
+    'you are blacklisted'
   end
 end
