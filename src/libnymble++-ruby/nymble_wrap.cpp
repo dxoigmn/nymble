@@ -100,16 +100,9 @@ VALUE rb_nymble_hexencode(VALUE rb_self, VALUE rb_string)
   
   u_char* in = (u_char*) RSTRING_PTR(rb_string);
   u_int len = RSTRING_LEN(rb_string);
-  char *out = Nymble::hexencode(in, len);
-  VALUE rb_out = rb_str_new(out, strlen(out));
   
-  free(out);
-  
-  return rb_out;
+  return rb_str_new2(Nymble::hexencode(in, len));
 }
-
-//static char* hexencode(u_char *in, u_int size);
-//static u_char* hexdecode(char *in, u_int* size);
 
 
 VALUE rb_nymble_hexdecode(VALUE rb_self, VALUE rb_string)
@@ -119,11 +112,8 @@ VALUE rb_nymble_hexdecode(VALUE rb_self, VALUE rb_string)
   char* in = RSTRING_PTR(rb_string);
   u_int len;
   u_char *out = Nymble::hexdecode(in, &len);
-  VALUE rb_out = rb_str_new((char*) out, len);
   
-  free(out);
-  
-  return rb_out;
+  return rb_str_new((char*) out, len);
 }
 
 VALUE rb_nymble_link_window(VALUE rb_self)
