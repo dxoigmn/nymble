@@ -19,18 +19,6 @@
 #define SIGNATURE_SIZE      128
 #define TRAPDOORENC_SIZE    (CIPHER_BLOCK_SIZE + DIGEST_SIZE + DIGEST_SIZE + CIPHER_BLOCK_SIZE)
 
-#define JSON_MARSHALL_INT(OBJ,FIELD) \
-        json_object_object_add(json_##OBJ, #FIELD, json_object_new_int(this->FIELD))
-
-#define JSON_UNMARSHALL_INT(OBJ,FIELD) \
-        OBJ->FIELD = json_object_get_int(json_object_object_get(json_##OBJ, #FIELD))
-
-#define JSON_MARSHALL_STR(OBJ,FIELD,SIZE) \
-        json_object_object_add(json_##OBJ, #FIELD, json_object_new_string(Nymble::hexencode(this->FIELD, SIZE)))
-
-#define JSON_UNMARSHALL_STR(OBJ,FIELD,SIZE) \
-        memcpy(OBJ->FIELD, Nymble::hexdecode(json_object_get_string(json_object_object_get(json_##OBJ, #FIELD))), SIZE);
-
 typedef unsigned char u_char;
 typedef unsigned int  u_int;
 
@@ -48,10 +36,16 @@ class Nymble
     void setTimePeriod(u_int time_period);
     u_int getTimePeriod();
     
-    static void digest(u_char *out, u_char *in, u_int size);
-    static void random_bytes(u_char *out, u_int size);
-    static char* hexencode(u_char *in, u_int size);
-    static u_char* hexdecode(char *in, u_int* size = NULL);
+    static void digest(u_char* in, u_int size, u_char* out);
+    static void random_bytes(u_int size, u_char* out);
+    static u_int hexencode(u_char* in, u_int size, char* out = NULL);
+    static u_int hexdecode(char* in, u_char* out = NULL);
+    
+    static void json_marshall_int(struct json_object* json, char* field, u_int value);
+    static void json_unmarshall_int(struct json_object* json, char* field, u_int* value);
+    
+    static void json_marshall_str(struct json_object* json, char* field, u_char* value, u_int len);
+    static void json_unmarshall_str(struct json_object* json, char* field, u_char* value, u_int len);
 };
 
 #endif

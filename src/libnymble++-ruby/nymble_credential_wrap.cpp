@@ -3,7 +3,9 @@
 VALUE rb_credential_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Credential* credential = Credential::unmarshall(bytes);
+  Credential* credential = new Credential();
+  
+  Credential::unmarshall(bytes, credential);
   
   if (credential == NULL) {
     return Qnil;
@@ -18,8 +20,11 @@ VALUE rb_credential_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cCredential);
   
   Credential* credential = (Credential*) DATA_PTR(rb_self);
+  char marshalled_credential[credential->marshall() + 1];
   
-  return rb_str_new2(credential->marshall());
+  credential->marshall(marshalled_credential);
+  
+  return rb_str_new2(marshalled_credential);
 }
 
 void rb_credential_delete(Credential* credential)

@@ -29,10 +29,10 @@ class Ticket
     void encrypt(u_char* encrypt_key_n, u_char* seed, u_char* pseudonym);
     void decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym);
     
-    void marshall(json_object* json_ticket);
-    char* marshall();
-    static Ticket* unmarshall(char* bytes);
-    static Ticket* unmarshall(json_object* ticket);
+    void marshall(json_object* out);
+    u_int marshall(char* out = NULL);
+    static void unmarshall(char* bytes, Ticket* out);
+    static void unmarshall(json_object* ticket, Ticket* out);
     
     static void computeNymble(u_char *trapdoor, u_char *out);
     static void evolveTrapdoor(u_char* trapdoor, u_int delta, u_char *out);

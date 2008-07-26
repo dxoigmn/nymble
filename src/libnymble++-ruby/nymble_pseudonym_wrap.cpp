@@ -3,7 +3,9 @@
 VALUE rb_pseudonym_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Pseudonym* pseudonym = Pseudonym::unmarshall(bytes);
+  Pseudonym* pseudonym = new Pseudonym();
+  
+  Pseudonym::unmarshall(bytes, pseudonym);
   
   if (pseudonym == NULL) {
     return Qnil;
@@ -18,12 +20,11 @@ VALUE rb_pseudonym_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cPseudonym);
   
   Pseudonym* pseudonym = (Pseudonym*) DATA_PTR(rb_self);
-  char* marshalled_pseudonym = pseudonym->marshall();
-  VALUE rb_marshalled_pseudonym = rb_str_new(marshalled_pseudonym, strlen(marshalled_pseudonym));
+  char marshalled_pseudonym[pseudonym->marshall() + 1];
   
-  free(marshalled_pseudonym);
+  pseudonym->marshall(marshalled_pseudonym);
   
-  return rb_marshalled_pseudonym;
+  return rb_str_new2(marshalled_pseudonym);
 }
 
 void rb_pseudonym_delete(Pseudonym* pseudonym)

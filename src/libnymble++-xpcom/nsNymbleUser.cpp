@@ -23,7 +23,9 @@ NS_IMETHODIMP nsNymbleUser::SetVerifyKeyN(PRUint8 *bytes, PRUint32 len)
 /* void setPseudonym (in string marshalled_pseudonym); */
 NS_IMETHODIMP nsNymbleUser::SetPseudonym(const char *marshalled_pseudonym)
 {
-  Pseudonym* pseudonym = Pseudonym::unmarshall((char*) marshalled_pseudonym);
+  Pseudonym* pseudonym = new Pseudonym();
+  
+  Pseudonym::unmarshall((char*) marshalled_pseudonym, pseudonym);
   
   this->user->setPseudonym(pseudonym);
   
@@ -40,7 +42,8 @@ NS_IMETHODIMP nsNymbleUser::GetPseudonym(char **_retval)
   if (pseudonym == NULL) {
     *_retval = NULL;
   } else {
-    *_retval = pseudonym->marshall();
+    *_retval = (char*) malloc(pseudonym->marshall() + 1);
+    pseudonym->marshall(*_retval);
   }
   
   return NS_OK;
@@ -49,14 +52,17 @@ NS_IMETHODIMP nsNymbleUser::GetPseudonym(char **_retval)
 /* string addBlacklist (in string marshalled_blacklist); */
 NS_IMETHODIMP nsNymbleUser::AddBlacklist(const char *marshalled_blacklist, char **_retval)
 {
-  Blacklist* blacklist = Blacklist::unmarshall((char*) marshalled_blacklist);
+  Blacklist* blacklist = new Blacklist();
+  
+  Blacklist::unmarshall((char*) marshalled_blacklist, blacklist);
   
   u_char* server_id = this->user->addBlacklist(blacklist);
   
   if (server_id == NULL) {
     *_retval = NULL;
   } else {
-    *_retval = Nymble::hexencode(server_id, DIGEST_SIZE);
+    *_retval = (char*) malloc(Nymble::hexencode(server_id, DIGEST_SIZE) + 1);
+    Nymble::hexencode(server_id, DIGEST_SIZE, *_retval);
   }
   
   delete blacklist;
@@ -67,7 +73,9 @@ NS_IMETHODIMP nsNymbleUser::AddBlacklist(const char *marshalled_blacklist, char 
 /* boolean addCredential (in string marshalled_credential); */
 NS_IMETHODIMP nsNymbleUser::AddCredential(const char *marshalled_credential, PRBool *_retval)
 {
-  Credential* credential = Credential::unmarshall((char*) marshalled_credential);
+  Credential* credential = new Credential();
+  
+  Credential::unmarshall((char*) marshalled_credential, credential);
   
   *_retval = this->user->addCredential(credential);
   
@@ -80,8 +88,11 @@ NS_IMETHODIMP nsNymbleUser::AddCredential(const char *marshalled_credential, PRB
 /* string getTicket (in string serverId); */
 NS_IMETHODIMP nsNymbleUser::GetTicket(const char *serverId, char **_retval)
 {
-  u_int server_id_len;
-  u_char* server_id = Nymble::hexdecode((char*) serverId, &server_id_len);
+  u_int server_id_len = Nymble::hexdecode((char*) serverId);
+  u_char server_id[server_id_len];
+  
+  Nymble::hexdecode((char*) serverId, server_id);
+
   Ticket* ticket;
   
   if (server_id_len == DIGEST_SIZE) {
@@ -91,7 +102,8 @@ NS_IMETHODIMP nsNymbleUser::GetTicket(const char *serverId, char **_retval)
   if (ticket == NULL) {
     *_retval = NULL;
   } else {
-    *_retval = ticket->marshall();
+    *_retval = (char*) malloc(ticket->marshall() + 1);
+    ticket->marshall(*_retval);
   }
   
   return NS_OK;

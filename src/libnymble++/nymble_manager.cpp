@@ -151,14 +151,14 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
   Blacklist* new_blacklist = new Blacklist(blacklist->getServerId(), this->cur_link_window, this->cur_time_period);
   
   for (Nymbles::iterator nymble = blacklist->begin(); nymble != blacklist->end(); ++nymble) {
-    u_char* new_nymble = (u_char*)malloc(DIGEST_SIZE);
+    u_char* new_nymble = new u_char[DIGEST_SIZE];
     memcpy(new_nymble, *nymble, DIGEST_SIZE);
     new_blacklist->push_back(new_nymble);
   }
   
   if (!complaints.empty()) {
     for (Tickets::iterator ticket = complaints.begin(); ticket != complaints.end(); ++ticket) {
-      u_char* new_nymble = (u_char*)malloc(DIGEST_SIZE);
+      u_char* new_nymble = new u_char[DIGEST_SIZE];
       u_char pseudonym[DIGEST_SIZE];
       u_char seed[DIGEST_SIZE];
       u_char nymble0[DIGEST_SIZE];

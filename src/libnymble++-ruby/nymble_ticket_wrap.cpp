@@ -3,7 +3,9 @@
 VALUE rb_ticket_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Ticket* ticket = Ticket::unmarshall(bytes);
+  Ticket* ticket = new Ticket();
+  
+  Ticket::unmarshall(bytes, ticket);
   
   if (ticket == NULL) {
     return Qnil;
@@ -18,12 +20,11 @@ VALUE rb_ticket_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cTicket);
   
   Ticket* ticket = (Ticket*) DATA_PTR(rb_self);
-  char* marshalled_ticket = ticket->marshall();
-  VALUE rb_marshalled_ticket = rb_str_new(marshalled_ticket, strlen(marshalled_ticket));
+  char marshalled_ticket[ticket->marshall() + 1];
   
-  free(marshalled_ticket);
+  ticket->marshall(marshalled_ticket);
   
-  return rb_marshalled_ticket;
+  return rb_str_new2(marshalled_ticket);
 }
 
 void rb_ticket_delete(Ticket* ticket)

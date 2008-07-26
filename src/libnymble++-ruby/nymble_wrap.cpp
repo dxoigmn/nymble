@@ -74,24 +74,23 @@ VALUE rb_nymble_digest(VALUE rb_self, VALUE rb_value)
   rb_value      = rb_funcall(rb_value, rb_intern("to_s"), 0);
   u_char* value = (u_char*) RSTRING_PTR(rb_value);
   u_int size    = RSTRING_LEN(rb_value);
-
-  u_char buffer[DIGEST_SIZE];
-
-  Nymble::digest(buffer, value, size);
-
-  return rb_str_new((char*) buffer, DIGEST_SIZE);
+  u_char out[DIGEST_SIZE];
+  
+  Nymble::digest(value, size, out);
+  
+  return rb_str_new((char*) out, DIGEST_SIZE);
 }
 
 VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count)
 {
   Check_Type(rb_count, T_FIXNUM);
-
+  
   u_int size = NUM2UINT(rb_count);
-  u_char buffer[size];
-
-  Nymble::random_bytes(buffer, size);
-
-  return rb_str_new((char*) buffer, size);
+  u_char out[size];
+  
+  Nymble::random_bytes(size, out);
+  
+  return rb_str_new((char*) out, size);
 }
 
 VALUE rb_nymble_hexencode(VALUE rb_self, VALUE rb_string)
@@ -100,20 +99,24 @@ VALUE rb_nymble_hexencode(VALUE rb_self, VALUE rb_string)
   
   u_char* in = (u_char*) RSTRING_PTR(rb_string);
   u_int len = RSTRING_LEN(rb_string);
+  char out[Nymble::hexencode(in, len) + 1];
   
-  return rb_str_new2(Nymble::hexencode(in, len));
+  Nymble::hexencode(in, len, out);
+  
+  return rb_str_new2(out);
 }
-
 
 VALUE rb_nymble_hexdecode(VALUE rb_self, VALUE rb_string)
 {
   Check_Type(rb_string, T_STRING);
   
   char* in = RSTRING_PTR(rb_string);
-  u_int len;
-  u_char *out = Nymble::hexdecode(in, &len);
+  u_int out_len = Nymble::hexdecode(in);
+  u_char out[out_len];
   
-  return rb_str_new((char*) out, len);
+  Nymble::hexdecode(in, out);
+  
+  return rb_str_new((char*) out, out_len);
 }
 
 VALUE rb_nymble_link_window(VALUE rb_self)

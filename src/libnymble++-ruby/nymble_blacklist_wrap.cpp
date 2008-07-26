@@ -4,7 +4,9 @@
 VALUE rb_blacklist_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Blacklist* blacklist = Blacklist::unmarshall(bytes);
+  Blacklist* blacklist = new Blacklist();
+  
+  Blacklist::unmarshall(bytes, blacklist);
   
   if (blacklist == NULL) {
     return Qnil;
@@ -19,8 +21,11 @@ VALUE rb_blacklist_marshall(VALUE rb_self)
   Check_Class(rb_self, rb_cBlacklist);
   
   Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_self);
+  char marshalled_blacklist[blacklist->marshall() + 1];
   
-  return rb_str_new2(blacklist->marshall());
+  blacklist->marshall(marshalled_blacklist);
+  
+  return rb_str_new2(marshalled_blacklist);
 }
 
 
