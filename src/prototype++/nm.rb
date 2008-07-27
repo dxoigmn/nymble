@@ -20,10 +20,10 @@ before do
   @@nm.time_period = (cur_time.hour * 60 + cur_time.min) / 1
 end
 
-post '/server/:server_id' do
-  server_id   = Nymble.hexdecode(params[:server_id])
+post '/server/' do
+  server_id = Nymble.hexdecode(params[:server_id])
   hmac_key_ns = @@nm.add_server(server_id)
-  blacklist   = @@nm.create_blacklist(server_id)
+  blacklist = @@nm.create_blacklist(server_id)
 
   { 
     :hmac_key_ns  => Nymble.hexencode(hmac_key_ns),
@@ -46,18 +46,21 @@ get '/server/:server_id/' do
   }.to_json
 end
 
-post '/server/:server_id/' do
-  server_id   = Nymble.hexdecode(params[:server_id])
-  blacklist   = Nymble::Blacklist.unmarshall(params[:blacklist])
-  complaints  = param[:complaints].map { |ticket| Nymble::Ticket.unmarshall(ticket) } if params[:complaints]
+put '/server/:server_id/' do
+  server_id = Nymble.hexdecode(params[:server_id])
+  blacklist = Nymble::Blacklist.unmarshall(params[:blacklist])
+  complaints = param[:complaints].map { |ticket| Nymble::Ticket.unmarshall(ticket) } unless params[:complaints].empty?
   
-  fail 'invalid blacklist' unless @@nm.valid_blacklist?(server_id, blacklist)
+  unless @@nm.valid_blacklist?(server_id, blacklist)
+    puts 'invalid blacklist'
+    fail 'invalid blacklist'
+  end
   
-  linking_tokens = @@nm.create_tokens(server_id, blacklist, complaints)
-  new_blacklist = @@nm.update_blacklist(server_id, blacklist, complaints)
+  linking_tokens = @@nm.create_linking_tokens(server_id, blacklist, complaints || [])
+  blacklist = @@nm.update_blacklist(server_id, blacklist, complaints || [])
   
   { 
-    :new_blacklist  => new_blacklist.marshall,
+    :blacklist  => blacklist.marshall,
     :linking_tokens => linking_tokens.map { |linking_token| linking_token.marshall }
   }.to_json
 end

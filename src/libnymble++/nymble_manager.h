@@ -5,10 +5,10 @@
 #include "nymble_manager_entry.h"
 #include "nymble_blacklist.h"
 #include "nymble_pseudonym.h"
-#include "nymble_token.h"
+#include "nymble_linking_token.h"
 
 typedef std::vector<NymbleManagerEntry*> NymbleManagerEntries;
-typedef std::vector<Token*> Tokens;
+typedef std::vector<LinkingToken*> LinkingTokens;
 
 class NymbleManager : public Nymble
 {
@@ -41,8 +41,8 @@ class NymbleManager : public Nymble
     bool verifyPseudonym(Pseudonym* pseudonym);
     bool verifyBlacklist(u_char* server_id, Blacklist* blacklist);
     Blacklist* createBlacklist(u_char* server_id);
-    Blacklist* updateBlacklist(u_char* server_id, Blacklist* blacklist, Tickets complaints);
-    Tokens* createTokens(u_char* server_id, Blacklist* blacklist, Tickets complaints);
+    Blacklist* updateBlacklist(u_char* server_id, Blacklist* blacklist, Tickets* complaints);
+    LinkingTokens* createLinkingTokens(u_char* server_id, Blacklist* blacklist, Tickets* complaints);
     Credential* createCredential(u_char* server_id, Pseudonym* pseudonym, u_int time_periods);
 };
 

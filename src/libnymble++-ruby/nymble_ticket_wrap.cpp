@@ -2,6 +2,8 @@
 
 VALUE rb_ticket_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
+  Check_Type(rb_bytes, T_STRING);
+  
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
   Ticket* ticket = new Ticket();
   
@@ -18,7 +20,7 @@ VALUE rb_ticket_marshall(VALUE rb_self)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cTicket);
-  
+
   Ticket* ticket = (Ticket*) DATA_PTR(rb_self);
   char marshalled_ticket[ticket->marshall() + 1];
   

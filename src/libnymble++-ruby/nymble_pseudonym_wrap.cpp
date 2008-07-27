@@ -2,6 +2,8 @@
 
 VALUE rb_pseudonym_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
+  Check_Type(rb_bytes, T_STRING);
+  
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
   Pseudonym* pseudonym = new Pseudonym();
   

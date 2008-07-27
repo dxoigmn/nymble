@@ -3,6 +3,8 @@
 
 VALUE rb_blacklist_unmarshall(VALUE rb_self, VALUE rb_bytes)
 {
+  Check_Type(rb_bytes, T_STRING);
+  
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
   Blacklist* blacklist = new Blacklist();
   

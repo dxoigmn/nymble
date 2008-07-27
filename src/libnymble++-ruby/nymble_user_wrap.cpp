@@ -24,6 +24,55 @@ VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_n)
   return rb_self;
 }
 
+VALUE rb_user_link_window(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  
+  User* user = (User*) DATA_PTR(rb_self);
+  
+  return INT2FIX(user->getLinkWindow());
+}
+
+VALUE rb_user_link_window_set(VALUE rb_self, VALUE rb_link_window)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  User* user = (User*) DATA_PTR(rb_self);
+  u_int link_window = FIX2UINT(rb_link_window);
+  
+  user->setLinkWindow(link_window);
+  
+  return rb_self;
+}
+
+VALUE rb_user_time_period(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  
+  User* user = (User*) DATA_PTR(rb_self);
+  
+  return INT2FIX(user->getTimePeriod());
+}
+
+VALUE rb_user_time_period_set(VALUE rb_self, VALUE rb_time_period)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  Check_Type(rb_time_period, T_FIXNUM);
+  
+  User* user = (User*) DATA_PTR(rb_self);
+  u_int time_period = FIX2UINT(rb_time_period);
+  
+  user->setTimePeriod(time_period);
+  
+  return rb_self;
+}
+
+
 VALUE rb_user_pseudonym(VALUE rb_self)
 {
   Check_Type(rb_self, T_DATA);

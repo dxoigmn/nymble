@@ -53,9 +53,12 @@ u_int NymbleManager::getSignKeyN(u_char** out) {
 
 u_char* NymbleManager::addServer(u_char* server_id)
 {
-  NymbleManagerEntry* entry = new NymbleManagerEntry(server_id, this->cur_time_period);
+  NymbleManagerEntry* entry = this->findServer(server_id);
   
-  this->entries->push_back(entry);
+  if (entry == NULL) {
+    entry = new NymbleManagerEntry(server_id, this->cur_time_period);
+    this->entries->push_back(entry);
+  }
   
   return entry->getHmacKeyNS();
 }
@@ -140,7 +143,7 @@ Blacklist* NymbleManager::createBlacklist(u_char* server_id)
   return blacklist;
 }
 
-Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklist, Tickets complaints)
+Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklist, Tickets* complaints)
 {
   NymbleManagerEntry* entry = findServer(server_id);
   
@@ -156,8 +159,8 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
     new_blacklist->push_back(new_nymble);
   }
   
-  if (!complaints.empty()) {
-    for (Tickets::iterator ticket = complaints.begin(); ticket != complaints.end(); ++ticket) {
+  if (!complaints->empty()) {
+    for (Tickets::iterator ticket = complaints->begin(); ticket != complaints->end(); ++ticket) {
       u_char* new_nymble = new u_char[DIGEST_SIZE];
       u_char pseudonym[DIGEST_SIZE];
       u_char seed[DIGEST_SIZE];
@@ -185,7 +188,7 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
   return new_blacklist;
 }
 
-Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Tickets complaints)
+LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* blacklist, Tickets* complaints)
 {
   NymbleManagerEntry* entry = findServer(server_id);
   
@@ -193,10 +196,10 @@ Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Tic
     return NULL;
   }
   
-  Tokens* tokens = new Tokens();
+  LinkingTokens* linking_tokens = new LinkingTokens();
   u_int next_time_period = cur_time_period + 1;
   
-  for (Tickets::iterator ticket = complaints.begin(); ticket != complaints.end(); ++ticket) {
+  for (Tickets::iterator ticket = complaints->begin(); ticket != complaints->end(); ++ticket) {
     u_char trapdoor_for_next_time_period[DIGEST_SIZE];
 
     u_char trapdoor[DIGEST_SIZE];
@@ -218,10 +221,10 @@ Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Tic
       // FIXME: This should add nymble0 to be checked in userIsBlacklisted.
     }
     
-    tokens->push_back(new Token(entry->getServerId(), cur_link_window, next_time_period, trapdoor_for_next_time_period, *ticket));
+    linking_tokens->push_back(new LinkingToken(next_time_period, trapdoor_for_next_time_period));
   }
   
-  return tokens;
+  return linking_tokens;
 }
 
 bool NymbleManager::userIsBlacklisted(Nymbles* nymbles, u_char* nymble0)

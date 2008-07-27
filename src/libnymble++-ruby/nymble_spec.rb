@@ -38,6 +38,8 @@ end
 
 context 'Pseudonym Manager' do
   before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
     @user_id = Nymble.digest('user_id')
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
@@ -59,16 +61,16 @@ context 'Pseudonym Manager' do
   
   it 'should manage the link window' do
     @pm.should.respond_to?(:link_window=)
-    @pm.link_window = 10
+    @pm.link_window = @cur_link_window
     @pm.should.respond_to?(:link_window)
-    @pm.link_window.should.equal(10)
+    @pm.link_window.should.equal(@cur_link_window)
   end
   
   it 'should manage the time period' do
     @pm.should.respond_to?(:time_period=)
-    @pm.time_period = 21
+    @pm.time_period = @cur_time_period
     @pm.should.respond_to?(:time_period)
-    @pm.time_period.should.equal(21)
+    @pm.time_period.should.equal(@cur_time_period)
   end
   
   it 'should create pseudonyms' do
@@ -79,8 +81,12 @@ end
 
 context 'Pseudonym' do
   before(:each) do
-    pm = Nymble::PseudonymManager.new(Nymble.digest('hmac_key_np'))
-    @pseudonym = pm.create_pseudonym(Nymble.digest('user_id'))
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pseudonym = @pm.create_pseudonym(@user_id)
   end
   
   it 'should be (un)marshallable' do
@@ -94,11 +100,14 @@ end
 
 context 'Nymble Manager' do
   before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
-    @server_id = Nymble.digest('server_id')
     @user_id = Nymble.digest('user_id')
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pseudonym = @pm.create_pseudonym(@user_id)
     @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @server_id = Nymble.digest('server_id')
   end
   
   it 'should be defined under Nymble' do
@@ -117,16 +126,16 @@ context 'Nymble Manager' do
   
   it 'should manage the link window' do
     @nm.should.respond_to?(:link_window=)
-    @nm.link_window = 10
+    @nm.link_window = @cur_link_window
     @nm.should.respond_to?(:link_window)
-    @nm.link_window.should.equal(10)
+    @nm.link_window.should.equal(@cur_link_window)
   end
   
   it 'should manage the time period' do
     @nm.should.respond_to?(:time_period=)
-    @nm.time_period = 12
+    @nm.time_period = @cur_time_period
     @nm.should.respond_to?(:time_period)
-    @nm.time_period.should.equal(12)
+    @nm.time_period.should.equal(@cur_time_period)
   end
   
   it 'should register servers with valid ids' do
@@ -176,7 +185,7 @@ context 'Nymble Manager' do
     blacklist = @nm.create_blacklist(@server_id)
     tickets = []
     
-    @nm.create_tokens(@server_id, blacklist, tickets).should.be.empty?
+    @nm.create_linking_tokens(@server_id, blacklist, tickets).should.be.empty?
   end
   
   it 'should create credentials' do
@@ -190,9 +199,16 @@ end
 
 context 'Blacklist' do
   before(:each) do
-    nm = Nymble::NymbleManager.new(Nymble.digest('hmac_key_np'))
-    nm.add_server(Nymble.digest('server_id'))
-    @blacklist = nm.create_blacklist(Nymble.digest('server_id'))
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
   end
   
   it 'should be (un)marshallable' do
@@ -206,11 +222,17 @@ end
 
 context 'Credential' do
   before(:each) do
-    pm = Nymble::PseudonymManager.new(Nymble.digest('hmac_key_np'))
-    nm = Nymble::NymbleManager.new(Nymble.digest('hmac_key_np'))
-    nm.add_server(Nymble.digest('server_id'))
-    pseudonym = pm.create_pseudonym(Nymble.digest('user_id'))
-    @credential = nm.create_credential(Nymble.digest('server_id'), pseudonym, 1)
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 1)
   end
   
   it 'should be (un)marshallable' do
@@ -222,57 +244,20 @@ context 'Credential' do
   end
 end
 
-context 'Server' do
-  before(:each) do
-    @hmac_key_np = Nymble.digest('hmac_key_np')
-    @server_id = Nymble.digest('server_id')
-    @user_id = Nymble.digest('user_id')
-    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
-    @hmac_key_ns = @nm.add_server(@server_id)
-    @blacklist = @nm.create_blacklist(@server_id)
-    @server = Nymble::Server.new(@server_id, @hmac_key_ns, @blacklist)
-  end
-  
-  it 'should be defined under Nymble' do
-    Nymble.should.const_defined?(:Server)
-  end
-  
-  it 'should be created with a valid hmac key' do
-    Nymble::Server.new(@server_id, @hmac_key_ns, @blacklist).should.not.be.nil
-  end
-  
-  it 'should manage the link window' do
-    @server.should.respond_to?(:link_window=)
-    @server.link_window = 67
-    @server.should.respond_to?(:link_window)
-    @server.link_window.should.equal(67)
-  end
-  
-  it 'should manage the time period' do
-    @server.should.respond_to?(:time_period=)
-    @server.time_period = 4545
-    @server.should.respond_to?(:time_period)
-    @server.time_period.should.equal(4545)
-  end
-  
-  it 'should verify tickets' do
-    @server.should.respond_to?(:valid_ticket?)
-  end
-end
-
 context 'User' do
   before(:each) do
-    hmac_key_np = Nymble.digest('hmac_key_np')
-    user_id = Nymble.digest('user_id')
-    @nm = Nymble::NymbleManager.new(hmac_key_np)
-    
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np)
     @server_id = Nymble.digest('server_id')
-    @pseudonym = Nymble::PseudonymManager.new(hmac_key_np).create_pseudonym(user_id)
-    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
-    @nm.add_server(@server_id).should.not.be.nil
-    @credential = @nm.create_credential(@server_id, @pseudonym, 1)
+    @hmac_key_ns = @nm.add_server(@server_id)
     @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 1)
+    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
   end
   
   it 'should be defined under Nymble' do
@@ -285,16 +270,16 @@ context 'User' do
   
   it 'should manage the link window' do
     @user.should.respond_to?(:link_window=)
-    @user.link_window = 4
+    @user.link_window = @cur_link_window
     @user.should.respond_to?(:link_window)
-    @user.link_window.should.equal(4)
+    @user.link_window.should.equal(@cur_link_window)
   end
   
   it 'should manage the time period' do
     @user.should.respond_to?(:time_period=)
-    @user.time_period = 32
+    @user.time_period = @cur_time_period
     @user.should.respond_to?(:time_period)
-    @user.time_period.should.equal(32)
+    @user.time_period.should.equal(@cur_time_period)
   end
   
   it 'should manage blacklist' do
@@ -307,5 +292,205 @@ context 'User' do
     @user.should.not.add_credential(@credential)
     @user.add_blacklist(@blacklist).should.equal(@server_id)
     @user.should.add_credential(@credential)
+  end
+end
+
+context 'Credential' do
+  before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+    
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pm.link_window = @cur_link_window
+    @pm.time_period = @cur_time_period
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    
+    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm.link_window = @cur_link_window
+    @nm.time_period = @cur_time_period
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 10)
+    
+    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user.link_window = @cur_link_window
+    @user.time_period = @cur_time_period
+    @user.add_blacklist(@blacklist)
+    @user.add_credential(@credential)
+    
+    @ticket = @user.ticket(@server_id)
+  end
+  
+  it 'should be (un)marshallable' do
+    bytes = @ticket.marshall
+    bytes.should.not.be.nil
+    ticket = Nymble::Ticket.unmarshall(bytes)
+    ticket.should.not.be.nil
+    bytes.should.equal(ticket.marshall)
+  end
+end
+
+context 'Server' do
+  before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pm.link_window = @cur_link_window
+    @pm.time_period = @cur_time_period
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    
+    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm.link_window = @cur_link_window
+    @nm.time_period = @cur_time_period
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 5)
+    
+    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user.link_window = @cur_link_window
+    @user.time_period = @cur_time_period
+    @user.add_blacklist(@blacklist)
+    @user.add_credential(@credential)
+    @ticket = @user.ticket(@server_id)
+    
+    @server = Nymble::Server.new(@server_id)
+  end
+  
+  it 'should be defined under Nymble' do
+    Nymble.should.const_defined?(:Server)
+  end
+  
+  it 'should be creatable' do
+    Nymble::Server.new(@server_id).should.not.be.nil
+  end
+  
+  it 'should manage server id' do
+    @server.should.respond_to?(:server_id)
+    @server.server_id.should.equal(@server_id)
+  end
+  
+  it 'should manage the link window' do
+    @server.should.respond_to?(:link_window=)
+    @server.link_window = @cur_link_window
+    @server.should.respond_to?(:link_window)
+    @server.link_window.should.equal(@cur_link_window)
+  end
+  
+  it 'should manage the time period' do
+    @server.should.respond_to?(:time_period=)
+    @server.time_period = @cur_time_period
+    @server.should.respond_to?(:time_period)
+    @server.time_period.should.equal(@cur_time_period)
+  end
+  
+  it 'should manage the hmac key' do
+    @server.should.respond_to?(:hmac_key_ns=)
+    @server.hmac_key_ns = @hmac_key_ns
+  end
+  
+  it 'should manage the blacklist' do
+    @server.should.respond_to?(:blacklist=)
+    @server.should.blacklist = @blacklist
+    @server.time_period = @cur_time_period + 1
+    @server.should.not.blacklist = @blacklist
+  end
+  
+  it 'should manage finalization' do
+    @server.time_period = @cur_time_period
+    @server.link_window = @cur_link_window
+    @server.should.respond_to?(:finalized?)
+    @server.should.not.be.finalized?
+    @server.blacklist = @blacklist
+    @server.should.be.finalized?
+    @server.time_period = @cur_time_period + 1
+    @nm.time_period = @cur_time_period + 1
+    @server.should.not.be.finalized?
+    @blacklist = @nm.create_blacklist(@server_id)
+    @server.blacklist = @blacklist
+    @server.should.be.finalized?
+  end
+  
+  it 'should verify tickets' do
+    @server.time_period = @cur_time_period
+    @server.link_window = @cur_link_window
+    @server.hmac_key_ns = @hmac_key_ns
+    @server.blacklist = @blacklist
+    @server.should.respond_to?(:valid_ticket?)
+    
+    @server.should.valid_ticket?(@ticket)
+  end
+  
+  it 'should not verify tickets with incorrect link windows' do
+    @server.link_window = @cur_link_window + 1
+    
+    @server.should.not.valid_ticket?(@ticket)
+  end
+  
+  it 'should not verify tickets with incorrect time periods' do
+    @server.time_period = @cur_time_period
+    @server.link_window = @cur_link_window
+    
+    @user.time_period = @cur_time_period - 1
+    @server.should.not.valid_ticket?(@user.ticket(@server_id))
+    
+    @user.time_period = @cur_time_period + 1
+    @server.should.not.valid_ticket?(@user.ticket(@server_id))
+  end
+  
+  it 'should manage linking tokens' do
+    @server.should.respond_to(:add_linking_tokens)
+    linking_tokens = @nm.create_linking_tokens(@server_id, @blacklist, [@ticket])
+    
+    linking_tokens.should.not.be.empty?
+    @server.add_linking_tokens(linking_tokens)
+  end
+end
+
+context 'Linking Token' do
+  before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @user_id = Nymble.digest('user_id')
+
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pm.link_window = @cur_link_window
+    @pm.time_period = @cur_time_period
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    
+    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm.link_window = @cur_link_window
+    @nm.time_period = @cur_time_period
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 5)
+    
+    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user.link_window = @cur_link_window
+    @user.time_period = @cur_time_period
+    @user.add_blacklist(@blacklist)
+    @user.add_credential(@credential)
+    @ticket = @user.ticket(@server_id)
+    
+    @server = Nymble::Server.new(@server_id)
+    @server.link_window = @cur_link_window
+    @server.time_period = @cur_time_period
+    @linking_token = @nm.create_linking_tokens(@server_id, @blacklist, [@ticket]).first
+  end
+  
+  it 'should be (un)marshallable' do
+    bytes = @linking_token.marshall
+    bytes.should.not.be.nil
+    linking_token = Nymble::LinkingToken.unmarshall(bytes)
+    linking_token.should.not.be.nil
+    bytes.should.equal(linking_token.marshall)
   end
 end

@@ -27,9 +27,29 @@ void Server::setServerId(u_char* server_id)
   memcpy(this->server_id, server_id, DIGEST_SIZE);
 }
 
+void Server::setTimePeriod(u_int time_period)
+{
+  if (time_period == this->cur_time_period) {
+    return;
+  }
+  
+  Nymble::setTimePeriod(time_period);
+  
+  for (LinkingTokens::iterator linking_token = this->linking_tokens->begin(); linking_token != this->linking_tokens->end(); ++linking_token) {
+    (*linking_token)->setTimePeriod(time_period);
+  }
+  
+  this->finalized = false;
+}
+
 void Server::setHmacKeyNS(u_char* hmac_key_ns)
 {
   memcpy(this->hmac_key_ns, hmac_key_ns, DIGEST_SIZE);
+}
+
+bool Server::isFinalized()
+{
+  return this->finalized;
 }
 
 Blacklist* Server::getBlacklist()
@@ -37,9 +57,21 @@ Blacklist* Server::getBlacklist()
   return this->blacklist;
 }
 
-void Server::setBlacklist(Blacklist* blacklist)
+bool Server::setBlacklist(Blacklist* blacklist)
 {
   this->blacklist = new Blacklist(blacklist);
+  // TODO: Should verify blacklist here.
+  
+  this->finalized = true;
+  
+  return true;
+}
+
+void Server::addLinkingTokens(LinkingTokens* linking_tokens)
+{
+  for (LinkingTokens::iterator linking_token = linking_tokens->begin(); linking_token != linking_tokens->end(); ++linking_token) {
+    this->linking_tokens->push_back(new LinkingToken(*linking_token));
+  }
 }
 
 bool Server::verifyTicket(Ticket* ticket)
@@ -66,7 +98,7 @@ bool Server::verifyTicket(Ticket* ticket)
   }
   
   for (LinkingTokens::iterator linking_token = this->linking_tokens->begin(); linking_token != this->linking_tokens->end(); ++linking_token) {
-    if (memcmp((*linking_token)->nymble, ticket->getNymble(), DIGEST_SIZE) == 0) {
+    if (memcmp((*linking_token)->getNymble(), ticket->getNymble(), DIGEST_SIZE) == 0) {
       valid = false;
     }
   }

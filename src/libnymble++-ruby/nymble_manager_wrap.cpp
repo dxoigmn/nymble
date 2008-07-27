@@ -20,6 +20,54 @@ VALUE rb_nm_init(VALUE rb_self, VALUE rb_hmac_key_np)
   return rb_self;
 }
 
+VALUE rb_nm_link_window(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  
+  NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
+  
+  return INT2FIX(nm->getLinkWindow());
+}
+
+VALUE rb_nm_link_window_set(VALUE rb_self, VALUE rb_link_window)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  Check_Type(rb_link_window, T_FIXNUM);
+  
+  NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
+  u_int link_window = FIX2UINT(rb_link_window);
+  
+  nm->setLinkWindow(link_window);
+  
+  return rb_self;
+}
+
+VALUE rb_nm_time_period(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  
+  NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
+  
+  return INT2FIX(nm->getTimePeriod());
+}
+
+VALUE rb_nm_time_period_set(VALUE rb_self, VALUE rb_time_period)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  Check_Type(rb_time_period, T_FIXNUM);
+  
+  NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
+  u_int time_period = FIX2UINT(rb_time_period);
+  
+  nm->setTimePeriod(time_period);
+  
+  return rb_self;
+}
+
 VALUE rb_nm_verify_key(VALUE rb_self)
 {
   Check_Type(rb_self, T_DATA);
@@ -122,7 +170,6 @@ VALUE rb_nm_update_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blackli
   NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
   u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
   Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_blacklist);
-  
   Tickets tickets;
   
   for (int i = 0; i < RARRAY_LEN(rb_tickets); i++) {
@@ -136,7 +183,7 @@ VALUE rb_nm_update_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blackli
     tickets.push_back(ticket);
   }
   
-  Blacklist* new_blacklist = nm->updateBlacklist(server_id, blacklist, tickets);
+  Blacklist* new_blacklist = nm->updateBlacklist(server_id, blacklist, &tickets);
   
   if (new_blacklist == NULL) {
     return Qnil;
@@ -168,7 +215,7 @@ VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_pseudo
   return Data_Wrap_Struct(rb_cCredential, NULL, rb_credential_delete, credential);
 }
 
-VALUE rb_nm_create_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_tickets)
+VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_tickets)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cNymbleManager);
@@ -181,7 +228,6 @@ VALUE rb_nm_create_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist,
   NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
   u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
   Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_blacklist);
-  
   Tickets tickets;
   
   for (int i = 0; i < RARRAY_LEN(rb_tickets); i++) {
@@ -195,19 +241,19 @@ VALUE rb_nm_create_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist,
     tickets.push_back(ticket);
   }
   
-  Tokens* tokens = nm->createTokens(server_id, blacklist, tickets);
+  LinkingTokens* linking_tokens = nm->createLinkingTokens(server_id, blacklist, &tickets);
   
-  VALUE rb_tokens = rb_ary_new();
+  VALUE rb_linking_tokens = rb_ary_new();
   
-  if (tokens) {
-    for (Tokens::iterator token = tokens->begin(); token != tokens->end(); ++token) {
-      rb_ary_push(rb_tokens, Data_Wrap_Struct(rb_cToken, NULL, rb_token_delete, *token));
+  if (linking_tokens) {
+    for (LinkingTokens::iterator linking_token = linking_tokens->begin(); linking_token != linking_tokens->end(); ++linking_token) {
+      rb_ary_push(rb_linking_tokens, Data_Wrap_Struct(rb_cLinkingToken, NULL, rb_linking_token_delete, *linking_token));
     }
     
-    delete tokens;
+    delete linking_tokens;
   }
   
-  return rb_tokens;
+  return rb_linking_tokens;
 }
 
 void rb_nm_delete(NymbleManager* nm)
