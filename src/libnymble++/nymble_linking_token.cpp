@@ -60,4 +60,5 @@ void LinkingToken::unmarshall(char* bytes, LinkingToken* out)
   
   Nymble::json_unmarshall_int(json_linking_token, "time_period", &out->time_period);
   Nymble::json_unmarshall_str(json_linking_token, "trapdoor", out->trapdoor, DIGEST_SIZE);
+  Ticket::computeNymble(out->trapdoor, out->nymble);
 }

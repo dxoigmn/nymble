@@ -22,7 +22,7 @@ before do
     if @@server.blacklist
       # Time period change
       puts "Time period changed!"
-      data = { :blacklist => @@server.blacklist.marshall, :complaints => @@complaints }
+      data = { :blacklist => @@server.blacklist.marshall, :complaints => @@complaints.map { |complaint| complaint.marshall } }
       data = JSON.parse(RestClient.put("http://localhost:3001/server/#{Nymble.hexencode(@@server.server_id)}/", data))
       
       blacklist = Nymble::Blacklist::unmarshall(data['blacklist'])

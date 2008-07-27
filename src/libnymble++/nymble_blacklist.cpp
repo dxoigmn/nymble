@@ -29,8 +29,6 @@ Blacklist::Blacklist(u_char* server_id, u_int link_window, u_int time_period)
 
   this->link_window = link_window;
   this->time_period = time_period;
-
-  this->hash();
 }
 
 Blacklist::~Blacklist()
@@ -129,6 +127,19 @@ u_int Blacklist::marshall(char* out)
   Nymble::json_marshall_str(json_blacklist, "bmac_n", this->bmac_n, DIGEST_SIZE);
   Nymble::json_marshall_str(json_blacklist, "sig", this->sig, SIGNATURE_SIZE);
   
+  struct json_object* json_nymbles = json_object_new_array();
+  
+  for (Nymbles::iterator nymble = this->begin(); nymble != this->end(); ++nymble) {
+    u_int encoded_len = Nymble::hexencode(*nymble, DIGEST_SIZE);
+    char encoded[encoded_len];
+
+    Nymble::hexencode(*nymble, DIGEST_SIZE, encoded);
+    
+    json_object_array_add(json_nymbles, json_object_new_string(encoded));
+  }
+  
+  json_object_object_add(json_blacklist, "nymbles", json_nymbles);
+  
   char* json = json_object_to_json_string(json_blacklist);
   
   if (out) {
@@ -148,4 +159,21 @@ void Blacklist::unmarshall(char* bytes, Blacklist* out)
   Nymble::json_unmarshall_str(json_blacklist, "bl_hash", out->bl_hash, DIGEST_SIZE);
   Nymble::json_unmarshall_str(json_blacklist, "bmac_n", out->bmac_n, DIGEST_SIZE);
   Nymble::json_unmarshall_str(json_blacklist, "sig", out->sig, SIGNATURE_SIZE);
+  
+  struct json_object* json_nymbles = json_object_object_get(json_blacklist, "nymbles");
+  
+  for (int i = 0; i < json_object_array_length(json_nymbles); i++) {
+    char* encoded = json_object_get_string(json_object_array_get_idx(json_nymbles, i));
+    
+    u_int decoded_len = Nymble::hexdecode(encoded);
+    u_char* decoded = new u_char[decoded_len];
+
+    Nymble::hexdecode(encoded, decoded);
+    
+    if (decoded_len == DIGEST_SIZE) {
+      out->push_back(decoded);
+    } else {
+      fprintf(stderr, "Couldn't unmarshall nymble because due to unexpected length %d (expected %d)", decoded_len, DIGEST_SIZE);
+    }
+  }
 }

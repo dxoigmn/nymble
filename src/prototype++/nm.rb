@@ -49,7 +49,13 @@ end
 put '/server/:server_id/' do
   server_id = Nymble.hexdecode(params[:server_id])
   blacklist = Nymble::Blacklist.unmarshall(params[:blacklist])
-  complaints = param[:complaints].map { |ticket| Nymble::Ticket.unmarshall(ticket) } unless params[:complaints].empty?
+  complaints = params[:complaints] unless params[:complaints].empty?
+  
+  if complaints.kind_of?(Array)
+    complaints = complaints.map { |complaint| Nymble::Ticket::unmarshall(complaint) }
+  elsif complaints.kind_of?(String)
+    complaints = [ Nymble::Ticket::unmarshall(complaints) ]
+  end
   
   unless @@nm.valid_blacklist?(server_id, blacklist)
     puts 'invalid blacklist'

@@ -35,9 +35,10 @@ Credential::~Credential()
 u_int Credential::marshall(char* out)
 {
   struct json_object* json_credential = json_object_new_object();
-  struct json_object* json_tickets = json_object_new_array();
   
   Nymble::json_marshall_str(json_credential, "seed", this->seed, DIGEST_SIZE);
+  
+  struct json_object* json_tickets = json_object_new_array();
   
   for (Tickets::iterator ticket = this->begin(); ticket != this->end(); ++ticket) {
     struct json_object* json_ticket = json_object_new_object();

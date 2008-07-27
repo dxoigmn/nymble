@@ -185,6 +185,8 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
   new_blacklist->hmac(this->hmac_key_n);
   new_blacklist->sign(this->sign_key_n);
   
+  entry->setLastUpdated(this->cur_time_period);
+  
   return new_blacklist;
 }
 
@@ -197,31 +199,28 @@ LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* 
   }
   
   LinkingTokens* linking_tokens = new LinkingTokens();
-  u_int next_time_period = cur_time_period + 1;
   
   for (Tickets::iterator ticket = complaints->begin(); ticket != complaints->end(); ++ticket) {
-    u_char trapdoor_for_next_time_period[DIGEST_SIZE];
-
     u_char trapdoor[DIGEST_SIZE];
     u_char pseudonym[DIGEST_SIZE];
     u_char seed[DIGEST_SIZE];
     u_char nymble0[DIGEST_SIZE];
-
+    
     this->decryptTrapdoor(trapdoor, pseudonym, *ticket);
     this->seedTrapdoor(seed, entry, pseudonym);
     Ticket::computeNymble(seed, nymble0);
     
     if (this->userIsBlacklisted(blacklist, nymble0)) {
-      RAND_bytes(trapdoor_for_next_time_period, DIGEST_SIZE);
+      RAND_bytes(trapdoor, DIGEST_SIZE);
     } else {
-      u_int delta = next_time_period - (*ticket)->getTimePeriod();
+      u_int delta = this->cur_time_period - (*ticket)->getTimePeriod();
       
-      Ticket::evolveTrapdoor(trapdoor, delta, trapdoor_for_next_time_period);
+      Ticket::evolveTrapdoor(trapdoor, delta, trapdoor);
       
       // FIXME: This should add nymble0 to be checked in userIsBlacklisted.
     }
     
-    linking_tokens->push_back(new LinkingToken(next_time_period, trapdoor_for_next_time_period));
+    linking_tokens->push_back(new LinkingToken(this->cur_time_period, trapdoor));
   }
   
   return linking_tokens;

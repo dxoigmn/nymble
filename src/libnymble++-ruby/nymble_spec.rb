@@ -445,11 +445,16 @@ context 'Server' do
   end
   
   it 'should manage linking tokens' do
+    @nm.time_period = @cur_time_period + 1
+    @server.time_period = @cur_time_period + 1
+    @user.time_period = @cur_time_period + 1
+    
     @server.should.respond_to(:add_linking_tokens)
     linking_tokens = @nm.create_linking_tokens(@server_id, @blacklist, [@ticket])
-    
     linking_tokens.should.not.be.empty?
+    
     @server.add_linking_tokens(linking_tokens)
+    @server.should.not.valid_ticket?(@user.ticket(@server_id))
   end
 end
 
