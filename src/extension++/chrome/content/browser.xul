@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" xmlns:html="http://www.w3.org/1999/xhtml" id="nymble-overlay">
+  <script type="application/x-javascript" src="chrome://nymble/content/jquery-1.2.6.js"></script>
+  <script type="application/x-javascript" src="chrome://nymble/content/nymble.js"></script>
+
+  <statusbar id="status-bar">
+    <statusbarpanel insertafter="statusbar-progresspanel" context="nymble-menu">
+      <image id="nymble-statusicon" style="cursor:pointer;" src="chrome://nymble/content/icon.png" tooltiptext="Run Nymble" onclick="if(!event.button) { nymble.run() }" />
+    </statusbarpanel>
+    
+    <menupopup id="nymble-menu">
+      <menuitem label="Nymble Homepage" oncommand="nymble.goHome()"/>
+      <menuitem label="About" oncommand="nymble.showAbout()" />
+      <menuseparator/>
+      <menuitem label="Run Nymble" oncommand="nymble.run()" />
+    </menupopup>
+  </statusbar>
+</overlay>

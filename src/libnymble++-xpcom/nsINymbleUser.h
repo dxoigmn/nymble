@@ -27,6 +27,12 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
 
   NS_DECLARE_STATIC_IID_ACCESSOR(NS_INYMBLEUSER_IID)
 
+  /* void setTimePeriod (in PRUint32 time_period); */
+  NS_SCRIPTABLE NS_IMETHOD SetTimePeriod(PRUint32 time_period) = 0;
+
+  /* void setLinkWindow (in PRUint32 link_window); */
+  NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window) = 0;
+
   /* void setPseudonym (in string marshalled_pseudonym); */
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym) = 0;
 
@@ -51,6 +57,8 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
 
 /* Use this macro when declaring classes that implement this interface. */
 #define NS_DECL_NSINYMBLEUSER \
+  NS_SCRIPTABLE NS_IMETHOD SetTimePeriod(PRUint32 time_period); \
+  NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window); \
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym); \
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval); \
   NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len); \
@@ -60,6 +68,8 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object. */
 #define NS_FORWARD_NSINYMBLEUSER(_to) \
+  NS_SCRIPTABLE NS_IMETHOD SetTimePeriod(PRUint32 time_period) { return _to SetTimePeriod(time_period); } \
+  NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window) { return _to SetLinkWindow(link_window); } \
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym) { return _to SetPseudonym(marshalled_pseudonym); } \
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval) { return _to GetPseudonym(_retval); } \
   NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len) { return _to SetVerifyKeyN(bytes, len); } \
@@ -69,6 +79,8 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
 #define NS_FORWARD_SAFE_NSINYMBLEUSER(_to) \
+  NS_SCRIPTABLE NS_IMETHOD SetTimePeriod(PRUint32 time_period) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetTimePeriod(time_period); } \
+  NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetLinkWindow(link_window); } \
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetPseudonym(marshalled_pseudonym); } \
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetPseudonym(_retval); } \
   NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetVerifyKeyN(bytes, len); } \
@@ -106,6 +118,18 @@ nsNymbleUser::nsNymbleUser()
 nsNymbleUser::~nsNymbleUser()
 {
   /* destructor code */
+}
+
+/* void setTimePeriod (in PRUint32 time_period); */
+NS_IMETHODIMP nsNymbleUser::SetTimePeriod(PRUint32 time_period)
+{
+    return NS_ERROR_NOT_IMPLEMENTED;
+}
+
+/* void setLinkWindow (in PRUint32 link_window); */
+NS_IMETHODIMP nsNymbleUser::SetLinkWindow(PRUint32 link_window)
+{
+    return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 /* void setPseudonym (in string marshalled_pseudonym); */

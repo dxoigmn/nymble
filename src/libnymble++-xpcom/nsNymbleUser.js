@@ -1,5 +1,16 @@
 google.load('jquery', '1');
 
+function getUTCDayOfYear(date) {   
+  // d is a Date object
+  var yn = date.getUTCFullYear();
+  var mn = date.getUTCMonth();
+  var dn = date.getUTCDate();
+  var d1 = new Date(yn, 0, 1, 12, 0, 0); // noon on Jan. 1
+  var d2 = new Date(yn, mn, dn, 12, 0, 0); // noon on input date
+  var ddiff = Math.round((d2 - d1) / 864e5);
+  return ddiff + 1; 
+}
+
 google.setOnLoadCallback(function() {
   netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
   
@@ -14,6 +25,10 @@ google.setOnLoadCallback(function() {
     }
     
     var user = Components.classes['@nymble.cs.dartmouth.edu/nymble/NymbleUser;1'].createInstance().QueryInterface(Components.interfaces.nsINymbleUser);
+    var cur_time = new Date();
+    
+    user.setLinkWindow(366 * (cur_time.getUTCFullYear() - 1970) + getUTCDayOfYear(cur_time));
+    user.setTimePeriod(cur_time.getUTCHours() * 60 + cur_time.getUTCMinutes());
     
     jQuery('p#status').append('Getting pseudonym...');
     

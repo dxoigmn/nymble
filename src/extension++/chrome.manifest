@@ -1,0 +1,3 @@
+content		nymble		chrome/content/
+
+overlay		chrome://browser/content/browser.xul		chrome://nymble/content/browser.xul

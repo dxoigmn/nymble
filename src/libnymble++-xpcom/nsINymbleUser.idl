@@ -3,6 +3,9 @@
 [scriptable, uuid(9AF36A2F-9B04-4936-ACFC-7BFFA77BC297)]
 interface nsINymbleUser : nsISupports
 {
+  void setTimePeriod(in PRUint32 time_period);
+  void setLinkWindow(in PRUint32 link_window);
+  
   void setPseudonym(in string marshalled_pseudonym);
   string getPseudonym();
   
