@@ -18,7 +18,7 @@ The Nymble system enables service providers (e.g., websites) to offer anonymous 
 
 For further details regarding security, refer to the paper:
 
-    Peter C. Johnson, Apu Kapadia, Patrick P. Tsang, and Sean W. Smith, "Nymble: Anonymous IP-Address Blocking," In Proceedings of the Seventh International Symposium on Privacy Enhancing Technologies (PET '07), pp. 113–-133, Ottawa, Canada, June 20-–22, 2007. Springer-Verlag, LNCS 4776.
+    Peter C. Johnson, Apu Kapadia, Patrick P. Tsang, and Sean W. Smith, "Nymble: Anonymous IP-Address Blocking," In Proceedings of the Seventh International Symposium on Privacy Enhancing Technologies (PET '07), pp. 113--133, Ottawa, Canada, June 20--22, 2007. Springer-Verlag, LNCS 4776.
 
 ### System configuration parameters
 
@@ -36,7 +36,7 @@ Default: 1440 (i.e. 1 day).
 
 ##### Implications of varying W
 
-Blacklists are cleared at the end of each linkability window. Since users remain blacklisted for the remainder of the linkability window after a complaint, it is desirable to keep the duration of the linkability window `L` long enough to curtail the malicious user’s activities, but not so long as to punish that user (or honest users to whom the IP address may get reassigned) indefinitely.
+Blacklists are cleared at the end of each linkability window. Since users remain blacklisted for the remainder of the linkability window after a complaint, it is desirable to keep the duration of the linkability window `L` long enough to curtail the malicious user's activities, but not so long as to punish that user (or honest users to whom the IP address may get reassigned) indefinitely.
 
 #### L, the number of time periods in one linkability window
 
@@ -147,6 +147,18 @@ FIXME
 Data Structures
 ---------------
 
+### Structure Serialization
+
+Whenever the following structures need to be sent between computers, they are serialized to a SEXP-based format (as describerd on http://theory.lcs.mit.edu/~rivest/sexp.html) with the following rules:
+
+  * Every transmitted structure is a list, whose first element is a string containing the name of the structure, as defined in this document.
+  * Every element in the structure's list after the first is a tuple (a list) whose first element is the name of a field as defined in this document, and whose second element is the value of the field.
+  * If a field value is an array or a linked list, it is represented as a list in the SEXP.
+  * Nested structures are specified completely. That is, if one structure contains a field whose value is another structure, that structure is serialized as per the above rules.
+  * There is no predefined order of fields in the serialized structure.
+
+Because of the way SEXPs are specified, the above rules can lead to a variety of different actual SEXP strings. Implementations should be flexible and accept any of the defined SEXP formats.
+
 ### Nymble Tickets and Credentials
 
 #### Nymble Tickets
@@ -171,6 +183,8 @@ where:
     trapdoorenc   : an ENC() output
     mac_n, mac_ns : an HMAC() output
 
+The SEXP structure name for a ticket is "ticket".
+
 #### Credentials
 
 A credential contains all the nymble tickets for a particular linkability window that a user can present to a particular server. As detailed later, the seed is a function of the user's id, the server's id, and the time period and linkability window for which the nymbles are valid. A collection of nymble tickets, therefore, are specific to user-server pairs, and cannot be transferred to other anonymous users, or be used at a different server.
@@ -183,6 +197,8 @@ where:
 
     seed     : a HMAC() output
     ticket[] : a NYMBLE_TICKET
+
+The SEXP structure name of a credential is "credential".
 
 ### Blacklists and their metadata
 
@@ -210,6 +226,8 @@ where:
     bmac_n      : an HMAC() output
     sig         : a SIG() output
 
+The SEXP structure name of a blacklist cert is "blacklist_cert".
+
 #### Blacklists
 
 
@@ -224,9 +242,11 @@ A blacklist has the following format:
 where:
 
     metadata : a BL_METADATA
-    cert     : a CERT
     nymble[] : a HASH() output
+    cert     : a CERT
 
+
+The SEXP structure name of a blacklist is "blacklist".
 
 ### Linking Tokens and Linking Lists
 
@@ -236,12 +256,12 @@ A linking token is issued by the Nymble Manager for each nymble ticket that has 
 
 A linking token has the following format:
 
-    LINKING_TOKEN = server_id || link_window || time_period || trapdoor || nymble_ticket
+    LINKING_TOKEN = server_id || cur_link_window || time_period || trapdoor || nymble_ticket
 
 where:
 
     server_id       : a HASH() output
-    link_window     : an INT
+    cur_link_window : an INT
     time_period     : an INT
     trapdoor        : an ENC() output
     nymble_ticket   : a TICKET 
@@ -259,6 +279,8 @@ where:
     time_period : an INT
     trapdoor    : a HASH() output
     nymble      : a HASH() output
+
+The SEXP structure name of a linking token is "linking_token".
 
 #### Linking Lists
 
@@ -287,8 +309,8 @@ NM maintains `NM_STATE`.
 
 A `NM_STATE` contains:
 
-    cur_link_window : an INT
     cur_time_period : an INT
+    cur_link_window : an INT
     hmac_key_n      : a HMAC key
     hmac_key_np     : a HMAC key
     keyedhash_key_n : a keyed hash key
@@ -311,6 +333,7 @@ PM maintains `PM_STATE`.
 
 A `PM_STATE` contains:
 
+    cur_time_period  : an INT
     cur_link_window  : an INT
     hmac_key_np      : an HMAC key
     keyedhash_key_p  : a keyed-hash key
@@ -390,16 +413,17 @@ A nymble for a particular time period is computed by hashing the trapdoor for th
 
 The NM verifies a blacklist's integrity by using HMAC `bmac_n`.
 
-    NM_BL_CHECK_INTEGRITY(blacklist, sid, hmac_key_n)
+    NM_CHECK_INTEGRITY(nm_state, blacklist, sid, hmac_key_n)
       
-      PARSE blacklist INTO metadata || nymble[1] || nymble[2] ||... || nymble[size] || cert
+      EXTRACT hmac_key_n FROM nm_state
+      PARSE blacklist INTO metadata || nymble[1] || nymble[2] || ... || nymble[size] || cert
       PARSE metadata  INTO server_id || link_window 
       PARSE cert      INTO bl_hash || time_period || bmac_n || sig
       
       IF 
-          bl_hash = HASH(metadata || nymble[1] || nymble[2] || ... || nymble[size], hmac_key_n)
+          bl_hash = HASH(metadata || nymble[1] || nymble[2] || ... || nymble[size])
         AND
-          bmac_n = HMAC(bl_hash || time_period) 
+          bmac_n = HMAC(bl_hash || time_period, hmac_key_n) 
         AND 
           server_id = id
       THEN
@@ -412,14 +436,14 @@ The NM verifies a blacklist's integrity by using HMAC `bmac_n`.
 
 Users can check a blacklist's integrity using the digital signature `sig` and the NM's public key `verify_key_n`.
 
-    BL_CHECK_INTEGRITY(blacklist, sid, verify_key_n)
+    CHECK_INTEGRITY(blacklist, sid, verify_key_n)
       
       PARSE blacklist INTO metadata || nymble[1] || nymble[2] || ... || nymble[size] || cert
       PARSE metadata  INTO server_id || link_window
       PARSE cert      INTO bl_hash || time_period || bmac_n || sig
       
       IF
-          bl_hash = HASH(metadata || nymble[1] || nymble[2] || ... || nymble[size], hmac_key_n)
+          bl_hash = HASH(metadata || nymble[1] || nymble[2] || ... || nymble[size])
         AND
           VERIFY(bl_hash || time_period, sig, verify_key_n) = TRUE
         AND 
@@ -434,7 +458,7 @@ Users can check a blacklist's integrity using the digital signature `sig` and th
 
 A user must check the the received blacklist is the most current blacklist. This function checks if a blacklist is current for the specified time period (`period`) and linkability window (`window`).
 
-    BL_CHECK_FRESHNESS(blacklist, period, window)
+    CHECK_FRESHNESS(blacklist, period, window)
       
       PARSE blacklist INTO metadata || nymble[1] || nymble[2] || ... || nymble[size] || cert
       PARSE metadata  INTO server_id || link_window
@@ -516,14 +540,16 @@ A user determines whether s/he is blacklisted by checking if one of his/her nymb
 
 The NM must not issue a trapdoor for the same user twice. For example, a server might complain about two nymble tickets that belong to the same user. Obtaining two or more trapdoors for the same user allows the server to link the trapdoors and violate the users unlinkability. Therefore, only one trapdoor must be issued to a server per user in a particular linkability window. The NM uses this algorithm to check whether the user has already been blacklisted. 
 
-    USER_ALREADY_BLACKLISTED(bl_nymbles, nymble)
+    USER_IS_BLACKLISTED(blacklist, nymble)
+      
+      EXTRACT nymble[] FROM blacklist
       
       flag = FALSE
       
-      FOR i FROM 1 TO size_of(bl_tickets) DO
+      FOR i FROM 1 TO size_of(nymble) DO
       
         IF
-          bl_nymbles[i] = nymble
+          nymble[i] = nymble
         THEN
           flag = TRUE
         END IF
@@ -536,9 +562,9 @@ The NM must not issue a trapdoor for the same user twice. For example, a server 
 
 > FIXME : add blurb
 
-    CREATE_CREDENTIAL(nm_state, pseudonym, server_id, cur_link_window)
+    CREATE_CREDENTIAL(nm_state, pseudonym, server_id)
       
-      PARSE nm_state INTO ...
+      PARSE nm_state INTO cur_time_period || cur_link_window || hmac_key_n || hmac_key_np || keyedhash_key_n || encrypt_key_n || sign_key_n || verify_key_n || entries[]       
       
       trapdoor[0] = KEYED_HASH(pseudonym || server_id || cur_link_window, keyedhash_key_n)
       seed        = trapdoor[0]
@@ -548,7 +574,7 @@ The NM must not issue a trapdoor for the same user twice. For example, a server 
       
         trapdoor[i]    = EVOLVE_TRAPDOOR(trapdoor[i-1], 1)
         nymble[i]      = COMPUTE_NYMBLE(trapdoor[i])
-        trapdoorenc[i] = ENC(trapdoor[i] || pseudonym, encrypt_key_n)
+        trapdoorenc[i] = ENC(pseudonym || trapdoor[i], encrypt_key_n)
         content[i]     = server_id || i || cur_link_window || nymble[i] || trapdoorenc[i]
         mac_n[i]       = HMAC(content[i], hmac_key_n)
         mac_ns[i]      = HMAC(content[i] || mac_n[i], hmac_key_ns[server_id])
@@ -562,13 +588,22 @@ The NM must not issue a trapdoor for the same user twice. For example, a server 
 
 ### Creating a blacklist
 
-> FIXME : define XXX_KEYGEN()
+> FIXME : dgp: is hmac_key_ns never used here?
 
-    CREATE_BLACKLIST(nm_state, server_id, time_period, link_window)
+    CREATE_BLACKLIST(nm_state, this_server_id, time_period)
       
-      PARSE nm_state INTO ...
+      PARSE nm_state INTO cur_time_period || cur_link_window || hmac_key_n || hmac_key_np || keyedhash_key_n || encrypt_key_n || sign_key_n || verify_key_n || entries[]       
       
-      hmac_key_ns = HMAC_KEYGEN()
+      FOR i FROM 1 TO size DO
+        PARSE entries[i] INTO server_id || bl_last_updated || hmac_key_ns
+      
+        IF
+          server_id = this_server_id
+        THEN
+          BREAK
+        END IF
+      END FOR
+      
       metadata    = server_id || link_window
       bl_hash     = HASH(metadata)
       bmac_n      = HMAC(bl_hash || time_period, hmac_key_n)
@@ -583,42 +618,36 @@ The NM must not issue a trapdoor for the same user twice. For example, a server 
 
 > FIXME : size_of() returns the number of entires in an array, and needs to be defined more formally somewhere.
 
-    UPDATE_BLACKLIST(nm_state, blacklist, complaint_tickets, time_period, link_window)
+    UPDATE_BLACKLIST(nm_state, blacklist, complaint_tickets, time_period)
       
-      PARSE nm_state INTO ...
+      PARSE nm_state INTO cur_time_period || cur_link_window || hmac_key_n || hmac_key_np || keyedhash_key_n || encrypt_key_n || sign_key_n || verify_key_n || entries[]       
       
-      EXTRACT nymbles FROM blacklist
+      EXTRACT nymble[] FROM blacklist
       
-      new_bl_size = size_of(nymbles) + size_of(complaint_tickets)
+      new_bl_size = size_of(nymble) + size_of(complaint_tickets)
+      
+      complaint_nymbles = NULL (i.e. empty list)
       
       FOR i FROM 1 to size_of(complaint_tickets) DO
       
-        EXTRACT trapdoorenc FROM ticket
+        EXTRACT trapdoorenc FROM complaint_tickets[i]
         EXTRACT pseudonym FROM DEC(trapdoorenc, encrypt_key_n)
         
         seed    = KEYED_HASH(pseudonym || server_id || cur_link_window, keyedhash_key_n)
         nymble0 = COMPUTE_NYMBLE(seed)
-        
-        EXTRACT blacklisted_nymbles FROM blacklist
-        
+                
         IF
-          USER_ALREADY_BLACKLISTED(blacklisted_nymbles, nymble0)
+          USER_IS_BLACKLISTED(blacklist, nymble0)
         THEN
-          complaint_nymbles[i] = rand()
+          complaint_nymbles[i] = RANDOM_BYTES(32)
         ELSE
-          
-          EXTRACT trapdoorenc FROM complaint_tickets[i]
-          EXTRACT trapdoor, pseudonym FROM DEC(trapdoorenc, encrypt_key_n)
-          
-          seed                 = KEYED_HASH(pseudonym || server_id || link_window, keyedhash_key_n)
-          complaint_nymbles[i] = COMPUTE_NYMBLE(seed)
-          
-        END
+          complaint_nymbles[i] = nymble0
+        END IF
         
       END FOR
       
-      new_metadata  = server_id || link_window || new_bl_size 
-      new_nymbles   = nymbles || complaint_nymbles
+      new_metadata  = server_id || cur_link_window || new_bl_size 
+      new_nymbles   = nymble[] || complaint_nymbles
       new_bl_hash   = HASH(new_metadata || new_nymbles)
       new_bmac_n    = HMAC(new_bl_hash || time_period, hmac_key_n)
       new_sig       = SIGN(new_bl_hash || time_period, sign_key_n)
@@ -645,9 +674,9 @@ The NM must not issue a trapdoor for the same user twice. For example, a server 
         nymble0 = COMPUTE_NYMBLE(seed)
         
         IF 
-          USER_ALREADY_BLACKLISTED(blacklisted_nymbles, nymble0)
+          USER_IS_BLACKLISTED(blacklisted_nymbles, nymble0)
         THEN 
-          trapdoor_for_next_time_period[i] = RAND()
+          trapdoor_for_next_time_period[i] = RANDOM_BYTES(32)
         ELSE
         
           EXTRACT time_period FROM complaint_tickets[i] AS complaint_time_period
@@ -672,7 +701,7 @@ The NM must not issue a trapdoor for the same user twice. For example, a server 
 Protocols
 ---------
 
-Note that because DENY payloads are `NULL`, they are not explicitly defined within each message section.
+The below protocols are HTTP-based. Messages are expressed as paths from the root the root of the receiving participant.
 
 > Big question: how do parties authenticate each other?
 
@@ -684,13 +713,15 @@ Note that because DENY payloads are `NULL`, they are not explicitly defined with
 
 This is a protocol executed between NM and PM over a confidential, mutually-authenticated channel upon initial system setup.  This happens once during the life of the system. The NM generates key material and establishes a shared key with the PM. 
 
+> dgp: this is not currently implemented.
+
   1.  NM generates all the keys using the respective key generation algorithm in `NM_STATE` and set `NM_SERVER_LIST` in `NM_STATE` to an empty list.
         
   2.  NM -> PM: `REQUEST`
-
-      The payload of `REQUEST` is:
-
-        hmac_key_np || verify_key_n
+    
+      The payload of `REQUEST` is 
+        
+        `hmac_key_np` || `verify_key_n` 
           
   3.  PM generates keyed hash key `keyedhash_key_p` in `PM_STATE` and sets `hmac_key_np` and `verify_key_n` in `PM_STATE` to those in `REQUEST`
       
@@ -698,89 +729,83 @@ This is a protocol executed between NM and PM over a confidential, mutually-auth
     
       The payload of `GRANT` is:
       
-        NULL
+        `NULL`
         
       NM and PM terminate as success.
 
 ### SERVER_REGISTRATION
 
-This is a protocol executed between a Server and the NM over a confidential, mutually-authenticated link.  This protocol must occur once for each server before that server may accept nymble tokens. In this protocol, the server sets up a shared key with the NM, and the NM initializes the server's blacklist.
+This is a protocol executed between a Server and the NM over a confidential, mutually-authenticated link.  This protocol must occur once for each server before that server may accept nymble tokens. In this protocol, the server sets up a shared key with the NM, and the NM initializes the server's blacklist. Payloads to HTTP messages are passed either as URL-encoded form data in POST requests, or as part of the URL in GET requests.
 
 
 > CTC: How does the server and NM establish this confidential, mutually-authenticated link? If we assume SSL, how are the key's exchanged?
 >> patrick : we assume X509 PKI, the details of which should probably be documented elsewhere.
 > ack: does it set finalized = true for the current time period?
 
-  1.  Server -> NM: `REQUEST`
-  
-      The payload of `REQUEST` is:
+  1.  Server -> NM: `HTTP POST` request to /register
     
-        NULL
+      The payload of the request is:
       
-      NM extracts the hostname of the server [ from the server's cert ? ]
+        `server_id`
+              
+      NM verifies `server_id` somehow (FIXME: how?).
+      
+        If `server_id` appears in `NM_SERVER_LIST` in `NM_STATE`, go to (2). Otherwise, go to (3)
+      
+  2.  NM -> Server: HTTP 400 Status with "`server_id` already registered" as message
     
-      NM hashes the hostname of the server to get `server_id`.
-    
-      If `server_i`d  appears in `NM_SERVER_LIST` in `NM_STATE`, go to (2). Otherwise, go to (3).
-    
-  2.  NM -> Server: `DENY`
-  
-      Both NM and the Server then terminate the protocol as failure.
-    
+      Both NM and the Server then terminate the protocol as `FAILURE`.
+      
   3.  NM does the following:
-  
-        blacklist       = CREATE_BLACKLIST(nm_state, server_id, cur_time_period, cur_link_window)
-        bl_last_updated = 0
-        nm_entry        = server_id || bl_last_updated || hmac_key_ns
-        NM_STATE        = NM_STATE || nm_entry
-      
-  4.  NM -> Server: GRANT
-  
-      The payload of the GRANT reply is a
-
-        hmac_key_ns || blacklist
-
-      NM terminates as success
     
+        `blacklist`       = `CREATE_BLACKLIST(nm_state, server_id, cur_time_period, cur_link_window)`
+        `bl_last_updated` = `0`
+        `nm_entry`        = `server_id` || `bl_last_updated` || `hmac_key_ns`
+        `NM_STATE`        = `NM_STATE` || `nm_entry`
+        
+  4.  NM -> Server: HTTP 200 Status with following as data:
+          
+        `hmac_key_ns`
+        `blacklist`
+        
+      NM terminates as `SUCCESS`
+      
   5.  Server sets `hmac_key_ns` and blacklist `SERVER_STATE` to those in the payload of `GRANT`, and initializes other state to the following:
-      
-        linking_list[server_id] = NULL (i.e. empty list)
-        finalized[server_id]    = false
-      
-      Server terminates as success.
+        
+        `linking_list[server_id]` = `NULL` (i.e. empty list)
+        `finalized[server_id] `   = `FALSE`
+        
+      Server terminates as `SUCCESS`.
 
 ### USER_REGISTER
 
 This is a protocol executed between a User and the PM over a PM-authenticated, confidential channel.  A user must register once each linkability window, before acquiring a credential, and before requesting a service.
 
-  1.  User -> PM: `REQUEST`
-  
-      The payload of `REQUEST` is:
+  1.  User -> PM: `HTTP GET` request to /pseudonym
     
-        NULL
-      
+      The payload of the request is empty.
+        
       PM infers the registering user's IP address `user_ip` from the channel. 
-    
+      
       PM checks if the IP is allowed to register, according to some policies, such as: it's a new IP address, it's not a Tor exit node address, etc. If the check fails, goto (2). Otherwise go to (3).
-      
-  2.  PM -> User: `DENY`
-  
-      PM terminates as failure. Upon receiving `DENY`, User also terminates as failure.
-      
+        
+  2.  PM -> User: HTTP 400 Status with "not allowed" as message
+    
+      PM terminates as failure. Upon receiving message, User also terminates as failure.
+        
   3.  PM computes:
-  
-        pseudonym   = KEYED_HASH(user_id || cur_link_window, keyedhash_key_p)
-        mac_np      = HMAC(pseudonym || cur_link_window, hmac_key_np)
+    
+        `pseudonym`   = `KEYED_HASH(user_id || cur_link_window, keyedhash_key_p)`
+        `mac_np`      = `HMAC(pseudonym || cur_link_window, hmac_key_np)`
+          
+  4.  PM -> User: HTTP 200 Status with following as data:
+            
+        `pseudonym`
+        `mac_np`
+          
+      User stores these in `USER_STATE`
         
-  4.  PM -> User: `GRANT`
-  
-      The payload of the `GRANT` reply is:
-      
-        pseudonym || mac_np
-        
-      User stores these in `USER_STATE`.
-      
-      They both terminate as success.
+      They both terminate as `SUCCESS`.
 
 ### CREDENTIAL_ACQUISITION
 
@@ -790,100 +815,92 @@ User wants to get a credential to connect to server with id `server_id`.
 
 > CTC: What does the user do with this credential?
 
-  1.  User -> NM: `REQUEST`
-  
+  1.  User -> NM: `HTTP GET` request to /credential
+    
       The payload of the request is:
-      
-        pseudonym || mac_np || server_id
         
+        `pseudonym` || `server_id`
+          
   2.  NM uses `hmac_key_np` in `NM_STATE` to verify the request by checking that:
-      
-        mac_np = HMAC(pseudonym || cur_link_window, hmac_key_np)
-      
-      If `server_id` is invalid, or the verification fails, go to (3), otherwise go to (4).  
-      
-  3.  NM -> User: `DENY`
-  
-      They both terminate as failure
-      
-  4.  NM creates and computes a credential as follows:
-  
-        credential = CREATE_CREDENTIAL(nm_state, pseudonym, server_id, cur_link_window)
-      
-  5.  NM -> User: `GRANT`
-  
-      The payload of the `GRANT` reply is:
-      
-        credential
         
-      They terminate as success.
+        `mac_np` = `HMAC(pseudonym || cur_link_window, hmac_key_np)`
+        
+      If `server_id` is invalid, or the verification fails, go to (3), otherwise go to (4).  
+        
+  3.  NM -> User: HTTP 400 Status with "invalid `server_id`" or "invalid pseudonym" as message, depending on error in (2)
+    
+      They both terminate as `FAILURE`
+        
+  4.  NM creates and computes a credential as follows:
+    
+        `credential` = `CREATE_CREDENTIAL(nm_state, pseudonym, server_id, cur_link_window)`
+        
+  5.  NM -> User: HTTP 200 Status with following payload
+            
+        `credential`
+          
+      They terminate as `SUCCESS`.
 
 ### GET_BLACKLIST
 
-This is a protocol executed between a registered User and a registered Server over an User-anonymous channel. This protocol must occur once during each time period (`access_time_period`) in which a user submits a `GET_SERVICE` request to a particular server, before the request is submitted.
+This is a protocol executed between a registered User and a registered Server over an User-anonymous channel. This protocol must occur once during each time period (`access_time_period`) in which a user submits a `GET_SERVICE` request to a particular server, before the request is submitted. Although fundamental to Nymble's correct behavior, this protocol message is not specified exactly, as the exact messages exchanged will depend on the protocol the Server is implementing.
 
 > Q: should the server be authenticated in the channel? what are the security and efficiency impact?
 > ack: Patrick, make more concrete after you've fleshed out the time synchronization protocol
 
-  1.  User -> Server: `REQUEST`
-  
-      The payload of the request is:
-      
-        NULL
+  1.  User -> Server: Requests blacklist in whatever way is suitable. The details of this step depend on Server protocol specifics.
+          
+  2.  Server -> User: Provides the blacklist as described below
+    
+      If finalized in `SERVER_STATE` is false, i.e. if the server does not have a finalized blacklist for the `cur_time_period`, then Server first executes `COMPLAIN` and `UPDATE` and obtains a finalized blacklist from the NM.
         
-  2.  Server -> User: `GRANT`
-  
-      If finalized in `SERVER_STATE` is false, i.e. if the server does not have a finalized blacklist for the `cur_time_period`, then Server first executes `COMPLAIN and UPDATE` and obtains a finalized blacklist from the NM.
-      
-      The payload of a `GRANT` reply is: 
-      
-        blacklist in NM_STATE
+      The payload should contain: 
         
+        `blacklist` in `NM_STATE`
+          
   3.  Now, an entry for `server_id` must already exist because a user gets a credential for a server before he/she gets a blacklist of the server.
-      
-  4.  User verifies the integrity and freshness of the blacklist.
-  
-        ASSERT TRUE = BL_CHECK_INTEGRITY(blacklist, server_id, verify_key_n)
-        ASSERT TRUE = BL_CHECK_FRESHNESS(blacklist, server_id, cur_time_period, cur_link_window)
         
+  4.  User verifies the integrity and freshness of the blacklist.
+    
+      ASSERT `TRUE` = `CHECK_INTEGRITY(blacklist, server_id, verify_key_n)`
+      ASSERT `TRUE` = `CHECK_FRESHNESS(blacklist, server_id, cur_time_period, cur_link_window)`
+          
       If any of the assertions fail, User removes the blacklist from the entry. He terminates as failure.
-      
+        
       Else, the user replaces `blacklist[server_id]` with this new blacklist. He terminates as success.
 
 ### AUTHENTICATE
 
-This is a protocol executed between a registered User and a registered Server with identity `server_id` over a Server-authenticated, confidential, User-anonymous channel during time period `access_time_period = cur_time_period`.
+This is a protocol executed between a registered User and a registered Server with identity `server_id` over a Server-authenticated, confidential, User-anonymous channel during time period `access_time_period = cur_time_period`. Although fundamental to Nymble's correct behavior, this protocol message is not specified exactly, as the exact messages exchanged will depend on the protocol the Server is implementing.
 
-  1.  User extracts from `USER_STATE` the entry for `server_id`, and `ticket[cur_time_period]` from the `credential` in that entry.
-      
-  2.  User -> Server: `REQUEST`
-  
-      The payload of the `REQUEST` is:
-      
+  1.  User extracts from `USER_STATE` the entry for `server_id`, and `ticket[cur_time_period]` from the credential in that entry.
+        
+  2.  User -> Server: Provides the ticket in whatever manner is suitable for the specific Server protocol.
+    
+      The payload of the request is:
+        
         the ticket extracted above
-        
-  3.  Server does the following:
-  
-      1. Extract `hmac_key_ns`, `server_id`, `linking_list` from its `SERVER_STATE`
-      
-      2. Asserts:
-      
-          1 = VERIFY_TICKET(ticket, server_id, cur_time_period, cur_link_window,hmac_key_ns)
-          0 = LINK_TICKET(ticket, linking_list)
           
-      If any of the assertions fail, go to (4), otherwise go to (5).
-      
-  4.  Server -> User : `DENY`
-  
-      Both terminate as failure
-      
-  5.  Server -> User : `GRANT`
-  
-      The payload of `GRANT` is:
-      
-        NULL
+  3.  Server does the following:
+    
+      1. Extract `hmac_key_ns`, `server_id`, `linking_list` from its `SERVER_STATE`
         
-      Both terminate as success.
+      2. Asserts:
+        
+        `1` = `VERIFY_TICKET(ticket, server_id, cur_time_period, cur_link_window,hmac_key_ns)`
+        `0` = `LINK_TICKET(ticket, linking_list)`
+            
+      If either of the assertions fail, go to (3), otherwise go to (4).
+        
+  4.  Server -> User : Denied, in whatever manner is suitable for the specific Server protocol.
+    
+      Both terminate as `FAILURE`.
+        
+  5.  Server -> User : Granted, in whatever manner is suitable for the specific Server protocol.
+    
+      This message has no system-defined payload, but individual servers may want to provide access to protected resources as part of the message.
+          
+      Both terminate as `SUCCESS`.
 
 ### REQUEST FOR SERVICE
 
@@ -895,82 +912,96 @@ This section describes the procedure a user follows to request a service.
 The User does the following:
 
   1.  Record the time of access:
-  
-        access_time_period = cur_time_period
-        
+    
+        `access_time_period` = `cur_time_period`
+          
   2.  Self-censoring:
-  
-      1. If `cur_time_period = last_authenticated` in the entry for `server_id` in `USER_STATE`, then terminate as `FAILURE`.
-         
+    
+      1. If `cur_time_period` = `last_authenticated` in the entry for `server_id` in `USER_STATE`, then terminate as `FAILURE`.
+           
       2. If `blacklisted[server_id]` in `USER_STATE` is `TRUE`, then terminate as `FAILURE`.
-         
+           
   3.  Getting Blacklist:
-  
+    
       Invoke `GET_BLACKLIST(server_id, access_time_period)`. If it returns `FAILURE`, the User terminates as `FAILURE`.
-      
+        
   4.  Blacklist Inspection:
-  
-      If `I_AM_BLACKLISTED(blacklist, credential[server_id])`, then terminate as `FAILURE`.
-         
+    
+      IF:
+        `I_AM_BLACKLISTED(blacklist, credential[server_id])`
+      THEN:
+        Terminate as `FAILURE`
+           
   5.  Ready to be authenticated
-  
-      If the blacklist for `access_time_period` has been verified for integrity and freshness, and the user is not on the blacklist, the user authenticates with the server.
-      
-      User invokes `AUTHENTICATE(server_id, access_time_period)`.
+    
+      If the blacklist for `access_time_period` has been verified for integrity and freshness, and the user is not on the blacklist, the user authenticates with the server
+        
+      User invokes `AUTHENTICATE(server_id, access_time_period)`
 
 ### COMPLAIN and UPDATE
 
 This protocol is executed between a registered Server and the NM over a mutually-authenticated, confidential channel. 
+The server must complain as early as possible in time period i with only tickets from time period i - 1. The NM will then
+grant it a new blacklist for time period i.
 
-  1.  By authenticating the server, the NM knows the server_id of the server.
-  
-  2.  Server -> NM: `REQUEST`
-  
-      The payload of `REQUEST` is:
-      
-        blacklist in SERVER_STATE and a complaint
+  1.  By authenticating the server, the NM knows the `server_id` of the server.
+    
+  2.  Server -> NM: `HTTP POST` request to /complain
+    
+      The payload of the request is:
         
+        `server_id`
+        `blacklist` in `SERVER_STATE`
+        `complaints`
+          
       where:
-      
-        complaint = ticket[1] || ticket[2] || ... || ticket[complaint_size]
         
+        `complaints` = `ticket[1]` || `ticket[2]` || ... || `ticket[complaint_size]`
+          
       where:
-      
-        ticket[i] is the ticket associated with the offending access and the blacklist is from SERVER_STATE.
         
-      complaint could be `NULL`.
-      
+        `ticket[i]` is the ticket associated with the offending access (in the previous time period) and the blacklist is from `SERVER_STATE`.
+          
+      complaint could be NULL.
+        
   3.  NM does the following:
-  
-        ASSERT 1 = NM_BL_CHECK_INTEGRITY(blacklist, server_id, hmac_key_n)
-        ASSERT 1 = BL_CHECK_FRESHNESS(blacklist, bl_last_updated[server_id], cur_link_window)
-        ASSERT NOT bl_last_updated[server_id] = cur_time_period
-      
-      If any of the assertions fail, go to (4), otherwise, go to (5).
-      
-  4.  NM -> Server: `DENY`
-  
-      Both terminate as failure.
-      
+    
+        ASSERT `server_id` is valid, by checking SSL certificate or something (FIXME: specify this exactly, and ideally just infer `server_id` from channel)
+        
+        ASSERT `TRUE` = `NM_CHECK_INTEGRITY(nm_state, blacklist, server_id, hmac_key_n)`
+        ASSERT `TRUE` = `CHECK_FRESHNESS(blacklist, bl_last_updated[server_id], cur_link_window)`
+        
+        FOREACH `complaint` IN `complaints`
+          EXTRACT `time_period` FROM `complaint`
+          ASSERT `time_period` = `cur_time_period` - `1`
+        END
+        
+        ASSERT NOT `bl_last_updated[server_id]` = `cur_time_period`
+        
+      If any of the assertions fail, go to (3), otherwise, go to (4).
+        
+  4.  NM -> Server: HTTP 400 Status with "invalid `server_id`" or "invalid blacklist"
+    
+      Both terminate as `FAILURE`.
+        
   5.  NM does the following:
-  
-      EXTRACT `tickets` FROM `blacklist`
-      
-        linking_tokens = COMPUTE_TOKENS(nm_state, tickets, complaint, cur_time_period)
-        new_blacklist = UPDATE_BLACKLIST(nm_state, blacklist, complaint, cur_time_period, cur_link_window)
-        bl_last_updated[server_id] = cur_time_period
+    
+        EXTRACT `tickets` FROM `blacklist`
         
-  6.  NM -> Server: `GRANT`:
-  
-      The payload of the `GRANT` reply is an blacklist and a list of tokens:
-      
-        complaint_reply = new_blacklist || linking_tokens
-        
+        `linking_tokens` = `COMPUTE_TOKENS(nm_state, tickets, complaint, cur_time_period)`
+        `new_blacklist` = `UPDATE_BLACKLIST(nm_state, blacklist, complaint, cur_time_period, cur_link_window)`
+        `bl_last_updated[server_id]` = `cur_time_period`
+          
+  6.  NM -> Server: HTTP 200 Status with following:
+            
+        `new_blacklist`
+        `linking_tokens`
+          
   7.  Upon receiving a `GRANT` reply, the server replaces blacklist in `SERVER_STATE` with `new_blacklist`, and appends each linking token to `linking_list` in `SERVER_STATE` as an `LL_ENTRY`:
-      
-      For each `linking_token[i]`, the server creates a linking list entry as `time_period[i] || trapdoor[i] || nymble[i]`. All these entries can be extracted from `linking_token[i]`.
-  
-      The SERVER sets `finalized[server_id] = true`.
+        
+      For each `linking_token[i]`, the server creates a linking list entry as `time_period[i]` || `trapdoor[i]` || `nymble[i]`. All these entries can be extracted from `linking_token[i]`. 
+    
+      The `SERVER` sets `finalized[server_id]` = `TRUE`
 
 State Update
 ------------
