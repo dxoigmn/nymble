@@ -1,6 +1,16 @@
 var nymble = {
-  run: function() {
-    var doc = window.top.getBrowser().selectedBrowser.contentWindow.document;
+  init: function() {
+    var appcontent = window.document.getElementById("appcontent");
+    
+    if(appcontent) {
+      appcontent.addEventListener("DOMContentLoaded", nymble.onPageLoad, false);
+    }
+  },
+  
+  run: function(doc) {
+    if (!doc) {
+      doc = window.top.getBrowser().selectedBrowser.contentWindow.document;
+    }
     
     jQuery('form', doc).each(function() {
       var form = this;
@@ -43,6 +53,10 @@ var nymble = {
     win.open("http://www.cs.dartmouth.edu/~nymble/");
   },
   
+  onPageLoad: function(evt) {
+    nymble.run(evt.originalTarget);
+  },
+  
   getUTCDayOfYear: function(date) {   
     // d is a Date object
     var yn = date.getUTCFullYear();
@@ -54,3 +68,5 @@ var nymble = {
     return ddiff + 1; 
   },
 }
+
+window.addEventListener("load", function() { nymble.init(); }, false);

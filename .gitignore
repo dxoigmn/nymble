@@ -3,4 +3,6 @@
 *.bundle
 *.dylib
 *.log
+*.xpi
+*.pub
 Makefile
