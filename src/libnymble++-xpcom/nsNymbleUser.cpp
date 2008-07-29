@@ -16,24 +16,23 @@ nsNymbleUser::~nsNymbleUser()
 /* void setTimePeriod (in PRUint32 time_period); */
 NS_IMETHODIMP nsNymbleUser::SetTimePeriod(PRUint32 time_period)
 {
-    this->user->setTimePeriod(time_period);
-    
-    return NS_OK;
+  this->user->setTimePeriod(time_period);
+  
+  return NS_OK;
 }
 
 /* void setLinkWindow (in PRUint32 link_window); */
 NS_IMETHODIMP nsNymbleUser::SetLinkWindow(PRUint32 link_window)
 {
-    this->user->setLinkWindow(link_window);
-    
-    return NS_OK;
+  this->user->setLinkWindow(link_window);
+  
+  return NS_OK;
 }
 
-/* void setVerifyKeyN ([array, size_is (len)] in PRUint8 bytes, in PRUint32 len); */
-NS_IMETHODIMP nsNymbleUser::SetVerifyKeyN(PRUint8 *bytes, PRUint32 len)
+/* void readVerifyKey (in string verify_key_path); */
+NS_IMETHODIMP nsNymbleUser::ReadVerifyKey(const char *verify_key_path)
 {
-  this->user->setVerifyKeyN(&bytes, len);
-  
+  this->user->readVerifyKey((char*) verify_key_path);
   return NS_OK;
 }
 

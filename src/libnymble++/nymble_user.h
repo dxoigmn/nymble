@@ -20,7 +20,7 @@ class User : public Nymble, public UserEntries
     void setPseudonym(Pseudonym* pseudonym);
     Pseudonym* getPseudonym();
     
-    void setVerifyKeyN(u_char** verify_key_n, u_int verify_key_n_len);
+    void readVerifyKey(char* verify_key_path);
     
     u_char* addBlacklist(Blacklist* blacklist);
     bool addCredential(Credential* credential);

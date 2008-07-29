@@ -5,21 +5,20 @@ VALUE rb_user_new(VALUE rb_self)
   return Data_Wrap_Struct(rb_self, NULL, rb_user_delete, new User());
 }
 
-VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_n)
+VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_path)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cUser);
   Check_Type(rb_pseudonym, T_DATA);
   Check_Class(rb_pseudonym, rb_cPseudonym);
-  Check_Type(rb_verify_key_n, T_STRING);
+  Check_Type(rb_verify_key_path, T_STRING);
   
   User* user = (User*) DATA_PTR(rb_self);
   Pseudonym* pseudonym = (Pseudonym*) DATA_PTR(rb_pseudonym);
-  u_char* verify_key_n = (u_char*) RSTRING_PTR(rb_verify_key_n);
-  u_int verify_key_n_len = RSTRING_LEN(rb_verify_key_n);
+  char* verify_key_path = RSTRING_PTR(rb_verify_key_path);
   
   user->setPseudonym(pseudonym);
-  user->setVerifyKeyN(&verify_key_n, verify_key_n_len);
+  user->readVerifyKey(verify_key_path);
   
   return rb_self;
 }

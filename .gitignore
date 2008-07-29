@@ -4,5 +4,5 @@
 *.dylib
 *.log
 *.xpi
-*.pub
+*.key
 Makefile

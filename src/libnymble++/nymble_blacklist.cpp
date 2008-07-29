@@ -113,7 +113,7 @@ void Blacklist::sign(RSA* sign_key_n, u_char* out)
   SHA256_Final(hashed, &sha_ctx);
   
   RSA_padding_add_PKCS1_PSS(sign_key_n, buffer, hashed, EVP_sha256(), -2);
-  RSA_private_encrypt(RSA_size(sign_key_n), buffer, out, sign_key_n, RSA_NO_PADDING);
+  RSA_private_encrypt(SIGNATURE_SIZE, buffer, out, sign_key_n, RSA_NO_PADDING);
 }
 
 u_int Blacklist::marshall(char* out)

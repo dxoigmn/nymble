@@ -13,12 +13,11 @@
 extern VALUE rb_cNymbleManager;
 
 VALUE rb_nm_new(VALUE rb_self);
-VALUE rb_nm_init(VALUE rb_self, VALUE rb_hmac_key_np);
+VALUE rb_nm_init(VALUE rb_self, VALUE rb_hmac_key_np, VALUE rb_sign_key_path);
 VALUE rb_nm_link_window(VALUE rb_self);
 VALUE rb_nm_link_window_set(VALUE rb_self, VALUE rb_link_window);
 VALUE rb_nm_time_period(VALUE rb_self);
 VALUE rb_nm_time_period_set(VALUE rb_self, VALUE rb_time_period);
-VALUE rb_nm_verify_key(VALUE rb_self);
 VALUE rb_nm_add_server(VALUE rb_self, VALUE rb_server_id);
 VALUE rb_nm_verify_pseudonym(VALUE rb_self, VALUE rb_pseudonym);
 VALUE rb_nm_verify_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist);

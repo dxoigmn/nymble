@@ -12,7 +12,7 @@
 extern VALUE rb_cUser;
 
 VALUE rb_user_new(VALUE rb_self);
-VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_n);
+VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_path);
 VALUE rb_user_link_window(VALUE rb_self);
 VALUE rb_user_link_window_set(VALUE rb_self, VALUE rb_link_window);
 VALUE rb_user_time_period(VALUE rb_self);

@@ -39,12 +39,11 @@ void Init_nymble() {
   
   rb_cNymbleManager = rb_define_class_under(rb_mNymble, "NymbleManager", rb_cObject);
   rb_define_alloc_func(rb_cNymbleManager, rb_nm_new);
-  rb_define_method(rb_cNymbleManager, "initialize", RUBY_METHOD_FUNC(rb_nm_init), 1);
+  rb_define_method(rb_cNymbleManager, "initialize", RUBY_METHOD_FUNC(rb_nm_init), 2);
   rb_define_method(rb_cNymbleManager, "link_window", RUBY_METHOD_FUNC(rb_nm_link_window), 0);
   rb_define_method(rb_cNymbleManager, "link_window=", RUBY_METHOD_FUNC(rb_nm_link_window_set), 1);
   rb_define_method(rb_cNymbleManager, "time_period", RUBY_METHOD_FUNC(rb_nm_time_period), 0);
   rb_define_method(rb_cNymbleManager, "time_period=", RUBY_METHOD_FUNC(rb_nm_time_period_set), 1);
-  rb_define_method(rb_cNymbleManager, "verify_key", RUBY_METHOD_FUNC(rb_nm_verify_key), 0);
   rb_define_method(rb_cNymbleManager, "add_server", RUBY_METHOD_FUNC(rb_nm_add_server), 1);
   rb_define_method(rb_cNymbleManager, "valid_pseudonym?", RUBY_METHOD_FUNC(rb_nm_verify_pseudonym), 1);
   rb_define_method(rb_cNymbleManager, "valid_blacklist?", RUBY_METHOD_FUNC(rb_nm_verify_blacklist), 2);

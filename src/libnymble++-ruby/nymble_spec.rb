@@ -103,10 +103,11 @@ context 'Nymble Manager' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
     @user_id = Nymble.digest('user_id')
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
     @pseudonym = @pm.create_pseudonym(@user_id)
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @server_id = Nymble.digest('server_id')
   end
   
@@ -115,13 +116,7 @@ context 'Nymble Manager' do
   end
   
   it 'should be created with a valid hmac key' do
-    Nymble::NymbleManager.new(@hmac_key_np).should.not.be.nil
-  end
-  
-  it 'should not be creatable with an invalid hmac key' do
-    should.raise(ArgumentError) { Nymble::NymbleManager.new() }
-    should.raise(ArgumentError) { Nymble::NymbleManager.new(@hmac_key_np * 2) }
-    should.raise(ArgumentError) { Nymble::NymbleManager.new(@hmac_key_np.slice(0, @hmac_key_np.size / 2)) }
+    Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n).should.not.be.nil
   end
   
   it 'should manage the link window' do
@@ -202,10 +197,11 @@ context 'Blacklist' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
     @user_id = Nymble.digest('user_id')
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
     @pseudonym = @pm.create_pseudonym(@user_id)
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @server_id = Nymble.digest('server_id')
     @hmac_key_ns = @nm.add_server(@server_id)
     @blacklist = @nm.create_blacklist(@server_id)
@@ -225,10 +221,11 @@ context 'Credential' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
     @user_id = Nymble.digest('user_id')
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
     @pseudonym = @pm.create_pseudonym(@user_id)
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @server_id = Nymble.digest('server_id')
     @hmac_key_ns = @nm.add_server(@server_id)
     @blacklist = @nm.create_blacklist(@server_id)
@@ -249,15 +246,17 @@ context 'User' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
+    @verify_key_n = File.expand_path('verify_n.key')
     @user_id = Nymble.digest('user_id')
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
     @pseudonym = @pm.create_pseudonym(@user_id)
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @server_id = Nymble.digest('server_id')
     @hmac_key_ns = @nm.add_server(@server_id)
     @blacklist = @nm.create_blacklist(@server_id)
     @credential = @nm.create_credential(@server_id, @pseudonym, 1)
-    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user = Nymble::User.new(@pseudonym, @verify_key_n)
   end
   
   it 'should be defined under Nymble' do
@@ -265,7 +264,7 @@ context 'User' do
   end
   
   it 'should be created with a valid pseudonym and verify key' do
-    Nymble::User.new(@pseudonym, @nm.verify_key).should.not.be.nil
+    Nymble::User.new(@pseudonym, @verify_key_n).should.not.be.nil
   end
   
   it 'should manage the link window' do
@@ -300,6 +299,8 @@ context 'Credential' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
+    @verify_key_n = File.expand_path('verify_n.key')
     @user_id = Nymble.digest('user_id')
     
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
@@ -307,7 +308,7 @@ context 'Credential' do
     @pm.time_period = @cur_time_period
     @pseudonym = @pm.create_pseudonym(@user_id)
     
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @nm.link_window = @cur_link_window
     @nm.time_period = @cur_time_period
     @server_id = Nymble.digest('server_id')
@@ -315,7 +316,7 @@ context 'Credential' do
     @blacklist = @nm.create_blacklist(@server_id)
     @credential = @nm.create_credential(@server_id, @pseudonym, 10)
     
-    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user = Nymble::User.new(@pseudonym, @verify_key_n)
     @user.link_window = @cur_link_window
     @user.time_period = @cur_time_period
     @user.add_blacklist(@blacklist)
@@ -338,6 +339,8 @@ context 'Server' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
+    @verify_key_n = File.expand_path('verify_n.key')
     @user_id = Nymble.digest('user_id')
 
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
@@ -345,7 +348,7 @@ context 'Server' do
     @pm.time_period = @cur_time_period
     @pseudonym = @pm.create_pseudonym(@user_id)
     
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @nm.link_window = @cur_link_window
     @nm.time_period = @cur_time_period
     @server_id = Nymble.digest('server_id')
@@ -353,7 +356,7 @@ context 'Server' do
     @blacklist = @nm.create_blacklist(@server_id)
     @credential = @nm.create_credential(@server_id, @pseudonym, 5)
     
-    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user = Nymble::User.new(@pseudonym, @verify_key_n)
     @user.link_window = @cur_link_window
     @user.time_period = @cur_time_period
     @user.add_blacklist(@blacklist)
@@ -463,6 +466,8 @@ context 'Linking Token' do
     @cur_link_window = 10
     @cur_time_period = 2
     @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
+    @verify_key_n = File.expand_path('verify_n.key')
     @user_id = Nymble.digest('user_id')
 
     @pm = Nymble::PseudonymManager.new(@hmac_key_np)
@@ -470,7 +475,7 @@ context 'Linking Token' do
     @pm.time_period = @cur_time_period
     @pseudonym = @pm.create_pseudonym(@user_id)
     
-    @nm = Nymble::NymbleManager.new(@hmac_key_np)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
     @nm.link_window = @cur_link_window
     @nm.time_period = @cur_time_period
     @server_id = Nymble.digest('server_id')
@@ -478,7 +483,7 @@ context 'Linking Token' do
     @blacklist = @nm.create_blacklist(@server_id)
     @credential = @nm.create_credential(@server_id, @pseudonym, 5)
     
-    @user = Nymble::User.new(@pseudonym, @nm.verify_key)
+    @user = Nymble::User.new(@pseudonym, @verify_key_n)
     @user.link_window = @cur_link_window
     @user.time_period = @cur_time_period
     @user.add_blacklist(@blacklist)

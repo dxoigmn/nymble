@@ -39,8 +39,8 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
   /* string getPseudonym (); */
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval) = 0;
 
-  /* void setVerifyKeyN ([array, size_is (len)] in PRUint8 bytes, in PRUint32 len); */
-  NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len) = 0;
+  /* void readVerifyKey (in string verify_key_path); */
+  NS_SCRIPTABLE NS_IMETHOD ReadVerifyKey(const char *verify_key_path) = 0;
 
   /* string addBlacklist (in string marshalled_blacklist); */
   NS_SCRIPTABLE NS_IMETHOD AddBlacklist(const char *marshalled_blacklist, char **_retval) = 0;
@@ -61,7 +61,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window); \
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym); \
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval); \
-  NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len); \
+  NS_SCRIPTABLE NS_IMETHOD ReadVerifyKey(const char *verify_key_path); \
   NS_SCRIPTABLE NS_IMETHOD AddBlacklist(const char *marshalled_blacklist, char **_retval); \
   NS_SCRIPTABLE NS_IMETHOD AddCredential(const char *marshalled_credential, PRBool *_retval); \
   NS_SCRIPTABLE NS_IMETHOD GetTicket(const char *serverId, char **_retval); 
@@ -72,7 +72,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window) { return _to SetLinkWindow(link_window); } \
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym) { return _to SetPseudonym(marshalled_pseudonym); } \
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval) { return _to GetPseudonym(_retval); } \
-  NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len) { return _to SetVerifyKeyN(bytes, len); } \
+  NS_SCRIPTABLE NS_IMETHOD ReadVerifyKey(const char *verify_key_path) { return _to ReadVerifyKey(verify_key_path); } \
   NS_SCRIPTABLE NS_IMETHOD AddBlacklist(const char *marshalled_blacklist, char **_retval) { return _to AddBlacklist(marshalled_blacklist, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD AddCredential(const char *marshalled_credential, PRBool *_retval) { return _to AddCredential(marshalled_credential, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD GetTicket(const char *serverId, char **_retval) { return _to GetTicket(serverId, _retval); } 
@@ -83,7 +83,7 @@ class NS_NO_VTABLE NS_SCRIPTABLE nsINymbleUser : public nsISupports {
   NS_SCRIPTABLE NS_IMETHOD SetLinkWindow(PRUint32 link_window) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetLinkWindow(link_window); } \
   NS_SCRIPTABLE NS_IMETHOD SetPseudonym(const char *marshalled_pseudonym) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetPseudonym(marshalled_pseudonym); } \
   NS_SCRIPTABLE NS_IMETHOD GetPseudonym(char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetPseudonym(_retval); } \
-  NS_SCRIPTABLE NS_IMETHOD SetVerifyKeyN(PRUint8 *bytes, PRUint32 len) { return !_to ? NS_ERROR_NULL_POINTER : _to->SetVerifyKeyN(bytes, len); } \
+  NS_SCRIPTABLE NS_IMETHOD ReadVerifyKey(const char *verify_key_path) { return !_to ? NS_ERROR_NULL_POINTER : _to->ReadVerifyKey(verify_key_path); } \
   NS_SCRIPTABLE NS_IMETHOD AddBlacklist(const char *marshalled_blacklist, char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->AddBlacklist(marshalled_blacklist, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD AddCredential(const char *marshalled_credential, PRBool *_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->AddCredential(marshalled_credential, _retval); } \
   NS_SCRIPTABLE NS_IMETHOD GetTicket(const char *serverId, char **_retval) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetTicket(serverId, _retval); } 
@@ -144,8 +144,8 @@ NS_IMETHODIMP nsNymbleUser::GetPseudonym(char **_retval)
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
-/* void setVerifyKeyN ([array, size_is (len)] in PRUint8 bytes, in PRUint32 len); */
-NS_IMETHODIMP nsNymbleUser::SetVerifyKeyN(PRUint8 *bytes, PRUint32 len)
+/* void readVerifyKey (in string verify_key_path); */
+NS_IMETHODIMP nsNymbleUser::ReadVerifyKey(const char *verify_key_path)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }

@@ -27,9 +27,13 @@ Pseudonym* User::getPseudonym()
   return this->pseudonym;
 }
 
-void User::setVerifyKeyN(u_char** verify_key_n, u_int verify_key_n_len)
+void User::readVerifyKey(char* verify_key_path)
 {
-  this->verify_key_n = d2i_RSAPublicKey(NULL, (const u_char**)verify_key_n, verify_key_n_len);
+  FILE* verify_key = fopen(verify_key_path, "w");
+  
+  this->verify_key_n  = PEM_read_RSAPublicKey(verify_key, NULL, NULL, NULL);
+  
+  fclose(verify_key);
 }
 
 u_char* User::addBlacklist(Blacklist* blacklist)

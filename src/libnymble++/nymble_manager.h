@@ -29,13 +29,11 @@ class NymbleManager : public Nymble
   
   public:
     NymbleManager();
-    NymbleManager(u_char* hmac_key_np);
     ~NymbleManager();
     
     void setHmacKeyNP(u_char* hmac_key_np);
     
-    u_int getSignKeyN(u_char** out = NULL);
-    u_int getVerifyKeyN(u_char** out = NULL);
+    void readSignKey(char* sign_key_path);
     
     u_char* addServer(u_char* server_id);
     bool verifyPseudonym(Pseudonym* pseudonym);

@@ -5,17 +5,20 @@ VALUE rb_nm_new(VALUE rb_self)
   return Data_Wrap_Struct(rb_self, NULL, rb_nm_delete, new NymbleManager());
 }
 
-VALUE rb_nm_init(VALUE rb_self, VALUE rb_hmac_key_np)
+VALUE rb_nm_init(VALUE rb_self, VALUE rb_hmac_key_np, VALUE rb_sign_key_path)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cNymbleManager);
   Check_Type(rb_hmac_key_np, T_STRING);
   Check_Size(rb_hmac_key_np, DIGEST_SIZE);
+  Check_Type(rb_sign_key_path, T_STRING);
   
   NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
   u_char* hmac_key_np = (u_char*) RSTRING_PTR(rb_hmac_key_np);
+  char* sign_key_path = RSTRING_PTR(rb_sign_key_path);
   
   nm->setHmacKeyNP(hmac_key_np);
+  nm->readSignKey(sign_key_path);
   
   return rb_self;
 }
@@ -66,22 +69,6 @@ VALUE rb_nm_time_period_set(VALUE rb_self, VALUE rb_time_period)
   nm->setTimePeriod(time_period);
   
   return rb_self;
-}
-
-VALUE rb_nm_verify_key(VALUE rb_self)
-{
-  Check_Type(rb_self, T_DATA);
-  Check_Class(rb_self, rb_cNymbleManager);
-  
-  NymbleManager* nm = (NymbleManager*) DATA_PTR(rb_self);
-  u_char* verify_key_n = NULL;
-  u_int verify_key_n_len = nm->getVerifyKeyN(&verify_key_n);
-  
-  VALUE rb_verify_key_n = rb_str_new((char*) verify_key_n, verify_key_n_len);
-  
-  free(verify_key_n);
-  
-  return rb_verify_key_n;
 }
 
 VALUE rb_nm_add_server(VALUE rb_self, VALUE rb_server_id)

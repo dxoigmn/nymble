@@ -6,14 +6,7 @@ NymbleManager::NymbleManager()
   RAND_bytes(this->keyedhash_key_n, DIGEST_SIZE);
   RAND_bytes(this->encrypt_key_n, CIPHER_BLOCK_SIZE);
   
-  this->sign_key_n = RSA_generate_key(SIGNATURE_SIZE * 8, 65537, NULL, NULL);
   this->entries = new NymbleManagerEntries();
-}
-
-NymbleManager::NymbleManager(u_char* hmac_key_np)
-{
-  NymbleManager();
-  this->setHmacKeyNP(hmac_key_np);
 }
 
 NymbleManager::~NymbleManager()
@@ -32,23 +25,13 @@ void NymbleManager::setHmacKeyNP(u_char* hmac_key_np)
   memcpy(this->hmac_key_np, hmac_key_np, DIGEST_SIZE);
 }
 
-u_int NymbleManager::getVerifyKeyN(u_char** out)
+void NymbleManager::readSignKey(char* sign_key_path)
 {
-  BIO *bio = BIO_new(BIO_s_mem());
-  PEM_write_bio_RSA_PUBKEY(bio, this->sign_key_n);
-  RSA *rsa = PEM_read_bio_RSA_PUBKEY(bio, NULL, NULL, NULL);
-  BIO_free(bio);
+  FILE* sign_key = fopen(sign_key_path, "r");
   
-  return i2d_RSAPublicKey(rsa, out);
-}
-
-u_int NymbleManager::getSignKeyN(u_char** out) {
-  BIO *bio = BIO_new(BIO_s_mem());
-  PEM_write_bio_RSAPrivateKey(bio, this->sign_key_n, NULL, NULL, 0, NULL, NULL);
-  RSA *rsa = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
-  BIO_free(bio);
-
-  return i2d_RSAPrivateKey(rsa, out);
+  this->sign_key_n = PEM_read_RSAPrivateKey(sign_key, NULL, NULL, NULL);
+  
+  fclose(sign_key);
 }
 
 u_char* NymbleManager::addServer(u_char* server_id)

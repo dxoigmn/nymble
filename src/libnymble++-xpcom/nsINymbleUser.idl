@@ -9,7 +9,7 @@ interface nsINymbleUser : nsISupports
   void setPseudonym(in string marshalled_pseudonym);
   string getPseudonym();
   
-  void setVerifyKeyN([array, size_is(len)] in PRUint8 bytes, in PRUint32 len);
+  void readVerifyKey(in string verify_key_path);
   
   string addBlacklist(in string marshalled_blacklist);
   boolean addCredential(in string marshalled_credential);
