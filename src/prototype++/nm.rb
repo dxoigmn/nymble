@@ -8,9 +8,7 @@ require File.join(File.dirname(__FILE__), '..', 'libnymble++-ruby', 'nymble')
 Sinatra::Application.default_options[:port] = 3001
 
 configure do
-  @@nm = Nymble::NymbleManager.new(Nymble.digest('hmac_key_np'))
-
-  File.open('nm.pub', 'w') { |f| f << @@nm.verify_key }
+  @@nm = Nymble::NymbleManager.new(Nymble.digest('hmac_key_np'), File.expand_path('nm_priv.key'))
 end
 
 before do

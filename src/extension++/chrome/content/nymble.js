@@ -28,6 +28,11 @@ var nymble = {
       user.setLinkWindow(366 * (cur_time.getUTCFullYear() - 1970) + nymble.getUTCDayOfYear(cur_time));
       user.setTimePeriod(cur_time.getUTCHours() * 60 + cur_time.getUTCMinutes());
       
+      var manager = Components.classes["@mozilla.org/extensions/manager;1"].getService(Components.interfaces.nsIExtensionManager);
+      var file = manager.getInstallLocation('nymble@cs.dartmouth.edu').getItemFile('nymble@cs.dartmouth.edu', 'components/nm_pub.key');
+      
+      user.readVerifyKey(file.path);
+      
       jQuery.post(pseudonym_manager, null, function(data, textStatus) {
         user.setPseudonym(data.pseudonym);
         
