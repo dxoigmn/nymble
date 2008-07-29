@@ -29,17 +29,19 @@ Pseudonym* User::getPseudonym()
 
 void User::readVerifyKey(char* verify_key_path)
 {
-  FILE* verify_key = fopen(verify_key_path, "w");
+  FILE* verify_key = fopen(verify_key_path, "r");
   
-  this->verify_key_n  = PEM_read_RSAPublicKey(verify_key, NULL, NULL, NULL);
+  this->verify_key_n  = PEM_read_RSA_PUBKEY(verify_key, NULL, NULL, NULL);
   
   fclose(verify_key);
 }
 
 u_char* User::addBlacklist(Blacklist* blacklist)
 {
-  // TODO: Check blacklist integrity, return NULL if not
-  
+  if (!blacklist->verify(this->verify_key_n, this->cur_link_window, this->cur_time_period)) {
+    return NULL;
+  }
+    
   UserEntry* entry = this->findEntry(blacklist->getServerId());
   
   if (entry == NULL) {

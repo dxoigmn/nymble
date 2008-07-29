@@ -132,11 +132,9 @@ VALUE rb_server_blacklist_set(VALUE rb_self, VALUE rb_blacklist)
   Server* server = (Server*) DATA_PTR(rb_self);
   Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_blacklist);
   
-  if (server->setBlacklist(blacklist)) {
-    return Qtrue;
-  }
-  
-  return Qfalse;
+  server->setBlacklist(blacklist);
+
+  return rb_self;
 }
 
 VALUE rb_server_add_linking_tokens(VALUE rb_self, VALUE rb_linking_tokens)

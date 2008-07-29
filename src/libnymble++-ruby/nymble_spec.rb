@@ -284,6 +284,8 @@ context 'User' do
   it 'should manage blacklist' do
     @user.should.respond_to?(:add_blacklist)
     @user.add_blacklist(@nm.create_blacklist(@server_id)).should.equal(@server_id)
+    @user.time_period = @cur_time_period + 1
+    @user.add_blacklist(@nm.create_blacklist(@server_id)).should.be.nil
   end
   
   it 'should manage credentials' do
@@ -401,8 +403,6 @@ context 'Server' do
   it 'should manage the blacklist' do
     @server.should.respond_to?(:blacklist=)
     @server.should.blacklist = @blacklist
-    @server.time_period = @cur_time_period + 1
-    @server.should.not.blacklist = @blacklist
   end
   
   it 'should manage finalization' do

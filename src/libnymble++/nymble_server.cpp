@@ -57,14 +57,10 @@ Blacklist* Server::getBlacklist()
   return this->blacklist;
 }
 
-bool Server::setBlacklist(Blacklist* blacklist)
+void Server::setBlacklist(Blacklist* blacklist)
 {
   this->blacklist = new Blacklist(blacklist);
-  // TODO: Should verify blacklist here.
-  
   this->finalized = true;
-  
-  return true;
 }
 
 void Server::addLinkingTokens(LinkingTokens* linking_tokens)

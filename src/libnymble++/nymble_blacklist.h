@@ -31,6 +31,8 @@ class Blacklist : public Nymbles
     void hmac(u_char* hmac_key_n, u_char* out = NULL);
     void sign(RSA* sign_key_n, u_char* out = NULL);
     
+    bool verify(RSA* verify_key_n, u_int link_window, u_int time_period);
+    
     u_int marshall(char* out = NULL);
     static void unmarshall(char* bytes, Blacklist* out);
 };

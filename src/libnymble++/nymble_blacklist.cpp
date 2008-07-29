@@ -116,6 +116,44 @@ void Blacklist::sign(RSA* sign_key_n, u_char* out)
   RSA_private_encrypt(SIGNATURE_SIZE, buffer, out, sign_key_n, RSA_NO_PADDING);
 }
 
+bool Blacklist::verify(RSA* verify_key_n, u_int link_window, u_int time_period)
+{
+  bool valid = true;
+  
+  if (this->link_window != link_window) {
+    valid = false;
+  }
+  
+  if (this->time_period != time_period) {
+    valid = false;
+  }
+  
+  u_char bl_hash[DIGEST_SIZE];
+  
+  this->hash(bl_hash);
+  
+  if (memcmp(this->bl_hash, bl_hash, DIGEST_SIZE) != 0) {
+    valid = false;
+  }
+  
+  SHA256_CTX sha_ctx;
+  u_char hashed[DIGEST_SIZE];
+  u_char buffer[SIGNATURE_SIZE];
+  
+  SHA256_Init(&sha_ctx);
+  SHA256_Update(&sha_ctx, this->bl_hash, DIGEST_SIZE);
+  SHA256_Update(&sha_ctx, (u_char*) &this->time_period, sizeof(this->time_period));
+  SHA256_Final(hashed, &sha_ctx);
+  
+  RSA_public_decrypt(SIGNATURE_SIZE, this->sig, buffer, verify_key_n, RSA_NO_PADDING);
+  
+  if (RSA_verify_PKCS1_PSS(verify_key_n, hashed, EVP_sha256(), buffer, -2) == 0) {
+    valid = false;
+  }
+  
+  return valid;
+}
+
 u_int Blacklist::marshall(char* out)
 {
   struct json_object* json_blacklist = json_object_new_object();

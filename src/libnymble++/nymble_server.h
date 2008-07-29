@@ -29,7 +29,7 @@ class Server : public Nymble
     bool isFinalized();
     
     Blacklist* getBlacklist();
-    bool setBlacklist(Blacklist* blacklist);
+    void setBlacklist(Blacklist* blacklist);
     
     void addLinkingTokens(LinkingTokens* linking_tokens);
     
