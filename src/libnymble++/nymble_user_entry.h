@@ -8,8 +8,6 @@
 class UserEntry
 {
   u_char  server_id[DIGEST_SIZE];
-  u_int   blacklisted;
-  u_int   last_authenticated;
   
   Credential* credential;
   Blacklist* blacklist;
@@ -18,12 +16,11 @@ class UserEntry
     UserEntry(Blacklist* blacklist);
     
     u_char* getServerId();
+    bool isBlacklisted();
+    Ticket* getTicket(u_int time_period);
     
     void setCredential(Credential* credential);
-    Credential* getCredential();
-    
     void setBlacklist(Blacklist* blacklist);
-    Blacklist* getBlacklist();
 };
 
 #endif

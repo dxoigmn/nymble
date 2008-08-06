@@ -41,7 +41,7 @@ u_char* User::addBlacklist(Blacklist* blacklist)
   if (!blacklist->verify(this->verify_key_n, this->cur_link_window, this->cur_time_period)) {
     return NULL;
   }
-    
+  
   UserEntry* entry = this->findEntry(blacklist->getServerId());
   
   if (entry == NULL) {
@@ -72,26 +72,11 @@ Ticket* User::getTicket(u_char* server_id)
 {
   UserEntry* entry = this->findEntry(server_id);
   
-  if (entry == NULL) {
+  if (entry == NULL || entry->isBlacklisted()) {
     return NULL;
   }
   
-  Credential* credential = entry->getCredential();
-  Blacklist* blacklist = entry->getBlacklist();
-  
-  if (credential == NULL || blacklist == NULL) {
-    return NULL;
-  }
-  
-  // TODO: Check blacklist, return NULL if on it
-  
-  for (Tickets::iterator ticket = credential->begin(); ticket != credential->end(); ++ticket) {
-    if ((*ticket)->getTimePeriod() == this->cur_time_period) {
-      return *ticket;
-    }
-  }
-  
-  return NULL;
+  return entry->getTicket(this->cur_time_period);
 }
 
 UserEntry* User::findEntry(u_char* server_id)

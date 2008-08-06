@@ -32,6 +32,11 @@ Credential::~Credential()
   }
 }
 
+u_char* Credential::getSeed()
+{
+  return this->seed;
+}
+
 u_int Credential::marshall(char* out)
 {
   struct json_object* json_credential = json_object_new_object();

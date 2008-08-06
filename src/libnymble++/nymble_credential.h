@@ -17,6 +17,8 @@ class Credential : public Tickets
     Credential(u_char* seed, u_char* server_id, u_int link_window, u_int time_periods);
     ~Credential();
     
+    u_char* getSeed();
+    
     u_int marshall(char* out = NULL);
     static void unmarshall(char* bytes, Credential* out);
 };
