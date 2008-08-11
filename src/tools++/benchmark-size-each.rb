@@ -4,8 +4,9 @@ fail unless ARGV.length > 0
 
 i = 0
 
-while i <= 2000
+while i <= 1000
   puts "benchmarking for #{i} users"
-  `./benchmark-time.rb #{i} >> #{ARGV[0]}`
+  `./benchmark-size.rb #{i} >> #{ARGV[0]}`
+  
   i += 50
 end

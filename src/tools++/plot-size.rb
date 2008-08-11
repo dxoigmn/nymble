@@ -27,14 +27,16 @@ end
 
 Gnuplot.open do |gp|
   Gnuplot::Plot.new(gp) do |plot|
-    plot.output   "#{ARGV[1] || 'nymble_performance_time.pdf'}"
+    plot.output   "#{ARGV[1] || 'nymble_performance_size.pdf'}"
     plot.terminal 'pdf fsize 9'
-    plot.title    'Nymble Performance (time)'
-    plot.ylabel   'Time (sec)'
-    plot.xlabel   'Number of blacklist entries'
-    plot.xrange   '[0:2000]'
+    plot.title    'Nymble Performance (size)'
+    plot.ylabel   'Size (bytes)'
+    plot.xlabel   'Number of users'
+    #plot.xrange   '[1:1024]'
     #plot.yrange   '[0:0.18]'
     plot.key      'top left'
+    #plot.logscale 'y'
+    #plot.logscale 'x'
 
 =begin
     @values.each do |title, values|
@@ -49,44 +51,34 @@ Gnuplot.open do |gp|
     end
 =end
 
-    values = @values['user_blacklist_update_average_2']
+    values = @values['blacklist_size']
     values   = values.to_a.sort_by { |x, y| x }
     x_values = values.map { |x, y| x }
     y_values = values.map { |x, y| y }
     
     plot.data << Gnuplot::DataSet.new([x_values, y_values]) do |ds|
-      ds.title  = 'User blacklist verify'
+      ds.title  = 'Blacklist'
       ds.with   = 'linespoints 1'
     end
 
-    values = @values['user_blacklist_check_fail_average']
+    values = @values['credential_size']
     values   = values.to_a.sort_by { |x, y| x }
     x_values = values.map { |x, y| x }
     y_values = values.map { |x, y| y }
     
     plot.data << Gnuplot::DataSet.new([x_values, y_values]) do |ds|
-      ds.title  = 'User blacklist check'
+      ds.title  = 'Credential'
       ds.with   = 'linespoints 2'
     end
     
-    values = @values['server_ticket_verify_pass_average']
+    values = @values['ticket_size']
     values   = values.to_a.sort_by { |x, y| x }
     x_values = values.map { |x, y| x }
     y_values = values.map { |x, y| y }
     
     plot.data << Gnuplot::DataSet.new([x_values, y_values]) do |ds|
-      ds.title  = 'Server authentication'
+      ds.title  = 'Ticket'
       ds.with   = 'linespoints 3'
-    end
-    
-    values = @values['server_iterate']
-    values   = values.to_a.sort_by { |x, y| x }
-    x_values = values.map { |x, y| x }
-    y_values = values.map { |x, y| y }
-    
-    plot.data << Gnuplot::DataSet.new([x_values, y_values]) do |ds|
-      ds.title  = 'Server iterate'
-      ds.with   = 'linespoints 4'
     end
   end
 end
