@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 %w| benchmark |.each { |lib| require lib }
 
-require 'libnymble'
+require '../libnymble-ruby/nymble'
 
 def benchmark(name, count = 1, &block)
   benchmark   = Benchmark.measure(&block)
@@ -21,8 +21,8 @@ user_count = ARGV[0].to_i
 @benchmarks     = []
 cur_link_window = 0
 cur_time_period = 1
-server_id       = Nymble.hash('server_id')
-hmac_key_np     = Nymble.hash('hmac_key_np')
+server_id       = Nymble.digest('server_id')
+hmac_key_np     = Nymble.digest('hmac_key_np')
 
 nm_state        = Nymble.nm_initialize(hmac_key_np)
 pm_state        = Nymble.pm_initialize(hmac_key_np)
@@ -33,7 +33,7 @@ users           = []
 
 benchmark :pm_pseudonym_create_average, user_count do
   users = (1..user_count).map do
-    pseudonym, mac_np = Nymble.pm_pseudonym_create(pm_state, Nymble.hash(rand.to_s), cur_link_window)
+    pseudonym, mac_np = Nymble.pm_pseudonym_create(pm_state, Nymble.digest(rand.to_s), cur_link_window)
 
     Nymble.user_initialize(pseudonym, mac_np, Nymble.nm_verify_key(nm_state))
   end
@@ -42,6 +42,7 @@ end
 benchmark :nm_credential_create_user_entry_initialize_average, users.size do
   users.each do |user_state|
     credential = Nymble.nm_credential_create(nm_state, Nymble.user_pseudonym(user_state), server_id, cur_link_window)
+    fail "credential should not be NULL" unless credential
     Nymble.user_entry_initialize(user_state, server_id, credential)
   end
 end
@@ -93,7 +94,7 @@ end
 
 benchmark :server_ticket_verify_fail_average, tickets.size do
   tickets.each do |ticket|
-    fail "ticket verification shouldn't pass" if Nymble.server_ticket_verify(server_state, ticket, cur_link_window, cur_time_period)
+    fail "ticket verification shouldn't pass" if Nymble.server_ticket_verify(server_state, ticket, cur_link_window, cur_time_period+1)
   end
 end
 

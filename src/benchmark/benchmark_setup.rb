@@ -42,13 +42,13 @@ def create_server(nm, server_id)
   server
 end
 
-def create_users(count, pm, nm, server, setup = true)
+def create_users(count, pm, nm, server)
   users = (1..count).map do |user_id|
     user = Nymble::User.new(pm.create_pseudonym(Nymble.digest(user_id)), @verify_key_n)
     user.link_window = @cur_link_window
     user.time_period = @cur_time_period
-    user.add_blacklist(server.blacklist) if setup
-    user.add_credential(nm.create_credential(server.server_id, user.pseudonym, 2)) if setup
+    user.add_blacklist(server.blacklist)
+    user.add_credential(nm.create_credential(server.server_id, user.pseudonym, 2))
     user
   end
 end

@@ -5,4 +5,5 @@
 *.log
 *.xpi
 *.key
+*.dat
 Makefile
