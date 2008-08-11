@@ -61,7 +61,7 @@ end
 
 benchmark :nm_credential_create_user_entry_initialize_average, @users.size do
   @users.each do |user|
-    credential = @nm.create_credential(@server.server_id, user.pseudonym, 288)
+    credential = @nm.create_credential(@server.server_id, user.pseudonym, @users.size)
     fail "credential should not be NULL" unless credential
     user.add_credential(credential)
   end
