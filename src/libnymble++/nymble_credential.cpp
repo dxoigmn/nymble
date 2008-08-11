@@ -14,12 +14,24 @@ Credential::Credential(Credential* credential)
   }
 }
 
-Credential::Credential(u_char* seed, u_char* server_id, u_int link_window, u_int time_periods)
+Credential::Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* pseudonym, u_int time_periods)
 {
-  memcpy(this->seed, seed, DIGEST_SIZE);
+  u_char trapdoor[DIGEST_SIZE];
+  u_char nymble[DIGEST_SIZE];
+  
+  this->seedTrapdoor(nm, entry, pseudonym->getPseudonym());
+  
+  memcpy(trapdoor, seed, DIGEST_SIZE);
   
   for (u_int time_period = 1; time_period <= time_periods; time_period++) {
-    Ticket* ticket = new Ticket(link_window, time_period, server_id, seed);
+    Ticket::evolveTrapdoor(trapdoor, 1, trapdoor);
+    Ticket::computeNymble(trapdoor, nymble);
+
+    Ticket* ticket = new Ticket(nm->getLinkWindow(), time_period, entry->getServerId(), nymble);
+    
+    ticket->encrypt(nm->getEncryptKeyN(), trapdoor, pseudonym->getPseudonym());
+    ticket->hmac(nm->getHmacKeyN());
+    ticket->hmac(entry->getHmacKeyNS(), true);
     
     this->push_back(ticket);
   }
@@ -35,6 +47,11 @@ Credential::~Credential()
 u_char* Credential::getSeed()
 {
   return this->seed;
+}
+
+void Credential::seedTrapdoor(NymbleManager* nm, NymbleManagerEntry *entry, u_char *pseudonym)
+{
+  nm->seedTrapdoor(entry, pseudonym, this->seed);
 }
 
 u_int Credential::marshall(char* out)

@@ -4,17 +4,22 @@
 #include "nymble.h"
 #include "nymble_ticket.h"
 #include "nymble_pseudonym.h"
+#include "nymble_manager_entry.h"
+#include "nymble_manager.h"
 
-typedef std::vector<Ticket*> Tickets;
+class NymbleManager;
+class NymbleManagerEntry;
 
 class Credential : public Tickets
 {
   u_char  seed[DIGEST_SIZE];
   
+  void seedTrapdoor(NymbleManager* nm, NymbleManagerEntry *entry, u_char *pseudonym);
+  
   public:
     Credential();
     Credential(Credential* credential);
-    Credential(u_char* seed, u_char* server_id, u_int link_window, u_int time_periods);
+    Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* pseudonym, u_int time_periods);
     ~Credential();
     
     u_char* getSeed();

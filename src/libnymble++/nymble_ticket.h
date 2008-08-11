@@ -16,7 +16,7 @@ class Ticket
   
   public:
     Ticket();
-    Ticket(u_int link_window, u_int time_period, u_char* server_id, u_char* seed);
+    Ticket(u_int link_window, u_int time_period, u_char* server_id, u_char* nymble);
     Ticket(Ticket* ticket);
     
     u_int getLinkWindow();
@@ -26,7 +26,7 @@ class Ticket
     u_char* getMacNS();
     
     void hmac(u_char* hmac_key, bool include_mac_n = false, u_char* out = NULL);
-    void encrypt(u_char* encrypt_key_n, u_char* seed, u_char* pseudonym);
+    void encrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym);
     void decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym);
     
     void marshall(json_object* out);
@@ -37,5 +37,7 @@ class Ticket
     static void computeNymble(u_char *trapdoor, u_char *out);
     static void evolveTrapdoor(u_char* trapdoor, u_int delta, u_char *out);
 };
+
+typedef std::vector<Ticket*> Tickets;
 
 #endif

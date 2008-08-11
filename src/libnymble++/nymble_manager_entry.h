@@ -4,6 +4,8 @@
 #include "nymble.h"
 #include "nymble_credential.h"
 
+class Credential;
+
 class NymbleManagerEntry {
   u_char  server_id[DIGEST_SIZE];
   u_int   bl_last_updated;

@@ -2,13 +2,18 @@
 #define __NYMBLE_MANAGER_H__
 
 #include "nymble.h"
-#include "nymble_manager_entry.h"
 #include "nymble_blacklist.h"
+#include "nymble_manager_entry.h"
 #include "nymble_pseudonym.h"
 #include "nymble_linking_token.h"
 
+class Blacklist;
+class NymbleManagerEntry;
+class Credential;
+
 typedef std::vector<NymbleManagerEntry*> NymbleManagerEntries;
 typedef std::vector<LinkingToken*> LinkingTokens;
+typedef std::vector<u_char*> Nymbles;
 
 class NymbleManager : public Nymble
 {
@@ -20,16 +25,16 @@ class NymbleManager : public Nymble
   
   NymbleManagerEntries* entries;
   
-  void signCredential(Credential* credential, Pseudonym* pseudonym, u_char* seed);
-  void encryptTrapdoor(Ticket* ticket, Pseudonym* pseudonym, u_char *seed);
-  void decryptTrapdoor(u_char *trapdoor, u_char *pseudonym, Ticket* ticket);
-  void seedTrapdoor(u_char *out, NymbleManagerEntry *entry, u_char *pseudonym);
   bool userIsBlacklisted(Nymbles* nymbles, u_char* nymble0);
   NymbleManagerEntry* findServer(u_char *server_id);
   
   public:
     NymbleManager();
     ~NymbleManager();
+    
+    u_char* getHmacKeyN();
+    u_char* getEncryptKeyN();
+    u_char* getKeyedhashKeyN();
     
     void setHmacKeyNP(u_char* hmac_key_np);
     
@@ -42,6 +47,9 @@ class NymbleManager : public Nymble
     Blacklist* updateBlacklist(u_char* server_id, Blacklist* blacklist, Tickets* complaints);
     LinkingTokens* createLinkingTokens(u_char* server_id, Blacklist* blacklist, Tickets* complaints);
     Credential* createCredential(u_char* server_id, Pseudonym* pseudonym, u_int time_periods);
+    
+    void encryptTrapdoor(Ticket* ticket, Pseudonym* pseudonym, u_char *seed);
+    void seedTrapdoor(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out);
 };
 
 #endif

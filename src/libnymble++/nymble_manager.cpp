@@ -20,6 +20,21 @@ NymbleManager::~NymbleManager()
   delete this->entries;
 }
 
+u_char* NymbleManager::getHmacKeyN()
+{
+  return this->hmac_key_n;
+}
+
+u_char* NymbleManager::getEncryptKeyN()
+{
+  return this->encrypt_key_n;
+}
+
+u_char* NymbleManager::getKeyedhashKeyN()
+{
+  return this->keyedhash_key_n;
+}
+
 void NymbleManager::setHmacKeyNP(u_char* hmac_key_np)
 {
   memcpy(this->hmac_key_np, hmac_key_np, DIGEST_SIZE);
@@ -150,8 +165,8 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
       u_char nymble0[DIGEST_SIZE];
       
       // Compute the nymble0 for the current complaint ticket
-      this->decryptTrapdoor(NULL, pseudonym, *ticket);
-      this->seedTrapdoor(seed, entry, pseudonym);
+      (*ticket)->decrypt(this->encrypt_key_n, NULL, pseudonym);
+      this->seedTrapdoor(entry, pseudonym, seed);
       Ticket::computeNymble(seed, nymble0);
       
       if (this->userIsBlacklisted(new_blacklist, nymble0)) {
@@ -189,8 +204,8 @@ LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* 
     u_char seed[DIGEST_SIZE];
     u_char nymble0[DIGEST_SIZE];
     
-    this->decryptTrapdoor(trapdoor, pseudonym, *ticket);
-    this->seedTrapdoor(seed, entry, pseudonym);
+    (*ticket)->decrypt(this->encrypt_key_n, trapdoor, pseudonym);
+    this->seedTrapdoor(entry, pseudonym, seed);
     Ticket::computeNymble(seed, nymble0);
     
     if (this->userIsBlacklisted(blacklist, nymble0)) {
@@ -228,23 +243,16 @@ Credential* NymbleManager::createCredential(u_char* server_id, Pseudonym* pseudo
     return NULL;
   }
   
-  u_char seed[DIGEST_SIZE];
-  
-  this->seedTrapdoor(seed, entry, pseudonym->getPseudonym());
-  
-  Credential* credential = new Credential(seed, entry->getServerId(), this->cur_link_window, time_periods);
-  
-  this->signCredential(credential, pseudonym, seed);
-  entry->signCredential(credential);
+  Credential* credential = new Credential(this, entry, pseudonym, time_periods);
   
   return credential;
 }
 
-void NymbleManager::seedTrapdoor(u_char *out, NymbleManagerEntry *entry, u_char *pseudonym)
+void NymbleManager::seedTrapdoor(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out)
 {
   HMAC_CTX ctx;
-
-  HMAC_Init(&ctx, this->keyedhash_key_n, DIGEST_SIZE, EVP_sha256());
+  
+  HMAC_Init(&ctx, this->getKeyedhashKeyN(), DIGEST_SIZE, EVP_sha256());
   HMAC_Update(&ctx, pseudonym, DIGEST_SIZE);
   HMAC_Update(&ctx, entry->getServerId(), DIGEST_SIZE);
   HMAC_Update(&ctx, (u_char *)&this->cur_link_window, sizeof(this->cur_link_window));
@@ -252,21 +260,3 @@ void NymbleManager::seedTrapdoor(u_char *out, NymbleManagerEntry *entry, u_char 
   HMAC_CTX_cleanup(&ctx);
 }
 
-void NymbleManager::signCredential(Credential* credential, Pseudonym* pseudonym, u_char* seed)
-{
-  for (Tickets::iterator ticket = credential->begin(); ticket != credential->end(); ++ticket)
-  {
-    this->encryptTrapdoor(*ticket, pseudonym, seed);
-    (*ticket)->hmac(this->hmac_key_n);
-  }
-}
-
-void NymbleManager::encryptTrapdoor(Ticket* ticket, Pseudonym* pseudonym, u_char* seed)
-{
-  ticket->encrypt(this->encrypt_key_n, seed, pseudonym->getPseudonym());
-}
-
-void NymbleManager::decryptTrapdoor(u_char *trapdoor, u_char *pseudonym, Ticket* ticket)
-{
-  ticket->decrypt(this->encrypt_key_n, trapdoor, pseudonym);
-}

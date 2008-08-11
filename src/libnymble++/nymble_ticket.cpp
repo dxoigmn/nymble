@@ -5,16 +5,12 @@ Ticket::Ticket()
   
 }
 
-Ticket::Ticket(u_int link_window, u_int time_period, u_char* server_id, u_char* seed)
+Ticket::Ticket(u_int link_window, u_int time_period, u_char* server_id, u_char* nymble)
 {
   this->link_window = link_window;
   this->time_period = time_period;
   memcpy(this->server_id, server_id, DIGEST_SIZE);
-  
-  u_char trapdoor[DIGEST_SIZE];
-  
-  Ticket::evolveTrapdoor(seed, this->time_period, trapdoor);
-  Ticket::computeNymble(trapdoor, this->nymble);
+  memcpy(this->nymble, nymble, DIGEST_SIZE);
 }
 
 Ticket::Ticket(Ticket* ticket)
@@ -80,13 +76,13 @@ void Ticket::hmac(u_char* hmac_key, bool include_mac_n, u_char* out)
   HMAC_CTX_cleanup(&ctx);
 }
 
-void Ticket::encrypt(u_char* encrypt_key_n, u_char* seed, u_char* pseudonym)
+void Ticket::encrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
 {
   u_char in[DIGEST_SIZE * 2];
   u_char iv[CIPHER_BLOCK_SIZE];
   AES_KEY key;
   
-  Ticket::evolveTrapdoor(seed, this->time_period, in);
+  memcpy(in, trapdoor, DIGEST_SIZE);
   memcpy(in + DIGEST_SIZE, pseudonym, DIGEST_SIZE);
   
   /* iv must be separate from buffer as the AES function messes with it as it works */

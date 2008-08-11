@@ -14,7 +14,7 @@
 
 #define DIGEST_SIZE         SHA256_DIGEST_LENGTH
 #define CIPHER_BLOCK_SIZE   AES_BLOCK_SIZE
-#define SIGNATURE_SIZE      128
+#define SIGNATURE_SIZE      256
 
 typedef unsigned char u_char;
 typedef unsigned int  u_int;
