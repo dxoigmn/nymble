@@ -24,7 +24,13 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     
     ticket = @users[number_of_users].ticket(@server.server_id)
     
-    bm = Benchmark.measure { @server.valid_ticket?(ticket) }
+    bm = Benchmark.measure do
+      50.times do
+        @server.valid_ticket?(ticket)
+      end
+    end
+    
+    bm /= 50
     
     f << "#{number_of_users+1}\t#{bm.real}\n"
     

@@ -56,4 +56,4 @@ end
 @pm = create_pm
 @nm = create_nm
 @server = create_server(@nm, @server_id)
-@users = create_users(2000, @pm, @nm, @server)
+@users = create_users(1000, @pm, @nm, @server)

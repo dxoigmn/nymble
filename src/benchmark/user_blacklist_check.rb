@@ -8,8 +8,15 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   
   user.add_blacklist(@server.blacklist)
   
-  bm = Benchmark.measure { user.ticket(@server_id) }
-  bm = Benchmark.measure { user.ticket(@server_id) }
+  server_id = @server.server_id
+  
+  bm = Benchmark.measure do
+    50.times do
+      user.ticket(server_id)
+    end
+  end
+  
+  bm /= 50
   
   f << "#{index}\t#{bm.real}\n"
   
@@ -18,8 +25,16 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     @server.blacklist = @nm.update_blacklist(@server.server_id, @server.blacklist, tickets)
     
     user.add_blacklist(@server.blacklist)
-
-    bm = Benchmark.measure { user.ticket(@server.server_id) }
+    
+    server_id = @server.server_id
+    
+    bm = Benchmark.measure do
+      50.times do
+        user.ticket(server_id)
+      end
+    end
+    
+    bm /= 50
     
     f << "#{index+1}\t#{bm.real}\n"
     

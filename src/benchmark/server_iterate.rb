@@ -17,7 +17,13 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     linking_tokens = @nm.create_linking_tokens(@server.server_id, @server.blacklist, tickets)
     @server.add_linking_tokens(linking_tokens)
     
-    bm = Benchmark.measure { @server.time_period = @cur_time_period + 1 }
+    bm = Benchmark.measure do
+      50.times do
+        @server.time_period = @server.time_period + 1
+      end
+    end
+    
+    bm /= 50
     
     f << "#{number_of_users+1}\t#{bm.real}\n"
     
