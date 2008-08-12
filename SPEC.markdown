@@ -973,7 +973,7 @@ grant it a new blacklist for time period i.
         
         FOREACH `complaint` IN `complaints`
           EXTRACT `time_period` FROM `complaint`
-          ASSERT `time_period` = `cur_time_period` - `1`
+          ASSERT `time_period` < `cur_time_period`
         END
         
         ASSERT NOT `bl_last_updated[server_id]` = `cur_time_period`
