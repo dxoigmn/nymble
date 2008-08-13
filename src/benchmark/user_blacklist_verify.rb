@@ -14,6 +14,8 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     end
   end
   
+  bm /= 50
+  
   f << "#{index}\t#{bm.real}\n"
   
   @users.each_with_index do |user, index|
@@ -27,6 +29,8 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
         user.add_blacklist(blacklist)
       end
     end
+    
+    bm /= 50
     
     f << "#{index+1}\t#{bm.real}\n"
     
