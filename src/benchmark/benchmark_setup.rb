@@ -57,3 +57,5 @@ end
 @nm = create_nm
 @server = create_server(@nm, @server_id)
 @users = create_users(1000, @pm, @nm, @server)
+
+RETEST_COUNT = 20

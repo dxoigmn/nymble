@@ -10,12 +10,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   
   1000.times do |number_of_credentials|
     bm = Benchmark.measure do
-      50.times do
-        @nm.create_credential(server_id, pseudonym, number_of_credentials)
+      RETEST_COUNT.times do
+        fail unless @nm.create_credential(server_id, pseudonym, number_of_credentials)
       end
     end
     
-    bm /= 50
+    bm /= RETEST_COUNT
     
     f << "#{number_of_credentials+1}\t#{bm.real}\n"
     

@@ -11,12 +11,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   server_id = @server.server_id
   
   bm = Benchmark.measure do
-    50.times do
+    RETEST_COUNT.times do
       user.ticket(server_id)
     end
   end
   
-  bm /= 50
+  bm /= RETEST_COUNT
   
   f << "#{index}\t#{bm.real}\n"
   
@@ -29,12 +29,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     server_id = @server.server_id
     
     bm = Benchmark.measure do
-      50.times do
-        user.ticket(server_id)
+      RETEST_COUNT.times do
+        fail if user.ticket(server_id)
       end
     end
     
-    bm /= 50
+    bm /= RETEST_COUNT
     
     f << "#{index+1}\t#{bm.real}\n"
     

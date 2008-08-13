@@ -9,12 +9,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   blacklist = @server.blacklist
   
   bm = Benchmark.measure do
-    50.times do
+    RETEST_COUNT.times do
       user.add_blacklist(blacklist)
     end
   end
   
-  bm /= 50
+  bm /= RETEST_COUNT
   
   f << "#{index}\t#{bm.real}\n"
   
@@ -25,12 +25,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     blacklist = @server.blacklist
     
     bm = Benchmark.measure do
-      50.times do
-        user.add_blacklist(blacklist)
+      RETEST_COUNT.times do
+        fail unless user.add_blacklist(blacklist)
       end
     end
     
-    bm /= 50
+    bm /= RETEST_COUNT
     
     f << "#{index+1}\t#{bm.real}\n"
     
