@@ -3,6 +3,16 @@
 require 'benchmark_setup'
 
 File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
+  bm = Benchmark.measure do
+    RETEST_COUNT.times do
+      @server.time_period = @server.time_period + 1
+    end
+  end
+  
+  bm /= RETEST_COUNT
+  
+  f << "0\t#{bm.real}\n"
+  
   @users.size.times do |number_of_users|
     @server = create_server(@nm, @server_id)
     

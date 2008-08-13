@@ -3,6 +3,18 @@
 require 'benchmark_setup'
 
 File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
+  ticket = @users.first.ticket(@server.server_id)
+  
+  bm = Benchmark.measure do
+    RETEST_COUNT.times do
+      fail unless @server.valid_ticket?(ticket)
+    end
+  end
+  
+  bm /= RETEST_COUNT
+  
+  f << "0\t#{bm.real}\n"
+  
   @users.size.times do |number_of_users|
     @server = create_server(@nm, @server_id)
     

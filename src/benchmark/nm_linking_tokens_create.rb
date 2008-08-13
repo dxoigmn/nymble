@@ -3,6 +3,20 @@
 require 'benchmark_setup'
 
 File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
+  server_id = @server.server_id
+  blacklist = @server.blacklist
+  tickets   = []
+  
+  bm = Benchmark.measure do
+    RETEST_COUNT.times do
+      fail unless @nm.create_linking_tokens(server_id, blacklist, tickets)
+    end
+  end
+  
+  bm /= RETEST_COUNT
+  
+  f << "0\t#{bm.real}\n"
+  
   @users.size.times do |number_of_users|
     @server = create_server(@nm, @server_id)
     
@@ -14,9 +28,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
       tickets << user.ticket(@server.server_id)
     end
     
+    server_id = @server.server_id
+    blacklist = @server.blacklist
+    
     bm = Benchmark.measure do
       RETEST_COUNT.times do
-        fail unless @nm.create_linking_tokens(@server.server_id, @server.blacklist, tickets)
+        fail unless @nm.create_linking_tokens(server_id, blacklist, tickets)
       end
     end
     

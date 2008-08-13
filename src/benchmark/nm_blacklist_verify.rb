@@ -3,6 +3,19 @@
 require 'benchmark_setup'
 
 File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
+  server_id = @server.server_id
+  blacklist = @server.blacklist
+  
+  bm = Benchmark.measure do
+    RETEST_COUNT.times do
+      fail unless @nm.valid_blacklist?(server_id, blacklist)
+    end
+  end
+  
+  bm /= RETEST_COUNT
+  
+  f << "0\t#{bm.real}\n"
+  
   @users.size.times do |number_of_users|
     @server = create_server(@nm, @server_id)
     

@@ -13,10 +13,15 @@ Gnuplot.open do |gp|
     #plot.yrange   '[0:0.20]'
     plot.key      'top left'
     
-    plot.data << graph('nm_create_credential.dat', 'NM Credential Create')
+    plot.data << graph('nm_credential_create.dat', 'NM Credential Create')
+    plot.data << graph('nm_blacklist_verify.dat', 'NM Blacklist Verify')
+    plot.data << graph('nm_blacklist_update.dat', 'NM Blacklist Update')
+    plot.data << graph('nm_linking_tokens_create.dat', 'NM Linking Tokens Create')
+    
     plot.data << graph('server_blacklist_check.dat', 'Server Blacklist Check')
     plot.data << graph('server_iterate.dat', 'Server Time Period Change')
-    plot.data << graph('user_blacklist_check.dat', 'User Blacklist Check')
+    
     plot.data << graph('user_blacklist_verify.dat', 'User Blacklist Verify')
+    plot.data << graph('user_blacklist_check.dat', 'User Blacklist Check')
   end
 end
