@@ -55,16 +55,16 @@ tickets = @users.map { |user| user.ticket(@server.server_id) }
 
 @server.blacklist = @nm.update_blacklist(@server.server_id, @server.blacklist, tickets)
 
-@benchmarks << ['blacklist_size', @server.blacklist.marshall.size]
+@benchmarks << ['blacklist_size', @server.blacklist.marshal.size]
 
 if @users.first
   credential = @nm.create_credential(@server.server_id, @users.first.pseudonym, user_count)
 
-  @benchmarks << ['credential_size', credential.marshall.size]
+  @benchmarks << ['credential_size', credential.marshal.size]
 
   ticket = @users.first.ticket(@server.server_id)
 
-  @benchmarks << ['ticket_size', ticket.marshall.size]
+  @benchmarks << ['ticket_size', ticket.marshal.size]
 else
   @benchmarks << ['credential_size', 0]
   @benchmarks << ['ticket_size', 0]

@@ -154,16 +154,16 @@ bool Blacklist::verify(RSA* verify_key_n, u_int link_window, u_int time_period)
   return valid;
 }
 
-u_int Blacklist::marshall(char* out)
+u_int Blacklist::marshal(char* out)
 {
   struct json_object* json_blacklist = json_object_new_object();
   
-  Nymble::json_marshall_int(json_blacklist, "link_window", this->link_window);
-  Nymble::json_marshall_int(json_blacklist, "time_period", this->time_period);
-  Nymble::json_marshall_str(json_blacklist, "server_id", this->server_id, DIGEST_SIZE);
-  Nymble::json_marshall_str(json_blacklist, "bl_hash", this->bl_hash, DIGEST_SIZE);
-  Nymble::json_marshall_str(json_blacklist, "bmac_n", this->bmac_n, DIGEST_SIZE);
-  Nymble::json_marshall_str(json_blacklist, "sig", this->sig, SIGNATURE_SIZE);
+  Nymble::json_marshal_int(json_blacklist, "link_window", this->link_window);
+  Nymble::json_marshal_int(json_blacklist, "time_period", this->time_period);
+  Nymble::json_marshal_str(json_blacklist, "server_id", this->server_id, DIGEST_SIZE);
+  Nymble::json_marshal_str(json_blacklist, "bl_hash", this->bl_hash, DIGEST_SIZE);
+  Nymble::json_marshal_str(json_blacklist, "bmac_n", this->bmac_n, DIGEST_SIZE);
+  Nymble::json_marshal_str(json_blacklist, "sig", this->sig, SIGNATURE_SIZE);
   
   struct json_object* json_nymbles = json_object_new_array();
   
@@ -187,16 +187,16 @@ u_int Blacklist::marshall(char* out)
   return strlen(json);
 }
 
-void Blacklist::unmarshall(char* bytes, Blacklist* out)
+void Blacklist::unmarshal(char* bytes, Blacklist* out)
 {
   struct json_object* json_blacklist = json_tokener_parse(bytes);
   
-  Nymble::json_unmarshall_int(json_blacklist, "link_window", &(out->link_window));
-  Nymble::json_unmarshall_int(json_blacklist, "time_period", &(out->time_period));
-  Nymble::json_unmarshall_str(json_blacklist, "server_id", out->server_id, DIGEST_SIZE);
-  Nymble::json_unmarshall_str(json_blacklist, "bl_hash", out->bl_hash, DIGEST_SIZE);
-  Nymble::json_unmarshall_str(json_blacklist, "bmac_n", out->bmac_n, DIGEST_SIZE);
-  Nymble::json_unmarshall_str(json_blacklist, "sig", out->sig, SIGNATURE_SIZE);
+  Nymble::json_unmarshal_int(json_blacklist, "link_window", &(out->link_window));
+  Nymble::json_unmarshal_int(json_blacklist, "time_period", &(out->time_period));
+  Nymble::json_unmarshal_str(json_blacklist, "server_id", out->server_id, DIGEST_SIZE);
+  Nymble::json_unmarshal_str(json_blacklist, "bl_hash", out->bl_hash, DIGEST_SIZE);
+  Nymble::json_unmarshal_str(json_blacklist, "bmac_n", out->bmac_n, DIGEST_SIZE);
+  Nymble::json_unmarshal_str(json_blacklist, "sig", out->sig, SIGNATURE_SIZE);
   
   struct json_object* json_nymbles = json_object_object_get(json_blacklist, "nymbles");
   
@@ -211,7 +211,7 @@ void Blacklist::unmarshall(char* bytes, Blacklist* out)
     if (decoded_len == DIGEST_SIZE) {
       out->push_back(decoded);
     } else {
-      fprintf(stderr, "Couldn't unmarshall nymble because due to unexpected length %d (expected %d)", decoded_len, DIGEST_SIZE);
+      fprintf(stderr, "Couldn't unmarshal nymble because due to unexpected length %d (expected %d)", decoded_len, DIGEST_SIZE);
     }
   }
 }

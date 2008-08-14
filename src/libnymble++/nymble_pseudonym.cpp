@@ -37,7 +37,7 @@ u_char* Pseudonym::getMacNP()
   return this->mac_np;
 }
 
-u_int Pseudonym::marshall(char* out)
+u_int Pseudonym::marshal(char* out)
 {
   u_char in[DIGEST_SIZE*2];
 
@@ -53,7 +53,7 @@ u_int Pseudonym::marshall(char* out)
   return out_len;
 }
 
-void Pseudonym::unmarshall(char* bytes, Pseudonym* out)
+void Pseudonym::unmarshal(char* bytes, Pseudonym* out)
 {
   u_int decoded_len = Nymble::hexdecode(bytes);
   u_char decoded[decoded_len];

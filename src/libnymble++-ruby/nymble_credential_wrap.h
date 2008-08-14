@@ -7,8 +7,8 @@
 
 extern VALUE rb_cCredential;
 
-VALUE rb_credential_unmarshall(VALUE rb_self, VALUE rb_bytes);
-VALUE rb_credential_marshall(VALUE rb_self);
+VALUE rb_credential_unmarshal(VALUE rb_self, VALUE rb_bytes);
+VALUE rb_credential_marshal(VALUE rb_self);
 
 void rb_credential_delete(Credential* credential);
 

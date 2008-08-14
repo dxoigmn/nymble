@@ -9,24 +9,24 @@ void Init_nymble() {
   rb_define_singleton_method(rb_mNymble, "hexdecode", RUBY_METHOD_FUNC(rb_nymble_hexdecode), 1);
   
   rb_cPseudonym = rb_define_class_under(rb_mNymble, "Pseudonym", rb_cObject);
-  rb_define_singleton_method(rb_cPseudonym, "unmarshall", RUBY_METHOD_FUNC(rb_pseudonym_unmarshall), 1);
-  rb_define_method(rb_cPseudonym, "marshall", RUBY_METHOD_FUNC(rb_pseudonym_marshall), 0);
+  rb_define_singleton_method(rb_cPseudonym, "unmarshal", RUBY_METHOD_FUNC(rb_pseudonym_unmarshal), 1);
+  rb_define_method(rb_cPseudonym, "marshal", RUBY_METHOD_FUNC(rb_pseudonym_marshal), 0);
   
   rb_cBlacklist = rb_define_class_under(rb_mNymble, "Blacklist", rb_cObject);
-  rb_define_singleton_method(rb_cBlacklist, "unmarshall", RUBY_METHOD_FUNC(rb_blacklist_unmarshall), 1);
-  rb_define_method(rb_cBlacklist, "marshall", RUBY_METHOD_FUNC(rb_blacklist_marshall), 0);
+  rb_define_singleton_method(rb_cBlacklist, "unmarshal", RUBY_METHOD_FUNC(rb_blacklist_unmarshal), 1);
+  rb_define_method(rb_cBlacklist, "marshal", RUBY_METHOD_FUNC(rb_blacklist_marshal), 0);
   
   rb_cCredential = rb_define_class_under(rb_mNymble, "Credential", rb_cObject);
-  rb_define_singleton_method(rb_cCredential, "unmarshall", RUBY_METHOD_FUNC(rb_credential_unmarshall), 1);
-  rb_define_method(rb_cCredential, "marshall", RUBY_METHOD_FUNC(rb_credential_marshall), 0);
+  rb_define_singleton_method(rb_cCredential, "unmarshal", RUBY_METHOD_FUNC(rb_credential_unmarshal), 1);
+  rb_define_method(rb_cCredential, "marshal", RUBY_METHOD_FUNC(rb_credential_marshal), 0);
   
   rb_cTicket = rb_define_class_under(rb_mNymble, "Ticket", rb_cObject);
-  rb_define_singleton_method(rb_cTicket, "unmarshall", RUBY_METHOD_FUNC(rb_ticket_unmarshall), 1);
-  rb_define_method(rb_cTicket, "marshall", RUBY_METHOD_FUNC(rb_ticket_marshall), 0);
+  rb_define_singleton_method(rb_cTicket, "unmarshal", RUBY_METHOD_FUNC(rb_ticket_unmarshal), 1);
+  rb_define_method(rb_cTicket, "marshal", RUBY_METHOD_FUNC(rb_ticket_marshal), 0);
   
   rb_cLinkingToken = rb_define_class_under(rb_mNymble, "LinkingToken", rb_cObject);
-  rb_define_singleton_method(rb_cLinkingToken, "unmarshall", RUBY_METHOD_FUNC(rb_linking_token_unmarshall), 1);
-  rb_define_method(rb_cLinkingToken, "marshall", RUBY_METHOD_FUNC(rb_linking_token_marshall), 0);
+  rb_define_singleton_method(rb_cLinkingToken, "unmarshal", RUBY_METHOD_FUNC(rb_linking_token_unmarshal), 1);
+  rb_define_method(rb_cLinkingToken, "marshal", RUBY_METHOD_FUNC(rb_linking_token_marshal), 0);
   
   rb_cPseudonymManager = rb_define_class_under(rb_mNymble, "PseudonymManager", rb_cObject);
   rb_define_alloc_func(rb_cPseudonymManager, rb_pm_new);

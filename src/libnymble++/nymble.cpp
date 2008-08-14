@@ -63,17 +63,17 @@ u_int Nymble::hexdecode(char* in, u_char* out)
   return len;
 }
 
-void Nymble::json_marshall_int(struct json_object* json, char* field, u_int value)
+void Nymble::json_marshal_int(struct json_object* json, char* field, u_int value)
 {
   json_object_object_add(json, field, json_object_new_int(value));
 }
 
-void Nymble::json_unmarshall_int(struct json_object* json, char* field, u_int* value)
+void Nymble::json_unmarshal_int(struct json_object* json, char* field, u_int* value)
 {
   *value = json_object_get_int(json_object_object_get(json, field));
 }
 
-void Nymble::json_marshall_str(struct json_object* json, char* field, u_char* value, u_int len)
+void Nymble::json_marshal_str(struct json_object* json, char* field, u_char* value, u_int len)
 {
   u_int encoded_len = Nymble::hexencode(value, len);
   char encoded[encoded_len];
@@ -83,7 +83,7 @@ void Nymble::json_marshall_str(struct json_object* json, char* field, u_char* va
   json_object_object_add(json, field, json_object_new_string(encoded));
 }
 
-void Nymble::json_unmarshall_str(struct json_object* json, char* field, u_char* value, u_int len)
+void Nymble::json_unmarshal_str(struct json_object* json, char* field, u_char* value, u_int len)
 {
   char* encoded = json_object_get_string(json_object_object_get(json, field));
   u_int decoded_len = Nymble::hexdecode(encoded);
@@ -94,6 +94,6 @@ void Nymble::json_unmarshall_str(struct json_object* json, char* field, u_char* 
   if (decoded_len == len) {
     memcpy(value, decoded, len);
   } else {
-    fprintf(stderr, "Couldn't unmarshall field %s because due to unexpected length %d (expected %d)", field, decoded_len, len);
+    fprintf(stderr, "Couldn't unmarshal field %s because due to unexpected length %d (expected %d)", field, decoded_len, len);
   }
 }

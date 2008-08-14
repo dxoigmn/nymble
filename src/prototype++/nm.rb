@@ -25,13 +25,13 @@ post '/server/' do
 
   { 
     :hmac_key_ns  => Nymble.hexencode(hmac_key_ns),
-    :blacklist    => blacklist.marshall
+    :blacklist    => blacklist.marshal
   }.to_json
 end
 
 get '/server/:server_id/' do
   server_id = Nymble.hexdecode(params[:server_id])
-  pseudonym = Nymble::Pseudonym.unmarshall(params[:pseudonym])
+  pseudonym = Nymble::Pseudonym.unmarshal(params[:pseudonym])
   
   fail 'invalid pseudonym' unless @@nm.valid_pseudonym?(pseudonym)
   
@@ -40,19 +40,19 @@ get '/server/:server_id/' do
   fail 'failed to create credential' unless credential
   
   { 
-    :credential => credential.marshall 
+    :credential => credential.marshal 
   }.to_json
 end
 
 put '/server/:server_id/' do
   server_id = Nymble.hexdecode(params[:server_id])
-  blacklist = Nymble::Blacklist.unmarshall(params[:blacklist])
+  blacklist = Nymble::Blacklist.unmarshal(params[:blacklist])
   complaints = params[:complaints] unless params[:complaints].empty?
   
   if complaints.kind_of?(Array)
-    complaints = complaints.map { |complaint| Nymble::Ticket::unmarshall(complaint) }
+    complaints = complaints.map { |complaint| Nymble::Ticket::unmarshal(complaint) }
   elsif complaints.kind_of?(String)
-    complaints = [ Nymble::Ticket::unmarshall(complaints) ]
+    complaints = [ Nymble::Ticket::unmarshal(complaints) ]
   end
   
   unless @@nm.valid_blacklist?(server_id, blacklist)
@@ -64,8 +64,8 @@ put '/server/:server_id/' do
   blacklist = @@nm.update_blacklist(server_id, blacklist, complaints || [])
   
   { 
-    :blacklist  => blacklist.marshall,
-    :linking_tokens => linking_tokens.map { |linking_token| linking_token.marshall }
+    :blacklist  => blacklist.marshal,
+    :linking_tokens => linking_tokens.map { |linking_token| linking_token.marshal }
   }.to_json
 end
 

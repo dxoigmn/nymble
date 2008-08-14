@@ -6,8 +6,8 @@
 
 extern VALUE rb_cTicket;
 
-VALUE rb_ticket_unmarshall(VALUE rb_self, VALUE rb_bytes);
-VALUE rb_ticket_marshall(VALUE rb_self);
+VALUE rb_ticket_unmarshal(VALUE rb_self, VALUE rb_bytes);
+VALUE rb_ticket_marshal(VALUE rb_self);
 
 void rb_ticket_delete(Ticket* ticket);
 

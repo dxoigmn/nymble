@@ -41,11 +41,11 @@ class Nymble
     static u_int hexencode(u_char* in, u_int size, char* out = NULL);
     static u_int hexdecode(char* in, u_char* out = NULL);
     
-    static void json_marshall_int(struct json_object* json, char* field, u_int value);
-    static void json_unmarshall_int(struct json_object* json, char* field, u_int* value);
+    static void json_marshal_int(struct json_object* json, char* field, u_int value);
+    static void json_unmarshal_int(struct json_object* json, char* field, u_int* value);
     
-    static void json_marshall_str(struct json_object* json, char* field, u_char* value, u_int len);
-    static void json_unmarshall_str(struct json_object* json, char* field, u_char* value, u_int len);
+    static void json_marshal_str(struct json_object* json, char* field, u_char* value, u_int len);
+    static void json_unmarshal_str(struct json_object* json, char* field, u_char* value, u_int len);
 };
 
 #endif

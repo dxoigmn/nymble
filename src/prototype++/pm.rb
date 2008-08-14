@@ -22,6 +22,6 @@ post '/pseudonym' do
   pseudonym = @@pm.create_pseudonym(Nymble.digest(request.env['REMOTE_ADDR']))
   
   {
-    :pseudonym => pseudonym.marshall
+    :pseudonym => pseudonym.marshal
   }.to_json
 end

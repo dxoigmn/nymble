@@ -1,14 +1,14 @@
 #include "nymble_blacklist_wrap.h"
 
 
-VALUE rb_blacklist_unmarshall(VALUE rb_self, VALUE rb_bytes)
+VALUE rb_blacklist_unmarshal(VALUE rb_self, VALUE rb_bytes)
 {
   Check_Type(rb_bytes, T_STRING);
   
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
   Blacklist* blacklist = new Blacklist();
   
-  Blacklist::unmarshall(bytes, blacklist);
+  Blacklist::unmarshal(bytes, blacklist);
   
   if (blacklist == NULL) {
     return Qnil;
@@ -17,17 +17,17 @@ VALUE rb_blacklist_unmarshall(VALUE rb_self, VALUE rb_bytes)
   return Data_Wrap_Struct(rb_self, NULL, rb_blacklist_delete, blacklist);
 }
 
-VALUE rb_blacklist_marshall(VALUE rb_self)
+VALUE rb_blacklist_marshal(VALUE rb_self)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cBlacklist);
   
   Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_self);
-  char marshalled_blacklist[blacklist->marshall() + 1];
+  char marshaled_blacklist[blacklist->marshal() + 1];
   
-  blacklist->marshall(marshalled_blacklist);
+  blacklist->marshal(marshaled_blacklist);
   
-  return rb_str_new2(marshalled_blacklist);
+  return rb_str_new2(marshaled_blacklist);
 }
 
 

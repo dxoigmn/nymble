@@ -41,7 +41,7 @@ NS_IMETHODIMP nsNymbleUser::SetPseudonym(const char *marshalled_pseudonym)
 {
   Pseudonym* pseudonym = new Pseudonym();
   
-  Pseudonym::unmarshall((char*) marshalled_pseudonym, pseudonym);
+  Pseudonym::unmarshal((char*) marshalled_pseudonym, pseudonym);
   
   this->user->setPseudonym(pseudonym);
   
@@ -58,8 +58,8 @@ NS_IMETHODIMP nsNymbleUser::GetPseudonym(char **_retval)
   if (pseudonym == NULL) {
     *_retval = NULL;
   } else {
-    *_retval = (char*) malloc(pseudonym->marshall() + 1);
-    pseudonym->marshall(*_retval);
+    *_retval = (char*) malloc(pseudonym->marshal() + 1);
+    pseudonym->marshal(*_retval);
   }
   
   return NS_OK;
@@ -70,7 +70,7 @@ NS_IMETHODIMP nsNymbleUser::AddBlacklist(const char *marshalled_blacklist, char 
 {
   Blacklist* blacklist = new Blacklist();
   
-  Blacklist::unmarshall((char*) marshalled_blacklist, blacklist);
+  Blacklist::unmarshal((char*) marshalled_blacklist, blacklist);
   
   u_char* server_id = this->user->addBlacklist(blacklist);
   
@@ -91,7 +91,7 @@ NS_IMETHODIMP nsNymbleUser::AddCredential(const char *marshalled_credential, PRB
 {
   Credential* credential = new Credential();
   
-  Credential::unmarshall((char*) marshalled_credential, credential);
+  Credential::unmarshal((char*) marshalled_credential, credential);
   
   *_retval = this->user->addCredential(credential);
   
@@ -118,8 +118,8 @@ NS_IMETHODIMP nsNymbleUser::GetTicket(const char *serverId, char **_retval)
   if (ticket == NULL) {
     *_retval = NULL;
   } else {
-    *_retval = (char*) malloc(ticket->marshall() + 1);
-    ticket->marshall(*_retval);
+    *_retval = (char*) malloc(ticket->marshal() + 1);
+    ticket->marshal(*_retval);
   }
   
   return NS_OK;

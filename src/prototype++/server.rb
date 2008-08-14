@@ -22,11 +22,11 @@ before do
     if @@server.blacklist
       # Time period change
       puts "Time period changed!"
-      data = { :blacklist => @@server.blacklist.marshall, :complaints => @@complaints.map { |complaint| complaint.marshall } }
+      data = { :blacklist => @@server.blacklist.marshal, :complaints => @@complaints.map { |complaint| complaint.marshal } }
       data = JSON.parse(RestClient.put("http://localhost:3001/server/#{Nymble.hexencode(@@server.server_id)}/", data))
       
-      blacklist = Nymble::Blacklist::unmarshall(data['blacklist'])
-      linking_tokens = data['linking_tokens'].map { |linking_token| Nymble::LinkingToken.unmarshall(linking_token) } unless data['linking_tokens'].empty?
+      blacklist = Nymble::Blacklist::unmarshal(data['blacklist'])
+      linking_tokens = data['linking_tokens'].map { |linking_token| Nymble::LinkingToken.unmarshal(linking_token) } unless data['linking_tokens'].empty?
     else
       # Link window change
       puts "Link window changed!"
@@ -34,7 +34,7 @@ before do
       data = JSON.parse(RestClient.post('http://localhost:3001/server/', data))
       
       hmac_key_ns = Nymble.hexdecode(data['hmac_key_ns'])
-      blacklist = Nymble::Blacklist.unmarshall(data['blacklist'])
+      blacklist = Nymble::Blacklist.unmarshal(data['blacklist'])
     end
     
     if (@@server.blacklist = blacklist)
@@ -52,12 +52,12 @@ get '/nymble/' do
   blacklist = @@server.blacklist
 
   { 
-    :blacklist  => blacklist.marshall
+    :blacklist  => blacklist.marshal
   }.to_json
 end
 
 post '/nymble/' do
-  ticket = Nymble::Ticket.unmarshall(request[:ticket]) if request[:ticket]
+  ticket = Nymble::Ticket.unmarshal(request[:ticket]) if request[:ticket]
   
   if @@server.valid_ticket?(ticket)
     'you are authenticated'

@@ -54,18 +54,18 @@ void Credential::seedTrapdoor(NymbleManager* nm, NymbleManagerEntry *entry, u_ch
   nm->seedTrapdoor(entry, pseudonym, this->seed);
 }
 
-u_int Credential::marshall(char* out)
+u_int Credential::marshal(char* out)
 {
   struct json_object* json_credential = json_object_new_object();
   
-  Nymble::json_marshall_str(json_credential, "seed", this->seed, DIGEST_SIZE);
+  Nymble::json_marshal_str(json_credential, "seed", this->seed, DIGEST_SIZE);
   
   struct json_object* json_tickets = json_object_new_array();
   
   for (Tickets::iterator ticket = this->begin(); ticket != this->end(); ++ticket) {
     struct json_object* json_ticket = json_object_new_object();
     
-    (*ticket)->marshall(json_ticket);
+    (*ticket)->marshal(json_ticket);
     
     json_object_array_add(json_tickets, json_ticket);
   }
@@ -81,11 +81,11 @@ u_int Credential::marshall(char* out)
   return strlen(json);
 }
 
-void Credential::unmarshall(char* bytes, Credential* out)
+void Credential::unmarshal(char* bytes, Credential* out)
 {
   struct json_object* json_credential = json_tokener_parse(bytes);
   
-  Nymble::json_unmarshall_str(json_credential, "seed", out->seed, DIGEST_SIZE);
+  Nymble::json_unmarshal_str(json_credential, "seed", out->seed, DIGEST_SIZE);
   
   struct json_object* json_tickets = json_object_object_get(json_credential, "tickets");
   
@@ -93,7 +93,7 @@ void Credential::unmarshall(char* bytes, Credential* out)
     struct json_object* json_ticket = json_object_array_get_idx(json_tickets, i);
     Ticket* ticket = new Ticket();
     
-    Ticket::unmarshall(json_ticket, ticket);
+    Ticket::unmarshal(json_ticket, ticket);
     
     out->push_back(ticket);
   }

@@ -33,8 +33,8 @@ class Blacklist : public Nymbles
     
     bool verify(RSA* verify_key_n, u_int link_window, u_int time_period);
     
-    u_int marshall(char* out = NULL);
-    static void unmarshall(char* bytes, Blacklist* out);
+    u_int marshal(char* out = NULL);
+    static void unmarshal(char* bytes, Blacklist* out);
 };
 
 #endif

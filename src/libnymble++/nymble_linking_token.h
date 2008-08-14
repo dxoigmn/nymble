@@ -18,8 +18,8 @@ class LinkingToken {
     
     u_char* getNymble();
     
-    u_int marshall(char* out = NULL);
-    static void unmarshall(char* bytes, LinkingToken* out);
+    u_int marshal(char* out = NULL);
+    static void unmarshal(char* bytes, LinkingToken* out);
 };
 
 #endif

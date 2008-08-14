@@ -89,12 +89,12 @@ context 'Pseudonym' do
     @pseudonym = @pm.create_pseudonym(@user_id)
   end
   
-  it 'should be (un)marshallable' do
-    bytes = @pseudonym.marshall
+  it 'should be (un)marshalable' do
+    bytes = @pseudonym.marshal
     bytes.should.not.be.nil
-    pseudonym = Nymble::Pseudonym.unmarshall(bytes)
+    pseudonym = Nymble::Pseudonym.unmarshal(bytes)
     pseudonym.should.not.be.nil
-    bytes.should.equal(pseudonym.marshall)
+    bytes.should.equal(pseudonym.marshal)
   end
 end
 
@@ -207,12 +207,12 @@ context 'Blacklist' do
     @blacklist = @nm.create_blacklist(@server_id)
   end
   
-  it 'should be (un)marshallable' do
-    bytes = @blacklist.marshall
+  it 'should be (un)marshalable' do
+    bytes = @blacklist.marshal
     bytes.should.not.be.nil
-    blacklist = Nymble::Blacklist.unmarshall(bytes)
+    blacklist = Nymble::Blacklist.unmarshal(bytes)
     blacklist.should.not.be.nil
-    bytes.should.equal(blacklist.marshall)
+    bytes.should.equal(blacklist.marshal)
   end
 end
 
@@ -232,12 +232,12 @@ context 'Credential' do
     @credential = @nm.create_credential(@server_id, @pseudonym, 1)
   end
   
-  it 'should be (un)marshallable' do
-    bytes = @credential.marshall
+  it 'should be (un)marshalable' do
+    bytes = @credential.marshal
     bytes.should.not.be.nil
-    credential = Nymble::Credential.unmarshall(bytes)
+    credential = Nymble::Credential.unmarshal(bytes)
     credential.should.not.be.nil
-    bytes.should.equal(credential.marshall)
+    bytes.should.equal(credential.marshal)
   end
 end
 
@@ -327,12 +327,12 @@ context 'Credential' do
     @ticket = @user.ticket(@server_id)
   end
   
-  it 'should be (un)marshallable' do
-    bytes = @ticket.marshall
+  it 'should be (un)marshalable' do
+    bytes = @ticket.marshal
     bytes.should.not.be.nil
-    ticket = Nymble::Ticket.unmarshall(bytes)
+    ticket = Nymble::Ticket.unmarshal(bytes)
     ticket.should.not.be.nil
-    bytes.should.equal(ticket.marshall)
+    bytes.should.equal(ticket.marshal)
   end
 end
 
@@ -496,11 +496,11 @@ context 'Linking Token' do
     @linking_token = @nm.create_linking_tokens(@server_id, @blacklist, [@ticket]).first
   end
   
-  it 'should be (un)marshallable' do
-    bytes = @linking_token.marshall
+  it 'should be (un)marshalable' do
+    bytes = @linking_token.marshal
     bytes.should.not.be.nil
-    linking_token = Nymble::LinkingToken.unmarshall(bytes)
+    linking_token = Nymble::LinkingToken.unmarshal(bytes)
     linking_token.should.not.be.nil
-    bytes.should.equal(linking_token.marshall)
+    bytes.should.equal(linking_token.marshal)
   end
 end

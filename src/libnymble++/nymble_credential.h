@@ -24,8 +24,8 @@ class Credential : public Tickets
     
     u_char* getSeed();
     
-    u_int marshall(char* out = NULL);
-    static void unmarshall(char* bytes, Credential* out);
+    u_int marshal(char* out = NULL);
+    static void unmarshal(char* bytes, Credential* out);
 };
 
 #endif
