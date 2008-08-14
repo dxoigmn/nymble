@@ -16,6 +16,6 @@ VALUE rb_pm_time_period(VALUE rb_self);
 VALUE rb_pm_time_period_set(VALUE rb_self, VALUE rb_time_period);
 VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id);
 
-void rb_pm_delete(PseudonymManager* pm);
+void rb_pm_delete(Nymble::PseudonymManager* pm);
 
 #endif

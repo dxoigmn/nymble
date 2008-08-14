@@ -4,6 +4,8 @@
 #include "nymble.h"
 #include "nymble_credential.h"
 
+namespace Nymble {
+
 class Credential;
 
 class NymbleManagerEntry {
@@ -25,5 +27,7 @@ class NymbleManagerEntry {
     
     void signCredential(Credential* credential);
 };
+
+}; // namespace Nymble
 
 #endif

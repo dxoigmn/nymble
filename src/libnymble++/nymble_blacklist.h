@@ -1,8 +1,13 @@
 #ifndef __NYMBLE_BLACKLIST_H__
 #define __NYMBLE_BLACKLIST_H__
 
+#include <openssl/rsa.h>
+#include <openssl/hmac.h>
+
 #include "nymble.h"
 #include "nymble_credential.h"
+
+namespace Nymble {
 
 typedef std::vector<u_char*> Nymbles;
 
@@ -36,5 +41,7 @@ class Blacklist : public Nymbles
     u_int marshal(char* out = NULL);
     static void unmarshal(char* bytes, Blacklist* out);
 };
+
+}; // namespace Nymble
 
 #endif

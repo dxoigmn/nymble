@@ -22,6 +22,6 @@ VALUE rb_user_add_blacklist(VALUE rb_self, VALUE rb_blacklist);
 VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_credential);
 VALUE rb_user_ticket(VALUE rb_self, VALUE rb_server_id);
 
-void rb_user_delete(User* user);
+void rb_user_delete(Nymble::User* user);
 
 #endif

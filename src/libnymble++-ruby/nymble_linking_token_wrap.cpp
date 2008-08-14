@@ -5,9 +5,9 @@ VALUE rb_linking_token_unmarshal(VALUE rb_self, VALUE rb_bytes)
   Check_Type(rb_bytes, T_STRING);
   
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  LinkingToken* linking_token = new LinkingToken();
+  Nymble::LinkingToken* linking_token = new Nymble::LinkingToken();
   
-  LinkingToken::unmarshal(bytes, linking_token);
+  Nymble::LinkingToken::unmarshal(bytes, linking_token);
   
   if (linking_token == NULL) {
     return Qnil;
@@ -21,7 +21,7 @@ VALUE rb_linking_token_marshal(VALUE rb_self)
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cLinkingToken);
 
-  LinkingToken* linking_token = (LinkingToken*) DATA_PTR(rb_self);
+  Nymble::LinkingToken* linking_token = (Nymble::LinkingToken*) DATA_PTR(rb_self);
   char marshaled_linking_token[linking_token->marshal() + 1];
   
   linking_token->marshal(marshaled_linking_token);
@@ -29,7 +29,7 @@ VALUE rb_linking_token_marshal(VALUE rb_self)
   return rb_str_new2(marshaled_linking_token);
 }
 
-void rb_linking_token_delete(LinkingToken* linking_token)
+void rb_linking_token_delete(Nymble::LinkingToken* linking_token)
 {
   delete linking_token;
 }

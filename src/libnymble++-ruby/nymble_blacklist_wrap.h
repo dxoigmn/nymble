@@ -10,6 +10,6 @@ extern VALUE rb_cBlacklist;
 VALUE rb_blacklist_unmarshal(VALUE rb_self, VALUE rb_bytes);
 VALUE rb_blacklist_marshal(VALUE rb_self);
 
-void rb_blacklist_delete(Blacklist* blacklist);
+void rb_blacklist_delete(Nymble::Blacklist* blacklist);
 
 #endif

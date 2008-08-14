@@ -1,5 +1,7 @@
 #include "nymble_linking_token.h"
 
+namespace Nymble {
+
 LinkingToken::LinkingToken()
 {
   
@@ -42,8 +44,8 @@ u_int LinkingToken::marshal(char* out)
 {
   struct json_object* json_linking_token = json_object_new_object();
   
-  Nymble::json_marshal_int(json_linking_token, "time_period", this->time_period);
-  Nymble::json_marshal_str(json_linking_token, "trapdoor", this->trapdoor, DIGEST_SIZE);
+  json_marshal_int(json_linking_token, "time_period", this->time_period);
+  json_marshal_str(json_linking_token, "trapdoor", this->trapdoor, DIGEST_SIZE);
   
   char* json = json_object_to_json_string(json_linking_token);
   
@@ -58,7 +60,9 @@ void LinkingToken::unmarshal(char* bytes, LinkingToken* out)
 {
   struct json_object* json_linking_token = json_tokener_parse(bytes);
   
-  Nymble::json_unmarshal_int(json_linking_token, "time_period", &out->time_period);
-  Nymble::json_unmarshal_str(json_linking_token, "trapdoor", out->trapdoor, DIGEST_SIZE);
+  json_unmarshal_int(json_linking_token, "time_period", &out->time_period);
+  json_unmarshal_str(json_linking_token, "trapdoor", out->trapdoor, DIGEST_SIZE);
   Ticket::computeNymble(out->trapdoor, out->nymble);
 }
+
+}; // namespace Nymble

@@ -3,6 +3,8 @@
 
 #include "nymble.h"
 
+namespace Nymble {
+
 class Pseudonym
 {
   u_char  pseudonym[DIGEST_SIZE];
@@ -22,5 +24,7 @@ class Pseudonym
     u_int marshal(char* out = NULL);
     static void unmarshal(char* bytes, Pseudonym* out);
 };
+
+}; // namespace Nymble
 
 #endif

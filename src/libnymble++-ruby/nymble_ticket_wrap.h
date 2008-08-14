@@ -9,6 +9,6 @@ extern VALUE rb_cTicket;
 VALUE rb_ticket_unmarshal(VALUE rb_self, VALUE rb_bytes);
 VALUE rb_ticket_marshal(VALUE rb_self);
 
-void rb_ticket_delete(Ticket* ticket);
+void rb_ticket_delete(Nymble::Ticket* ticket);
 
 #endif

@@ -1,5 +1,7 @@
 #include "nymble_credential.h"
 
+namespace Nymble {
+
 Credential::Credential()
 {
   
@@ -58,7 +60,7 @@ u_int Credential::marshal(char* out)
 {
   struct json_object* json_credential = json_object_new_object();
   
-  Nymble::json_marshal_str(json_credential, "seed", this->seed, DIGEST_SIZE);
+  json_marshal_str(json_credential, "seed", this->seed, DIGEST_SIZE);
   
   struct json_object* json_tickets = json_object_new_array();
   
@@ -85,7 +87,7 @@ void Credential::unmarshal(char* bytes, Credential* out)
 {
   struct json_object* json_credential = json_tokener_parse(bytes);
   
-  Nymble::json_unmarshal_str(json_credential, "seed", out->seed, DIGEST_SIZE);
+  json_unmarshal_str(json_credential, "seed", out->seed, DIGEST_SIZE);
   
   struct json_object* json_tickets = json_object_object_get(json_credential, "tickets");
   
@@ -98,3 +100,5 @@ void Credential::unmarshal(char* bytes, Credential* out)
     out->push_back(ticket);
   }
 }
+
+}; // namespace Nymble

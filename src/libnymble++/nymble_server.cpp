@@ -1,5 +1,7 @@
 #include "nymble_server.h"
 
+namespace Nymble {
+
 Server::Server()
 {
   this->finalized = false;
@@ -101,3 +103,5 @@ bool Server::verifyTicket(Ticket* ticket)
   
   return valid;
 }
+
+}; // namespace Nymble

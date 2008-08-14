@@ -1,5 +1,7 @@
 #include "nymble_manager.h"
 
+namespace Nymble {
+
 NymbleManager::NymbleManager()
 {
   RAND_bytes(this->hmac_key_n, DIGEST_SIZE);
@@ -260,3 +262,4 @@ void NymbleManager::seedTrapdoor(NymbleManagerEntry *entry, u_char *pseudonym, u
   HMAC_CTX_cleanup(&ctx);
 }
 
+}; // namespace Nymble

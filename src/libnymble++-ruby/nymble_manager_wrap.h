@@ -26,6 +26,6 @@ VALUE rb_nm_update_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blackli
 VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_pseudonym, VALUE rb_time_periods);
 VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_tickets);
 
-void rb_nm_delete(NymbleManager* nm);
+void rb_nm_delete(Nymble::NymbleManager* nm);
 
 #endif

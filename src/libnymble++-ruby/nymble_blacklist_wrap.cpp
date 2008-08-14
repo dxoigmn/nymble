@@ -6,9 +6,9 @@ VALUE rb_blacklist_unmarshal(VALUE rb_self, VALUE rb_bytes)
   Check_Type(rb_bytes, T_STRING);
   
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Blacklist* blacklist = new Blacklist();
+  Nymble::Blacklist* blacklist = new Nymble::Blacklist();
   
-  Blacklist::unmarshal(bytes, blacklist);
+  Nymble::Blacklist::unmarshal(bytes, blacklist);
   
   if (blacklist == NULL) {
     return Qnil;
@@ -22,7 +22,7 @@ VALUE rb_blacklist_marshal(VALUE rb_self)
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cBlacklist);
   
-  Blacklist* blacklist = (Blacklist*) DATA_PTR(rb_self);
+  Nymble::Blacklist* blacklist = (Nymble::Blacklist*) DATA_PTR(rb_self);
   char marshaled_blacklist[blacklist->marshal() + 1];
   
   blacklist->marshal(marshaled_blacklist);
@@ -31,7 +31,7 @@ VALUE rb_blacklist_marshal(VALUE rb_self)
 }
 
 
-void rb_blacklist_delete(Blacklist* blacklist)
+void rb_blacklist_delete(Nymble::Blacklist* blacklist)
 {
   delete blacklist;
 }

@@ -5,6 +5,8 @@
 #include "nymble_linking_token.h"
 #include "nymble_blacklist.h"
 
+namespace Nymble {
+
 typedef std::vector<LinkingToken*> LinkingTokens;
 
 class Server : public Nymble
@@ -35,5 +37,7 @@ class Server : public Nymble
     
     bool verifyTicket(Ticket* ticket);
 };
+
+}
 
 #endif

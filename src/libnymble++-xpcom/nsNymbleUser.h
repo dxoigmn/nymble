@@ -7,7 +7,6 @@
 #include "nymble_blacklist.h"
 #include "nymble_credential.h"
 #include "nymble_ticket.h"
-#include <string.h>
 
 class nsNymbleUser : public nsINymbleUser
 {
@@ -20,7 +19,7 @@ public:
 private:
   ~nsNymbleUser();
   
-  User* user;
+  Nymble::User* user;
 };
 
 #endif

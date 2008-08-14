@@ -1,5 +1,7 @@
 #include "nymble_ticket.h"
 
+namespace Nymble {
+
 Ticket::Ticket()
 {
   
@@ -115,13 +117,13 @@ void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
 
 void Ticket::marshal(json_object* out)
 {
-  Nymble::json_marshal_int(out, "link_window", this->link_window);
-  Nymble::json_marshal_int(out, "time_period", this->time_period);
-  Nymble::json_marshal_str(out, "server_id", this->server_id, DIGEST_SIZE);
-  Nymble::json_marshal_str(out, "nymble", this->nymble, DIGEST_SIZE);
-  Nymble::json_marshal_str(out, "mac_n", this->mac_n, DIGEST_SIZE);
-  Nymble::json_marshal_str(out, "mac_ns", this->mac_ns, DIGEST_SIZE);
-  Nymble::json_marshal_str(out, "trapdoorenc", this->trapdoorenc, TRAPDOORENC_SIZE);
+  json_marshal_int(out, "link_window", this->link_window);
+  json_marshal_int(out, "time_period", this->time_period);
+  json_marshal_str(out, "server_id", this->server_id, DIGEST_SIZE);
+  json_marshal_str(out, "nymble", this->nymble, DIGEST_SIZE);
+  json_marshal_str(out, "mac_n", this->mac_n, DIGEST_SIZE);
+  json_marshal_str(out, "mac_ns", this->mac_ns, DIGEST_SIZE);
+  json_marshal_str(out, "trapdoorenc", this->trapdoorenc, TRAPDOORENC_SIZE);
 }
 
 u_int Ticket::marshal(char* out)
@@ -141,13 +143,13 @@ u_int Ticket::marshal(char* out)
 
 void Ticket::unmarshal(json_object* json_ticket, Ticket* out)
 {
-  Nymble::json_unmarshal_int(json_ticket, "link_window", &out->link_window);
-  Nymble::json_unmarshal_int(json_ticket, "time_period", &out->time_period);
-  Nymble::json_unmarshal_str(json_ticket, "server_id", out->server_id, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_ticket, "nymble", out->nymble, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_ticket, "mac_n", out->mac_n, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_ticket, "mac_ns", out->mac_ns, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_ticket, "trapdoorenc", out->trapdoorenc, TRAPDOORENC_SIZE);
+  json_unmarshal_int(json_ticket, "link_window", &out->link_window);
+  json_unmarshal_int(json_ticket, "time_period", &out->time_period);
+  json_unmarshal_str(json_ticket, "server_id", out->server_id, DIGEST_SIZE);
+  json_unmarshal_str(json_ticket, "nymble", out->nymble, DIGEST_SIZE);
+  json_unmarshal_str(json_ticket, "mac_n", out->mac_n, DIGEST_SIZE);
+  json_unmarshal_str(json_ticket, "mac_ns", out->mac_ns, DIGEST_SIZE);
+  json_unmarshal_str(json_ticket, "trapdoorenc", out->trapdoorenc, TRAPDOORENC_SIZE);
 }
 
 void Ticket::unmarshal(char* bytes, Ticket* out)
@@ -183,3 +185,5 @@ void Ticket::evolveTrapdoor(u_char* trapdoor, u_int delta, u_char* out)
     memcpy(out, buffer, DIGEST_SIZE);
   }
 }
+
+}; // namespace Nymble

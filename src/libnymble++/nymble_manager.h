@@ -1,11 +1,15 @@
 #ifndef __NYMBLE_MANAGER_H__
 #define __NYMBLE_MANAGER_H__
 
+#include <openssl/pem.h>
+
 #include "nymble.h"
 #include "nymble_blacklist.h"
 #include "nymble_manager_entry.h"
 #include "nymble_pseudonym.h"
 #include "nymble_linking_token.h"
+
+namespace Nymble {
 
 class Blacklist;
 class NymbleManagerEntry;
@@ -51,5 +55,7 @@ class NymbleManager : public Nymble
     void encryptTrapdoor(Ticket* ticket, Pseudonym* pseudonym, u_char *seed);
     void seedTrapdoor(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out);
 };
+
+}; // namespace Nymble
 
 #endif

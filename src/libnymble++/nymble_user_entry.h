@@ -5,6 +5,8 @@
 #include "nymble_credential.h"
 #include "nymble_blacklist.h"
 
+namespace Nymble {
+
 class UserEntry
 {
   u_char  server_id[DIGEST_SIZE];
@@ -22,5 +24,7 @@ class UserEntry
     void setCredential(Credential* credential);
     void setBlacklist(Blacklist* blacklist);
 };
+
+}; // namespace Nymble
 
 #endif

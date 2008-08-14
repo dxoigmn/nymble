@@ -24,6 +24,6 @@ VALUE rb_server_blacklist_set(VALUE rb_self, VALUE rb_blacklist);
 VALUE rb_server_add_linking_tokens(VALUE rb_self, VALUE rb_linking_tokens);
 VALUE rb_server_verify_ticket(VALUE rb_self, VALUE rb_ticket);
 
-void rb_server_delete(Server* server);
+void rb_server_delete(Nymble::Server* server);
 
 #endif

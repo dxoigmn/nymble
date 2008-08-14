@@ -7,6 +7,8 @@
 #include "nymble_manager_entry.h"
 #include "nymble_manager.h"
 
+namespace Nymble {
+
 class NymbleManager;
 class NymbleManagerEntry;
 
@@ -27,5 +29,7 @@ class Credential : public Tickets
     u_int marshal(char* out = NULL);
     static void unmarshal(char* bytes, Credential* out);
 };
+
+}; // namespace Nymble
 
 #endif

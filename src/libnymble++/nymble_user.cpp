@@ -1,5 +1,7 @@
 #include "nymble_user.h"
 
+namespace Nymble {
+
 User::User()
 {
   this->pseudonym = NULL;
@@ -89,3 +91,5 @@ UserEntry* User::findEntry(u_char* server_id)
   
   return NULL;
 }
+
+}; // namespace Nymble

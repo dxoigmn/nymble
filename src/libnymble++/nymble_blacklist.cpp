@@ -1,5 +1,7 @@
 #include "nymble_blacklist.h"
 
+namespace Nymble {
+
 Blacklist::Blacklist()
 {
 
@@ -158,20 +160,20 @@ u_int Blacklist::marshal(char* out)
 {
   struct json_object* json_blacklist = json_object_new_object();
   
-  Nymble::json_marshal_int(json_blacklist, "link_window", this->link_window);
-  Nymble::json_marshal_int(json_blacklist, "time_period", this->time_period);
-  Nymble::json_marshal_str(json_blacklist, "server_id", this->server_id, DIGEST_SIZE);
-  Nymble::json_marshal_str(json_blacklist, "bl_hash", this->bl_hash, DIGEST_SIZE);
-  Nymble::json_marshal_str(json_blacklist, "bmac_n", this->bmac_n, DIGEST_SIZE);
-  Nymble::json_marshal_str(json_blacklist, "sig", this->sig, SIGNATURE_SIZE);
+  json_marshal_int(json_blacklist, "link_window", this->link_window);
+  json_marshal_int(json_blacklist, "time_period", this->time_period);
+  json_marshal_str(json_blacklist, "server_id", this->server_id, DIGEST_SIZE);
+  json_marshal_str(json_blacklist, "bl_hash", this->bl_hash, DIGEST_SIZE);
+  json_marshal_str(json_blacklist, "bmac_n", this->bmac_n, DIGEST_SIZE);
+  json_marshal_str(json_blacklist, "sig", this->sig, SIGNATURE_SIZE);
   
   struct json_object* json_nymbles = json_object_new_array();
   
   for (Nymbles::iterator nymble = this->begin(); nymble != this->end(); ++nymble) {
-    u_int encoded_len = Nymble::hexencode(*nymble, DIGEST_SIZE);
+    u_int encoded_len = hexencode(*nymble, DIGEST_SIZE);
     char encoded[encoded_len];
 
-    Nymble::hexencode(*nymble, DIGEST_SIZE, encoded);
+    hexencode(*nymble, DIGEST_SIZE, encoded);
     
     json_object_array_add(json_nymbles, json_object_new_string(encoded));
   }
@@ -191,22 +193,22 @@ void Blacklist::unmarshal(char* bytes, Blacklist* out)
 {
   struct json_object* json_blacklist = json_tokener_parse(bytes);
   
-  Nymble::json_unmarshal_int(json_blacklist, "link_window", &(out->link_window));
-  Nymble::json_unmarshal_int(json_blacklist, "time_period", &(out->time_period));
-  Nymble::json_unmarshal_str(json_blacklist, "server_id", out->server_id, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_blacklist, "bl_hash", out->bl_hash, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_blacklist, "bmac_n", out->bmac_n, DIGEST_SIZE);
-  Nymble::json_unmarshal_str(json_blacklist, "sig", out->sig, SIGNATURE_SIZE);
+  json_unmarshal_int(json_blacklist, "link_window", &(out->link_window));
+  json_unmarshal_int(json_blacklist, "time_period", &(out->time_period));
+  json_unmarshal_str(json_blacklist, "server_id", out->server_id, DIGEST_SIZE);
+  json_unmarshal_str(json_blacklist, "bl_hash", out->bl_hash, DIGEST_SIZE);
+  json_unmarshal_str(json_blacklist, "bmac_n", out->bmac_n, DIGEST_SIZE);
+  json_unmarshal_str(json_blacklist, "sig", out->sig, SIGNATURE_SIZE);
   
   struct json_object* json_nymbles = json_object_object_get(json_blacklist, "nymbles");
   
   for (int i = 0; i < json_object_array_length(json_nymbles); i++) {
     char* encoded = json_object_get_string(json_object_array_get_idx(json_nymbles, i));
     
-    u_int decoded_len = Nymble::hexdecode(encoded);
+    u_int decoded_len = hexdecode(encoded);
     u_char* decoded = new u_char[decoded_len];
 
-    Nymble::hexdecode(encoded, decoded);
+    hexdecode(encoded, decoded);
     
     if (decoded_len == DIGEST_SIZE) {
       out->push_back(decoded);
@@ -215,3 +217,5 @@ void Blacklist::unmarshal(char* bytes, Blacklist* out)
     }
   }
 }
+
+}; // namespace Nymble

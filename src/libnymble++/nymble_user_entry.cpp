@@ -1,5 +1,7 @@
 #include "nymble_user_entry.h"
 
+namespace Nymble {
+
 UserEntry::UserEntry(Blacklist* blacklist)
 {
   this->setBlacklist(blacklist);
@@ -60,3 +62,5 @@ void UserEntry::setBlacklist(Blacklist* blacklist)
     this->blacklist = new Blacklist(blacklist);
   }
 }
+
+}; // namespace Nymble

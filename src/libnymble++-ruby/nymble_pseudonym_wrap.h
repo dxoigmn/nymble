@@ -10,6 +10,6 @@ extern VALUE rb_cPseudonym;
 VALUE rb_pseudonym_unmarshal(VALUE rb_self, VALUE rb_bytes);
 VALUE rb_pseudonym_marshal(VALUE rb_self);
 
-void rb_pseudonym_delete(Pseudonym* pseudonym);
+void rb_pseudonym_delete(Nymble::Pseudonym* pseudonym);
 
 #endif

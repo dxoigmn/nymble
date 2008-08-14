@@ -13,6 +13,7 @@ SRCS =  nymble_user.cpp \
         nymble_manager.cpp \
         nymble_manager_entry.cpp \
         nymble_linking_token.cpp \
+        nymble_util.cpp \
         nymble.cpp \
         nsNymbleUser.cpp \
         nsNymbleUserModule.cpp
@@ -26,6 +27,7 @@ OBJS =  nymble_user.o \
         nymble_manager.o \
         nymble_manager_entry.o \
         nymble_linking_token.o \
+        nymble_util.o \
         nymble.o \
         nsNymbleUser.o \
         nsNymbleUserModule.o

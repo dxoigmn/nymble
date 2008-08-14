@@ -5,9 +5,9 @@ VALUE rb_ticket_unmarshal(VALUE rb_self, VALUE rb_bytes)
   Check_Type(rb_bytes, T_STRING);
   
   char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Ticket* ticket = new Ticket();
+  Nymble::Ticket* ticket = new Nymble::Ticket();
   
-  Ticket::unmarshal(bytes, ticket);
+  Nymble::Ticket::unmarshal(bytes, ticket);
   
   if (ticket == NULL) {
     return Qnil;
@@ -21,7 +21,7 @@ VALUE rb_ticket_marshal(VALUE rb_self)
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cTicket);
 
-  Ticket* ticket = (Ticket*) DATA_PTR(rb_self);
+  Nymble::Ticket* ticket = (Nymble::Ticket*) DATA_PTR(rb_self);
   char marshaled_ticket[ticket->marshal() + 1];
   
   ticket->marshal(marshaled_ticket);
@@ -29,7 +29,7 @@ VALUE rb_ticket_marshal(VALUE rb_self)
   return rb_str_new2(marshaled_ticket);
 }
 
-void rb_ticket_delete(Ticket* ticket)
+void rb_ticket_delete(Nymble::Ticket* ticket)
 {
   delete ticket;
 }

@@ -4,6 +4,8 @@
 #include "nymble.h"
 #include "nymble_ticket.h"
 
+namespace Nymble {
+
 class LinkingToken {
   u_int   time_period;
   u_char  trapdoor[DIGEST_SIZE];
@@ -21,5 +23,7 @@ class LinkingToken {
     u_int marshal(char* out = NULL);
     static void unmarshal(char* bytes, LinkingToken* out);
 };
+
+}; // namespace Nymble
 
 #endif

@@ -1,7 +1,15 @@
 #ifndef __NYMBLE_TICKET_H__
 #define __NYMBLE_TICKET_H__
 
+#include <openssl/aes.h>
+#include <openssl/hmac.h>
+
 #include "nymble.h"
+
+namespace Nymble {
+
+class Ticket;
+typedef std::vector<Ticket*> Tickets;
 
 class Ticket
 {
@@ -38,6 +46,6 @@ class Ticket
     static void evolveTrapdoor(u_char* trapdoor, u_int delta, u_char *out);
 };
 
-typedef std::vector<Ticket*> Tickets;
+}; // namespace Nymble
 
 #endif

@@ -4,6 +4,8 @@
 #include "nymble.h"
 #include "nymble_user_entry.h"
 
+namespace Nymble {
+
 typedef std::vector<UserEntry*> UserEntries;
 
 class User : public Nymble, public UserEntries
@@ -26,5 +28,7 @@ class User : public Nymble, public UserEntries
     bool addCredential(Credential* credential);
     Ticket* getTicket(u_char* server_id);
 };
+
+}
 
 #endif

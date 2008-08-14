@@ -1,5 +1,7 @@
 #include "nymble_manager_entry.h"
 
+namespace Nymble {
+
 NymbleManagerEntry::NymbleManagerEntry(u_char* server_id, u_int cur_time_period)
 {
   u_char hmac_key_ns[DIGEST_SIZE];
@@ -46,3 +48,5 @@ void NymbleManagerEntry::signCredential(Credential* credential)
     (*ticket)->hmac(this->hmac_key_ns, true);
   }
 }
+
+}; // namespace Nymble

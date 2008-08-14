@@ -1,5 +1,7 @@
 #include "nymble_pseudonym_manager.h"
 
+namespace Nymble {
+
 PseudonymManager::PseudonymManager()
 {
   RAND_bytes(this->keyedhash_key_p, DIGEST_SIZE);
@@ -44,3 +46,5 @@ Pseudonym* PseudonymManager::createPseudonym(u_char* user_id)
   
   return pseudonym;
 }
+
+}; // namespace Nymble
