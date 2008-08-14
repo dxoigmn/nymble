@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'gnuplot'
 
-def graph(file, title)
+def graph(file, title, yscale=1)
   values = []
   
   File.open(file) do |f|
@@ -11,7 +11,7 @@ def graph(file, title)
   values.delete_if { |x, y| x % 50 != 0 }
   
   x_values = values.map { |x, y| x }
-  y_values = values.map { |x, y| y }
+  y_values = values.map { |x, y| y * yscale.to_f }
   
   Gnuplot::DataSet.new([x_values, y_values]) do |ds|
     ds.title  = title
