@@ -11,7 +11,7 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     tickets = @users[0..number_of_users].map { |user| user.ticket(@server.server_id) }
     blacklist = @nm.create_blacklist(@server.server_id)
     linking_tokens = @nm.create_linking_tokens(@server.server_id, blacklist, tickets)
-    linking_tokens = linking_tokens.map { |linking_token| linking_token.marshall }
+    linking_tokens = linking_tokens.map { |linking_token| linking_token.marshal }
     
     f << "#{number_of_users+1}\t#{linking_tokens.inject(0) { |sum, linking_token| sum + linking_token.size }}\n"
     
