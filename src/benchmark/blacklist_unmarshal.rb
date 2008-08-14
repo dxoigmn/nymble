@@ -4,10 +4,11 @@ require 'benchmark_setup'
 
 File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   @server.blacklist.marshal
+  marshalled = @server.blacklist.marshal
   
   bm = Benchmark.measure do
     RETEST_COUNT.times do
-      @server.blacklist.marshal
+      Nymble::Blacklist::unmarshal(marshalled)
     end
   end
   
@@ -18,10 +19,11 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   @users.each_with_index do |user, index|
     tickets = [ user.ticket(@server.server_id) ]
     @server.blacklist = @nm.update_blacklist(@server.server_id, @server.blacklist, tickets)
+    marshalled = @server.blacklist.marshal
     
     bm = Benchmark.measure do
       RETEST_COUNT.times do
-        @server.blacklist.marshal
+        Nymble::Blacklist::unmarshal(marshalled)
       end
     end
     
