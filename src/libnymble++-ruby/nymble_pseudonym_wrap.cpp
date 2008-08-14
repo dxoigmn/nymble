@@ -4,10 +4,9 @@ VALUE rb_pseudonym_unmarshal(VALUE rb_self, VALUE rb_bytes)
 {
   Check_Type(rb_bytes, T_STRING);
   
-  char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Nymble::Pseudonym* pseudonym = new Nymble::Pseudonym();
-  
-  Nymble::Pseudonym::unmarshal(bytes, pseudonym);
+  u_char* bytes = (u_char*) RSTRING_PTR(rb_bytes);
+  u_int size = RSTRING_LEN(rb_bytes);
+  Nymble::Pseudonym* pseudonym = Nymble::Pseudonym::unmarshal(bytes, size);
   
   if (pseudonym == NULL) {
     return Qnil;
@@ -22,11 +21,12 @@ VALUE rb_pseudonym_marshal(VALUE rb_self)
   Check_Class(rb_self, rb_cPseudonym);
   
   Nymble::Pseudonym* pseudonym = (Nymble::Pseudonym*) DATA_PTR(rb_self);
-  char marshaled_pseudonym[pseudonym->marshal() + 1];
+  u_int marshalled_size = pseudonym->marshal();
+  u_char marshalled[marshalled_size];
   
-  pseudonym->marshal(marshaled_pseudonym);
+  pseudonym->marshal(marshalled, marshalled_size);
   
-  return rb_str_new2(marshaled_pseudonym);
+  return rb_str_new((char*) marshalled, marshalled_size);
 }
 
 void rb_pseudonym_delete(Nymble::Pseudonym* pseudonym)

@@ -16,6 +16,15 @@ Credential::Credential(Credential* credential)
   }
 }
 
+Credential::Credential(Marshal::Credential* credential)
+{
+  memcpy(this->seed, credential->seed().data(), DIGEST_SIZE);
+  
+  for (int i = 0; i < credential->ticket_size(); i++) {
+    this->push_back(new Ticket((Marshal::Ticket*) &credential->ticket(i)));
+  }
+}
+
 Credential::Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* pseudonym, u_int time_periods)
 {
   u_char trapdoor[DIGEST_SIZE];
@@ -56,49 +65,32 @@ void Credential::seedTrapdoor(NymbleManager* nm, NymbleManagerEntry *entry, u_ch
   nm->seedTrapdoor(entry, pseudonym, this->seed);
 }
 
-u_int Credential::marshal(char* out)
+u_int Credential::marshal(u_char* out, u_int size)
 {
-  struct json_object* json_credential = json_object_new_object();
+  Marshal::Credential credential;
   
-  json_marshal_str(json_credential, "seed", this->seed, DIGEST_SIZE);
-  
-  struct json_object* json_tickets = json_object_new_array();
+  credential.set_seed(this->seed, DIGEST_SIZE);
   
   for (Tickets::iterator ticket = this->begin(); ticket != this->end(); ++ticket) {
-    struct json_object* json_ticket = json_object_new_object();
-    
-    (*ticket)->marshal(json_ticket);
-    
-    json_object_array_add(json_tickets, json_ticket);
+    (*ticket)->marshal(credential.add_ticket());
   }
-  
-  json_object_object_add(json_credential, "tickets", json_tickets);
-  
-  char* json = json_object_to_json_string(json_credential);
   
   if (out != NULL) {
-    strcpy(out, json);
+    credential.SerializeToArray(out, size);
   }
   
-  return strlen(json);
+  return credential.ByteSize();
 }
 
-void Credential::unmarshal(char* bytes, Credential* out)
+Credential* Credential::unmarshal(u_char* bytes, u_int size)
 {
-  struct json_object* json_credential = json_tokener_parse(bytes);
+  Marshal::Credential credential;
   
-  json_unmarshal_str(json_credential, "seed", out->seed, DIGEST_SIZE);
-  
-  struct json_object* json_tickets = json_object_object_get(json_credential, "tickets");
-  
-  for (int i = 0; i < json_object_array_length(json_tickets); i++) {
-    struct json_object* json_ticket = json_object_array_get_idx(json_tickets, i);
-    Ticket* ticket = new Ticket();
-    
-    Ticket::unmarshal(json_ticket, ticket);
-    
-    out->push_back(ticket);
+  if (credential.ParseFromArray(bytes, size)) {
+    return new Credential(&credential);
   }
+  
+  return NULL;
 }
 
 }; // namespace Nymble

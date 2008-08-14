@@ -6,6 +6,7 @@
 
 #include "nymble.h"
 #include "nymble_credential.h"
+#include "nymble_blacklist.pb.h"
 
 namespace Nymble {
 
@@ -23,6 +24,7 @@ class Blacklist : public Nymbles
   public:
     Blacklist();
     Blacklist(Blacklist* blacklist);
+    Blacklist(Marshal::Blacklist* blacklist);
     Blacklist(u_char* server_id, u_int link_window, u_int time_period);
     ~Blacklist();
     
@@ -38,8 +40,8 @@ class Blacklist : public Nymbles
     
     bool verify(RSA* verify_key_n, u_int link_window, u_int time_period);
     
-    u_int marshal(char* out = NULL);
-    static void unmarshal(char* bytes, Blacklist* out);
+    u_int marshal(u_char* out = NULL, u_int size = 0);
+    static Blacklist* unmarshal(u_char* bytes, u_int size);
 };
 
 }; // namespace Nymble

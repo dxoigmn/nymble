@@ -6,6 +6,7 @@
 #include "nymble_pseudonym.h"
 #include "nymble_manager_entry.h"
 #include "nymble_manager.h"
+#include "nymble_credential.pb.h"
 
 namespace Nymble {
 
@@ -21,13 +22,14 @@ class Credential : public Tickets
   public:
     Credential();
     Credential(Credential* credential);
+    Credential(Marshal::Credential* credential);
     Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* pseudonym, u_int time_periods);
     ~Credential();
     
     u_char* getSeed();
     
-    u_int marshal(char* out = NULL);
-    static void unmarshal(char* bytes, Credential* out);
+    u_int marshal(u_char* out = NULL, u_int size = 0);
+    static Credential* unmarshal(u_char* bytes, u_int size);
 };
 
 }; // namespace Nymble

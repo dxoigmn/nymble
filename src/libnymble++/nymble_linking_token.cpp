@@ -14,6 +14,14 @@ LinkingToken::LinkingToken(LinkingToken* linking_token)
   memcpy(this->nymble, linking_token->nymble, DIGEST_SIZE);
 }
 
+LinkingToken::LinkingToken(Marshal::LinkingToken* linking_token)
+{
+  this->time_period = linking_token->time_period();
+  memcpy(this->trapdoor, linking_token->trapdoor().data(), DIGEST_SIZE);
+  
+  Ticket::computeNymble(this->trapdoor, this->nymble);
+}
+
 LinkingToken::LinkingToken(u_int time_period, u_char* trapdoor)
 {
   this->time_period = time_period;
@@ -40,29 +48,29 @@ u_char* LinkingToken::getNymble()
   return this->nymble;
 }
 
-u_int LinkingToken::marshal(char* out)
+u_int LinkingToken::marshal(u_char* out, u_int size)
 {
-  struct json_object* json_linking_token = json_object_new_object();
+  Marshal::LinkingToken linking_token;
   
-  json_marshal_int(json_linking_token, "time_period", this->time_period);
-  json_marshal_str(json_linking_token, "trapdoor", this->trapdoor, DIGEST_SIZE);
-  
-  char* json = json_object_to_json_string(json_linking_token);
+  linking_token.set_time_period(this->time_period);
+  linking_token.set_trapdoor(this->trapdoor, DIGEST_SIZE);
   
   if (out != NULL) {
-    strcpy(out, json);
+    linking_token.SerializeToArray(out, size);
   }
   
-  return strlen(json);
+  return linking_token.ByteSize();
 }
 
-void LinkingToken::unmarshal(char* bytes, LinkingToken* out)
+LinkingToken* LinkingToken::unmarshal(u_char* bytes, u_int size)
 {
-  struct json_object* json_linking_token = json_tokener_parse(bytes);
+  Marshal::LinkingToken linking_token;
   
-  json_unmarshal_int(json_linking_token, "time_period", &out->time_period);
-  json_unmarshal_str(json_linking_token, "trapdoor", out->trapdoor, DIGEST_SIZE);
-  Ticket::computeNymble(out->trapdoor, out->nymble);
+  if (linking_token.ParseFromArray(bytes, size)) {
+    return new LinkingToken(&linking_token);
+  }
+  
+  return NULL;
 }
 
 }; // namespace Nymble

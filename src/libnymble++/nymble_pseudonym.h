@@ -21,8 +21,8 @@ class Pseudonym
     void setMacNP(u_char* mac_np);
     u_char* getMacNP();
     
-    u_int marshal(char* out = NULL);
-    static void unmarshal(char* bytes, Pseudonym* out);
+    u_int marshal(u_char* out = NULL, u_int size = 0);
+    static Pseudonym* unmarshal(u_char* bytes, u_int size);
 };
 
 }; // namespace Nymble

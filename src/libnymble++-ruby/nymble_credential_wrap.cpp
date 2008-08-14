@@ -4,10 +4,9 @@ VALUE rb_credential_unmarshal(VALUE rb_self, VALUE rb_bytes)
 {
   Check_Type(rb_bytes, T_STRING);
   
-  char* bytes = (char*) RSTRING_PTR(rb_bytes);
-  Nymble::Credential* credential = new Nymble::Credential();
-  
-  Nymble::Credential::unmarshal(bytes, credential);
+  u_char* bytes = (u_char*) RSTRING_PTR(rb_bytes);
+  u_int size = RSTRING_LEN(rb_bytes);
+  Nymble::Credential* credential = Nymble::Credential::unmarshal(bytes, size);
   
   if (credential == NULL) {
     return Qnil;
@@ -22,11 +21,12 @@ VALUE rb_credential_marshal(VALUE rb_self)
   Check_Class(rb_self, rb_cCredential);
   
   Nymble::Credential* credential = (Nymble::Credential*) DATA_PTR(rb_self);
-  char marshaled_credential[credential->marshal() + 1];
+  u_int marshalled_size = credential->marshal();
+  u_char marshalled[marshalled_size];
   
-  credential->marshal(marshaled_credential);
+  credential->marshal(marshalled, marshalled_size);
   
-  return rb_str_new2(marshaled_credential);
+  return rb_str_new((char*) marshalled, marshalled_size);
 }
 
 void rb_credential_delete(Nymble::Credential* credential)

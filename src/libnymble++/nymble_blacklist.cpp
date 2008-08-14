@@ -25,6 +25,24 @@ Blacklist::Blacklist(Blacklist* blacklist)
   }
 }
 
+Blacklist::Blacklist(Marshal::Blacklist* blacklist)
+{
+  this->link_window = blacklist->link_window();
+  this->time_period = blacklist->time_period();
+  memcpy(this->server_id, blacklist->server_id().data(), DIGEST_SIZE);
+  memcpy(this->bl_hash, blacklist->bl_hash().data(), DIGEST_SIZE);
+  memcpy(this->bmac_n, blacklist->bmac_n().data(), DIGEST_SIZE);
+  memcpy(this->sig, blacklist->sig().data(), SIGNATURE_SIZE);
+  
+  for (int i = 0; i < blacklist->nymble_size(); i++) {
+    u_char* nymble = (u_char*) malloc(DIGEST_SIZE);
+    
+    memcpy(nymble, blacklist->nymble(i).data(), DIGEST_SIZE);
+    
+    this->push_back(nymble);
+  }
+}
+
 Blacklist::Blacklist(u_char* server_id, u_int link_window, u_int time_period)
 {
   memcpy(this->server_id, server_id, DIGEST_SIZE);
@@ -156,66 +174,37 @@ bool Blacklist::verify(RSA* verify_key_n, u_int link_window, u_int time_period)
   return valid;
 }
 
-u_int Blacklist::marshal(char* out)
+u_int Blacklist::marshal(u_char* out, u_int size)
 {
-  struct json_object* json_blacklist = json_object_new_object();
+  Marshal::Blacklist blacklist;
   
-  json_marshal_int(json_blacklist, "link_window", this->link_window);
-  json_marshal_int(json_blacklist, "time_period", this->time_period);
-  json_marshal_str(json_blacklist, "server_id", this->server_id, DIGEST_SIZE);
-  json_marshal_str(json_blacklist, "bl_hash", this->bl_hash, DIGEST_SIZE);
-  json_marshal_str(json_blacklist, "bmac_n", this->bmac_n, DIGEST_SIZE);
-  json_marshal_str(json_blacklist, "sig", this->sig, SIGNATURE_SIZE);
-  
-  struct json_object* json_nymbles = json_object_new_array();
+  blacklist.set_link_window(this->link_window);
+  blacklist.set_time_period(this->time_period);
+  blacklist.set_server_id(this->server_id, DIGEST_SIZE);
+  blacklist.set_bl_hash(this->bl_hash, DIGEST_SIZE);
+  blacklist.set_bmac_n(this->bmac_n, DIGEST_SIZE);
+  blacklist.set_sig(this->sig, SIGNATURE_SIZE);
   
   for (Nymbles::iterator nymble = this->begin(); nymble != this->end(); ++nymble) {
-    u_int encoded_len = hexencode(*nymble, DIGEST_SIZE);
-    char encoded[encoded_len];
-
-    hexencode(*nymble, DIGEST_SIZE, encoded);
-    
-    json_object_array_add(json_nymbles, json_object_new_string(encoded));
+    blacklist.add_nymble(*nymble, DIGEST_SIZE);
   }
   
-  json_object_object_add(json_blacklist, "nymbles", json_nymbles);
-  
-  char* json = json_object_to_json_string(json_blacklist);
-  
-  if (out) {
-    strcpy(out, json);
+  if (out != NULL) {
+    blacklist.SerializeToArray(out, size);
   }
   
-  return strlen(json);
+  return blacklist.ByteSize();
 }
 
-void Blacklist::unmarshal(char* bytes, Blacklist* out)
+Blacklist* Blacklist::unmarshal(u_char* bytes, u_int size)
 {
-  struct json_object* json_blacklist = json_tokener_parse(bytes);
+  Marshal::Blacklist blacklist;
   
-  json_unmarshal_int(json_blacklist, "link_window", &(out->link_window));
-  json_unmarshal_int(json_blacklist, "time_period", &(out->time_period));
-  json_unmarshal_str(json_blacklist, "server_id", out->server_id, DIGEST_SIZE);
-  json_unmarshal_str(json_blacklist, "bl_hash", out->bl_hash, DIGEST_SIZE);
-  json_unmarshal_str(json_blacklist, "bmac_n", out->bmac_n, DIGEST_SIZE);
-  json_unmarshal_str(json_blacklist, "sig", out->sig, SIGNATURE_SIZE);
-  
-  struct json_object* json_nymbles = json_object_object_get(json_blacklist, "nymbles");
-  
-  for (int i = 0; i < json_object_array_length(json_nymbles); i++) {
-    char* encoded = json_object_get_string(json_object_array_get_idx(json_nymbles, i));
-    
-    u_int decoded_len = hexdecode(encoded);
-    u_char* decoded = new u_char[decoded_len];
-
-    hexdecode(encoded, decoded);
-    
-    if (decoded_len == DIGEST_SIZE) {
-      out->push_back(decoded);
-    } else {
-      fprintf(stderr, "Couldn't unmarshal nymble because due to unexpected length %d (expected %d)", decoded_len, DIGEST_SIZE);
-    }
+  if (blacklist.ParseFromArray(bytes, size)) {
+    return new Blacklist(&blacklist);
   }
+  
+  return NULL;
 }
 
 }; // namespace Nymble

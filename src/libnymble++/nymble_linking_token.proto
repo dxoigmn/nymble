@@ -1,0 +1,6 @@
+package Nymble.Marshal;
+
+message LinkingToken {
+  required int32 time_period = 1;
+  required bytes trapdoor = 2;
+}

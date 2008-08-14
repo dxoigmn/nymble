@@ -39,31 +39,30 @@ u_char* Pseudonym::getMacNP()
   return this->mac_np;
 }
 
-u_int Pseudonym::marshal(char* out)
+u_int Pseudonym::marshal(u_char* out, u_int size)
 {
   u_char in[DIGEST_SIZE*2];
-
+  
   memcpy(in, this->pseudonym, DIGEST_SIZE);
   memcpy(in+DIGEST_SIZE, this->mac_np, DIGEST_SIZE);
   
   u_int out_len = hexencode(in, DIGEST_SIZE*2);
   
-  if (out) {
-    hexencode(in, DIGEST_SIZE*2, out);
+  if (out && size == out_len) {
+    hexencode(in, DIGEST_SIZE*2, (char*) out);
   }
   
   return out_len;
 }
 
-void Pseudonym::unmarshal(char* bytes, Pseudonym* out)
+Pseudonym* Pseudonym::unmarshal(u_char* bytes, u_int size)
 {
-  u_int decoded_len = hexdecode(bytes);
+  u_int decoded_len = hexdecode((char*) bytes);
   u_char decoded[decoded_len];
   
-  hexdecode(bytes, decoded);
+  hexdecode((char*) bytes, decoded);
   
-  memcpy(out->pseudonym, decoded, DIGEST_SIZE);
-  memcpy(out->mac_np, decoded + DIGEST_SIZE, DIGEST_SIZE);
+  return new Pseudonym(decoded, decoded + DIGEST_SIZE);
 }
 
 }; // namespace Nymble

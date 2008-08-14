@@ -26,6 +26,16 @@ Ticket::Ticket(Ticket* ticket)
   memcpy(this->mac_ns, ticket->mac_ns, DIGEST_SIZE);
 }
 
+Ticket::Ticket(Marshal::Ticket* ticket) {
+  this->link_window = ticket->link_window();
+  this->time_period = ticket->time_period();
+  memcpy(this->server_id, ticket->server_id().data(), DIGEST_SIZE);
+  memcpy(this->nymble, ticket->nymble().data(), DIGEST_SIZE);
+  memcpy(this->mac_n, ticket->mac_n().data(), DIGEST_SIZE);
+  memcpy(this->mac_ns, ticket->mac_ns().data(), DIGEST_SIZE);
+  memcpy(this->trapdoorenc, ticket->trapdoorenc().data(), TRAPDOORENC_SIZE);
+}
+
 u_int Ticket::getLinkWindow()
 {
   return this->link_window;
@@ -115,46 +125,39 @@ void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
   }
 }
 
-void Ticket::marshal(json_object* out)
+void Ticket::marshal(Marshal::Ticket* out)
 {
-  json_marshal_int(out, "link_window", this->link_window);
-  json_marshal_int(out, "time_period", this->time_period);
-  json_marshal_str(out, "server_id", this->server_id, DIGEST_SIZE);
-  json_marshal_str(out, "nymble", this->nymble, DIGEST_SIZE);
-  json_marshal_str(out, "mac_n", this->mac_n, DIGEST_SIZE);
-  json_marshal_str(out, "mac_ns", this->mac_ns, DIGEST_SIZE);
-  json_marshal_str(out, "trapdoorenc", this->trapdoorenc, TRAPDOORENC_SIZE);
+  out->set_link_window(this->link_window);
+  out->set_time_period(this->time_period);
+  out->set_server_id(this->server_id, DIGEST_SIZE);
+  out->set_nymble(this->nymble, DIGEST_SIZE);
+  out->set_mac_n(this->mac_n, DIGEST_SIZE);
+  out->set_mac_ns(this->mac_ns, DIGEST_SIZE);
+  out->set_trapdoorenc(this->trapdoorenc, TRAPDOORENC_SIZE);
 }
 
-u_int Ticket::marshal(char* out)
+u_int Ticket::marshal(u_char* out, u_int size)
 {
-  struct json_object* json_ticket = json_object_new_object();
+  Marshal::Ticket ticket;
   
-  this->marshal(json_ticket);
-  
-  char* json = json_object_to_json_string(json_ticket);
+  this->marshal(&ticket);
   
   if (out != NULL) {
-    strcpy(out, json);
+    ticket.SerializeToArray(out, size);
   }
   
-  return strlen(json);
+  return ticket.ByteSize();
 }
 
-void Ticket::unmarshal(json_object* json_ticket, Ticket* out)
+Ticket* Ticket::unmarshal(u_char* bytes, u_int size)
 {
-  json_unmarshal_int(json_ticket, "link_window", &out->link_window);
-  json_unmarshal_int(json_ticket, "time_period", &out->time_period);
-  json_unmarshal_str(json_ticket, "server_id", out->server_id, DIGEST_SIZE);
-  json_unmarshal_str(json_ticket, "nymble", out->nymble, DIGEST_SIZE);
-  json_unmarshal_str(json_ticket, "mac_n", out->mac_n, DIGEST_SIZE);
-  json_unmarshal_str(json_ticket, "mac_ns", out->mac_ns, DIGEST_SIZE);
-  json_unmarshal_str(json_ticket, "trapdoorenc", out->trapdoorenc, TRAPDOORENC_SIZE);
-}
-
-void Ticket::unmarshal(char* bytes, Ticket* out)
-{
-  Ticket::unmarshal(json_tokener_parse(bytes), out);
+  Marshal::Ticket ticket;
+  
+  if (ticket.ParseFromArray(bytes, size)) {
+    return new Ticket(&ticket);
+  }
+  
+  return NULL;
 }
 
 void Ticket::computeNymble(u_char *trapdoor, u_char *out)
