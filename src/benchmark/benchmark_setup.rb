@@ -58,4 +58,4 @@ end
 @server = create_server(@nm, @server_id)
 @users = create_users(1000, @pm, @nm, @server)
 
-RETEST_COUNT = 20
+RETEST_COUNT = 10

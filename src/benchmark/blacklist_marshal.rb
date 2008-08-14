@@ -23,6 +23,8 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
       end
     end
     
+    bm /= RETEST_COUNT
+    
     f << "#{index+1}\t#{bm.real}\n"
     
     puts "#{Time.now}\t#{index}" if index % 100 == 0
