@@ -6,4 +6,5 @@
 *.xpi
 *.key
 *.dat
+*.pdf
 Makefile
