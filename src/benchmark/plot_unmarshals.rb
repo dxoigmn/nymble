@@ -13,9 +13,9 @@ Gnuplot.open do |gp|
     #plot.yrange   '[0:0.20]'
     plot.key      'top left'
     
-    plot.data << graph('blacklist_unmarshal.dat', 'Blacklist', 1000)
+    plot.data << graph('ticket_unmarshal.dat', 'Complaint Request', 1000)
+    plot.data << graph('linking_token_unmarshal.dat', 'Linking List', 1000)
     plot.data << graph('credential_unmarshal.dat', 'Credential', 1000)
-    plot.data << graph('ticket_unmarshal.dat', 'Ticket', 1000)
-    plot.data << graph('linking_token_unmarshal.dat', 'Linking Token', 1000)
+    plot.data << graph('blacklist_unmarshal.dat', 'Blacklist', 1000)
   end
 end
