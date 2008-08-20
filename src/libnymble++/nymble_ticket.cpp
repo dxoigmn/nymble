@@ -7,48 +7,25 @@ Ticket::Ticket()
   
 }
 
-Ticket::Ticket(u_int link_window, u_int time_period, u_char* server_id, u_char* nymble)
+Ticket::Ticket(u_char* nymble)
 {
-  this->link_window = link_window;
-  this->time_period = time_period;
-  memcpy(this->server_id, server_id, DIGEST_SIZE);
   memcpy(this->nymble, nymble, DIGEST_SIZE);
 }
 
 Ticket::Ticket(Ticket* ticket)
 {
-  this->link_window = ticket->link_window;
-  this->time_period = ticket->time_period;
-  memcpy(this->server_id, ticket->server_id, DIGEST_SIZE);
   memcpy(this->nymble, ticket->nymble, DIGEST_SIZE);
   memcpy(this->trapdoorenc, ticket->trapdoorenc, TRAPDOORENC_SIZE);
   memcpy(this->mac_n, ticket->mac_n, DIGEST_SIZE);
   memcpy(this->mac_ns, ticket->mac_ns, DIGEST_SIZE);
 }
 
-Ticket::Ticket(Marshal::Ticket* ticket) {
-  this->link_window = ticket->link_window();
-  this->time_period = ticket->time_period();
-  memcpy(this->server_id, ticket->server_id().data(), DIGEST_SIZE);
+Ticket::Ticket(Marshal::Ticket* ticket)
+{
   memcpy(this->nymble, ticket->nymble().data(), DIGEST_SIZE);
+  memcpy(this->trapdoorenc, ticket->trapdoorenc().data(), TRAPDOORENC_SIZE);
   memcpy(this->mac_n, ticket->mac_n().data(), DIGEST_SIZE);
   memcpy(this->mac_ns, ticket->mac_ns().data(), DIGEST_SIZE);
-  memcpy(this->trapdoorenc, ticket->trapdoorenc().data(), TRAPDOORENC_SIZE);
-}
-
-u_int Ticket::getLinkWindow()
-{
-  return this->link_window;
-}
-
-u_int Ticket::getTimePeriod()
-{
-  return this->time_period;
-}
-
-u_char* Ticket::getServerId()
-{
-  return this->server_id;
 }
 
 u_char* Ticket::getNymble()
@@ -61,14 +38,14 @@ u_char* Ticket::getMacNS()
   return this->mac_ns;
 }
 
-void Ticket::hmac(u_char* hmac_key, bool include_mac_n, u_char* out)
+void Ticket::hmac(u_char* hmac_key, u_char* server_id, u_int link_window, u_int time_period, bool include_mac_n, u_char* out)
 {
   HMAC_CTX ctx;
-
+  
   HMAC_Init(&ctx, hmac_key, DIGEST_SIZE, EVP_sha256());
-  HMAC_Update(&ctx, this->server_id, DIGEST_SIZE);
-  HMAC_Update(&ctx, (u_char *)&this->link_window, sizeof(this->link_window));
-  HMAC_Update(&ctx, (u_char *)&this->time_period, sizeof(this->time_period));
+  HMAC_Update(&ctx, server_id, DIGEST_SIZE);
+  HMAC_Update(&ctx, (u_char *)&link_window, sizeof(link_window));
+  HMAC_Update(&ctx, (u_char *)&time_period, sizeof(time_period));
   HMAC_Update(&ctx, this->nymble, DIGEST_SIZE);
   HMAC_Update(&ctx, this->trapdoorenc, TRAPDOORENC_SIZE);
   
@@ -125,15 +102,17 @@ void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
   }
 }
 
+Complaint* Ticket::createComplaint(u_int time_period)
+{
+  return new Complaint(time_period, this);
+}
+
 void Ticket::marshal(Marshal::Ticket* out)
 {
-  out->set_link_window(this->link_window);
-  out->set_time_period(this->time_period);
-  out->set_server_id(this->server_id, DIGEST_SIZE);
   out->set_nymble(this->nymble, DIGEST_SIZE);
+  out->set_trapdoorenc(this->trapdoorenc, TRAPDOORENC_SIZE);
   out->set_mac_n(this->mac_n, DIGEST_SIZE);
   out->set_mac_ns(this->mac_ns, DIGEST_SIZE);
-  out->set_trapdoorenc(this->trapdoorenc, TRAPDOORENC_SIZE);
 }
 
 u_int Ticket::marshal(u_char* out, u_int size)

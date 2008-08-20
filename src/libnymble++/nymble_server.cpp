@@ -35,11 +35,11 @@ void Server::setTimePeriod(u_int time_period)
     return;
   }
   
-  Nymble::setTimePeriod(time_period);
-  
   for (LinkingTokens::iterator linking_token = this->linking_tokens->begin(); linking_token != this->linking_tokens->end(); ++linking_token) {
-    (*linking_token)->setTimePeriod(time_period);
+    (*linking_token)->evolve(time_period - this->cur_time_period);
   }
+  
+  Nymble::setTimePeriod(time_period);
   
   this->finalized = false;
 }
@@ -77,19 +77,7 @@ bool Server::verifyTicket(Ticket* ticket)
   bool valid = true;
   u_char mac_ns[DIGEST_SIZE];
   
-  ticket->hmac(this->hmac_key_ns, true, mac_ns);
-  
-  if (memcmp(ticket->getServerId(), this->server_id, DIGEST_SIZE) != 0) {
-    valid = false;
-  }
-  
-  if (ticket->getLinkWindow() != this->cur_link_window) {
-    valid = false;
-  }
-  
-  if (ticket->getTimePeriod() != this->cur_time_period) {
-    valid = false;
-  }
+  ticket->hmac(this->hmac_key_ns, this->server_id, this->cur_link_window, this->cur_time_period, true, mac_ns);
   
   if (memcmp(ticket->getMacNS(), mac_ns, DIGEST_SIZE) != 0) {
     valid = false;

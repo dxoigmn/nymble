@@ -42,11 +42,4 @@ u_char* NymbleManagerEntry::getHmacKeyNS()
   return this->hmac_key_ns;
 }
 
-void NymbleManagerEntry::signCredential(Credential* credential)
-{
-  for (Tickets::iterator ticket = credential->begin(); ticket != credential->end(); ++ticket) {
-    (*ticket)->hmac(this->hmac_key_ns, true);
-  }
-}
-
 }; // namespace Nymble

@@ -16,10 +16,12 @@ VALUE rb_cBlacklist;
 VALUE rb_cCredential;
 VALUE rb_cLinkingToken;
 VALUE rb_cTicket;
+VALUE rb_cComplaint;
 VALUE rb_cPseudonymManager;
 VALUE rb_cNymbleManager;
 VALUE rb_cServer;
 VALUE rb_cUser;
+VALUE rb_cUserEntry;
 
 extern "C" {
   void Init_nymble();

@@ -38,11 +38,11 @@ Credential::Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* 
     Ticket::evolveTrapdoor(trapdoor, 1, trapdoor);
     Ticket::computeNymble(trapdoor, nymble);
 
-    Ticket* ticket = new Ticket(nm->getLinkWindow(), time_period, entry->getServerId(), nymble);
+    Ticket* ticket = new Ticket(nymble);
     
     ticket->encrypt(nm->getEncryptKeyN(), trapdoor, pseudonym->getPseudonym());
-    ticket->hmac(nm->getHmacKeyN());
-    ticket->hmac(entry->getHmacKeyNS(), true);
+    ticket->hmac(nm->getHmacKeyN(), entry->getServerId(), nm->getLinkWindow(), time_period);
+    ticket->hmac(entry->getHmacKeyNS(), entry->getServerId(), nm->getLinkWindow(), time_period, true);
     
     this->push_back(ticket);
   }

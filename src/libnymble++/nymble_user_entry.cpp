@@ -2,15 +2,22 @@
 
 namespace Nymble {
 
-UserEntry::UserEntry(Blacklist* blacklist)
+UserEntry::UserEntry()
 {
-  this->setBlacklist(blacklist);
+  
+}
+
+UserEntry::UserEntry(u_char* server_id)
+{
+  memcpy(this->server_id, server_id, DIGEST_SIZE);
+  
+  this->blacklist = NULL;
   this->credential = NULL;
 }
 
 u_char* UserEntry::getServerId()
 {
-  return this->blacklist->getServerId();
+  return this->server_id;
 }
 
 bool UserEntry::isBlacklisted()
@@ -40,27 +47,21 @@ Ticket* UserEntry::getTicket(u_int time_period)
     return NULL;
   }
   
-  for (Tickets::iterator ticket = this->credential->begin(); ticket != this->credential->end(); ++ticket) {
-    if ((*ticket)->getTimePeriod() == time_period) {
-      return *ticket;
-    }
+  if (time_period > this->credential->size()) {
+    return NULL;
   }
   
-  return NULL;
+  return this->credential->at(time_period - 1);
 }
 
 void UserEntry::setCredential(Credential* credential)
 {
-  if (credential != NULL) {
-    this->credential = new Credential(credential);
-  }
+  this->credential = new Credential(credential);
 }
 
 void UserEntry::setBlacklist(Blacklist* blacklist)
 {
-  if (blacklist != NULL) {
-    this->blacklist = new Blacklist(blacklist);
-  }
+  this->blacklist = new Blacklist(blacklist);
 }
 
 }; // namespace Nymble

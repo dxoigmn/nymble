@@ -73,28 +73,7 @@ class Ticket : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required int32 link_window = 1;
-  inline bool has_link_window() const;
-  inline void clear_link_window();
-  inline ::google::protobuf::int32 link_window() const;
-  inline void set_link_window(::google::protobuf::int32 value);
-  
-  // required int32 time_period = 2;
-  inline bool has_time_period() const;
-  inline void clear_time_period();
-  inline ::google::protobuf::int32 time_period() const;
-  inline void set_time_period(::google::protobuf::int32 value);
-  
-  // required bytes server_id = 3;
-  inline bool has_server_id() const;
-  inline void clear_server_id();
-  inline const ::std::string& server_id() const;
-  inline void set_server_id(const ::std::string& value);
-  inline void set_server_id(const char* value);
-  inline void set_server_id(const void* value, size_t size);
-  inline ::std::string* mutable_server_id();
-  
-  // required bytes nymble = 4;
+  // required bytes nymble = 1;
   inline bool has_nymble() const;
   inline void clear_nymble();
   inline const ::std::string& nymble() const;
@@ -103,7 +82,7 @@ class Ticket : public ::google::protobuf::Message {
   inline void set_nymble(const void* value, size_t size);
   inline ::std::string* mutable_nymble();
   
-  // required bytes mac_n = 5;
+  // required bytes mac_n = 2;
   inline bool has_mac_n() const;
   inline void clear_mac_n();
   inline const ::std::string& mac_n() const;
@@ -112,7 +91,7 @@ class Ticket : public ::google::protobuf::Message {
   inline void set_mac_n(const void* value, size_t size);
   inline ::std::string* mutable_mac_n();
   
-  // required bytes mac_ns = 6;
+  // required bytes mac_ns = 3;
   inline bool has_mac_ns() const;
   inline void clear_mac_ns();
   inline const ::std::string& mac_ns() const;
@@ -121,7 +100,7 @@ class Ticket : public ::google::protobuf::Message {
   inline void set_mac_ns(const void* value, size_t size);
   inline ::std::string* mutable_mac_ns();
   
-  // required bytes trapdoorenc = 7;
+  // required bytes trapdoorenc = 4;
   inline bool has_trapdoorenc() const;
   inline void clear_trapdoorenc();
   inline const ::std::string& trapdoorenc() const;
@@ -134,10 +113,6 @@ class Ticket : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   mutable int _cached_size_;
   
-  ::google::protobuf::int32 link_window_;
-  ::google::protobuf::int32 time_period_;
-  ::std::string* server_id_;
-  static const ::std::string _default_server_id_;
   ::std::string* nymble_;
   static const ::std::string _default_nymble_;
   ::std::string* mac_n_;
@@ -148,9 +123,9 @@ class Ticket : public ::google::protobuf::Message {
   static const ::std::string _default_trapdoorenc_;
   friend void protobuf_BuildDesc_nymble_5fticket_2eproto();
   static const Ticket default_instance_;
-  static const int _offsets_[7];
+  static const int _offsets_[4];
   
-  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
   inline bool _has_bit(int index) const {
@@ -173,242 +148,168 @@ class Ticket : public ::google::protobuf::Message {
 
 // Ticket
 
-// required int32 link_window = 1;
-inline bool Ticket::has_link_window() const {
-  return _has_bit(0);
-}
-inline void Ticket::clear_link_window() {
-  link_window_ = 0;
-  _clear_bit(0);
-}
-inline ::google::protobuf::int32 Ticket::link_window() const {
-  return link_window_;
-}
-inline void Ticket::set_link_window(::google::protobuf::int32 value) {
-  _set_bit(0);
-  link_window_ = value;
-}
-
-// required int32 time_period = 2;
-inline bool Ticket::has_time_period() const {
-  return _has_bit(1);
-}
-inline void Ticket::clear_time_period() {
-  time_period_ = 0;
-  _clear_bit(1);
-}
-inline ::google::protobuf::int32 Ticket::time_period() const {
-  return time_period_;
-}
-inline void Ticket::set_time_period(::google::protobuf::int32 value) {
-  _set_bit(1);
-  time_period_ = value;
-}
-
-// required bytes server_id = 3;
-inline bool Ticket::has_server_id() const {
-  return _has_bit(2);
-}
-inline void Ticket::clear_server_id() {
-  if (server_id_ != &_default_server_id_) {
-    server_id_->clear();
-  }
-  _clear_bit(2);
-}
-inline const ::std::string& Ticket::server_id() const {
-  return *server_id_;
-}
-inline void Ticket::set_server_id(const ::std::string& value) {
-  _set_bit(2);
-  if (server_id_ == &_default_server_id_) {
-    server_id_ = new ::std::string;
-  }
-  server_id_->assign(value);
-}
-inline void Ticket::set_server_id(const char* value) {
-  _set_bit(2);
-  if (server_id_ == &_default_server_id_) {
-    server_id_ = new ::std::string;
-  }
-  server_id_->assign(value);
-}
-inline void Ticket::set_server_id(const void* value, size_t size) {
-  _set_bit(2);
-  if (server_id_ == &_default_server_id_) {
-    server_id_ = new ::std::string;
-  }
-  server_id_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Ticket::mutable_server_id() {
-  _set_bit(2);
-  if (server_id_ == &_default_server_id_) {
-    server_id_ = new ::std::string;
-  }
-  return server_id_;
-}
-
-// required bytes nymble = 4;
+// required bytes nymble = 1;
 inline bool Ticket::has_nymble() const {
-  return _has_bit(3);
+  return _has_bit(0);
 }
 inline void Ticket::clear_nymble() {
   if (nymble_ != &_default_nymble_) {
     nymble_->clear();
   }
-  _clear_bit(3);
+  _clear_bit(0);
 }
 inline const ::std::string& Ticket::nymble() const {
   return *nymble_;
 }
 inline void Ticket::set_nymble(const ::std::string& value) {
-  _set_bit(3);
+  _set_bit(0);
   if (nymble_ == &_default_nymble_) {
     nymble_ = new ::std::string;
   }
   nymble_->assign(value);
 }
 inline void Ticket::set_nymble(const char* value) {
-  _set_bit(3);
+  _set_bit(0);
   if (nymble_ == &_default_nymble_) {
     nymble_ = new ::std::string;
   }
   nymble_->assign(value);
 }
 inline void Ticket::set_nymble(const void* value, size_t size) {
-  _set_bit(3);
+  _set_bit(0);
   if (nymble_ == &_default_nymble_) {
     nymble_ = new ::std::string;
   }
   nymble_->assign(reinterpret_cast<const char*>(value), size);
 }
 inline ::std::string* Ticket::mutable_nymble() {
-  _set_bit(3);
+  _set_bit(0);
   if (nymble_ == &_default_nymble_) {
     nymble_ = new ::std::string;
   }
   return nymble_;
 }
 
-// required bytes mac_n = 5;
+// required bytes mac_n = 2;
 inline bool Ticket::has_mac_n() const {
-  return _has_bit(4);
+  return _has_bit(1);
 }
 inline void Ticket::clear_mac_n() {
   if (mac_n_ != &_default_mac_n_) {
     mac_n_->clear();
   }
-  _clear_bit(4);
+  _clear_bit(1);
 }
 inline const ::std::string& Ticket::mac_n() const {
   return *mac_n_;
 }
 inline void Ticket::set_mac_n(const ::std::string& value) {
-  _set_bit(4);
+  _set_bit(1);
   if (mac_n_ == &_default_mac_n_) {
     mac_n_ = new ::std::string;
   }
   mac_n_->assign(value);
 }
 inline void Ticket::set_mac_n(const char* value) {
-  _set_bit(4);
+  _set_bit(1);
   if (mac_n_ == &_default_mac_n_) {
     mac_n_ = new ::std::string;
   }
   mac_n_->assign(value);
 }
 inline void Ticket::set_mac_n(const void* value, size_t size) {
-  _set_bit(4);
+  _set_bit(1);
   if (mac_n_ == &_default_mac_n_) {
     mac_n_ = new ::std::string;
   }
   mac_n_->assign(reinterpret_cast<const char*>(value), size);
 }
 inline ::std::string* Ticket::mutable_mac_n() {
-  _set_bit(4);
+  _set_bit(1);
   if (mac_n_ == &_default_mac_n_) {
     mac_n_ = new ::std::string;
   }
   return mac_n_;
 }
 
-// required bytes mac_ns = 6;
+// required bytes mac_ns = 3;
 inline bool Ticket::has_mac_ns() const {
-  return _has_bit(5);
+  return _has_bit(2);
 }
 inline void Ticket::clear_mac_ns() {
   if (mac_ns_ != &_default_mac_ns_) {
     mac_ns_->clear();
   }
-  _clear_bit(5);
+  _clear_bit(2);
 }
 inline const ::std::string& Ticket::mac_ns() const {
   return *mac_ns_;
 }
 inline void Ticket::set_mac_ns(const ::std::string& value) {
-  _set_bit(5);
+  _set_bit(2);
   if (mac_ns_ == &_default_mac_ns_) {
     mac_ns_ = new ::std::string;
   }
   mac_ns_->assign(value);
 }
 inline void Ticket::set_mac_ns(const char* value) {
-  _set_bit(5);
+  _set_bit(2);
   if (mac_ns_ == &_default_mac_ns_) {
     mac_ns_ = new ::std::string;
   }
   mac_ns_->assign(value);
 }
 inline void Ticket::set_mac_ns(const void* value, size_t size) {
-  _set_bit(5);
+  _set_bit(2);
   if (mac_ns_ == &_default_mac_ns_) {
     mac_ns_ = new ::std::string;
   }
   mac_ns_->assign(reinterpret_cast<const char*>(value), size);
 }
 inline ::std::string* Ticket::mutable_mac_ns() {
-  _set_bit(5);
+  _set_bit(2);
   if (mac_ns_ == &_default_mac_ns_) {
     mac_ns_ = new ::std::string;
   }
   return mac_ns_;
 }
 
-// required bytes trapdoorenc = 7;
+// required bytes trapdoorenc = 4;
 inline bool Ticket::has_trapdoorenc() const {
-  return _has_bit(6);
+  return _has_bit(3);
 }
 inline void Ticket::clear_trapdoorenc() {
   if (trapdoorenc_ != &_default_trapdoorenc_) {
     trapdoorenc_->clear();
   }
-  _clear_bit(6);
+  _clear_bit(3);
 }
 inline const ::std::string& Ticket::trapdoorenc() const {
   return *trapdoorenc_;
 }
 inline void Ticket::set_trapdoorenc(const ::std::string& value) {
-  _set_bit(6);
+  _set_bit(3);
   if (trapdoorenc_ == &_default_trapdoorenc_) {
     trapdoorenc_ = new ::std::string;
   }
   trapdoorenc_->assign(value);
 }
 inline void Ticket::set_trapdoorenc(const char* value) {
-  _set_bit(6);
+  _set_bit(3);
   if (trapdoorenc_ == &_default_trapdoorenc_) {
     trapdoorenc_ = new ::std::string;
   }
   trapdoorenc_->assign(value);
 }
 inline void Ticket::set_trapdoorenc(const void* value, size_t size) {
-  _set_bit(6);
+  _set_bit(3);
   if (trapdoorenc_ == &_default_trapdoorenc_) {
     trapdoorenc_ = new ::std::string;
   }
   trapdoorenc_->assign(reinterpret_cast<const char*>(value), size);
 }
 inline ::std::string* Ticket::mutable_trapdoorenc() {
-  _set_bit(6);
+  _set_bit(3);
   if (trapdoorenc_ == &_default_trapdoorenc_) {
     trapdoorenc_ = new ::std::string;
   }

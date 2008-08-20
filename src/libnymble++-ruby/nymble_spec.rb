@@ -186,7 +186,7 @@ context 'Nymble Manager' do
   it 'should create credentials' do
     @nm.add_server(@server_id)
     pseudonym = @pm.create_pseudonym(@user_id)
-    time_periods = 1440
+    time_periods = 1
     
     @nm.create_credential(@server_id, pseudonym, time_periods).should.not.be.nil
   end
@@ -281,22 +281,43 @@ context 'User' do
     @user.time_period.should.equal(@cur_time_period)
   end
   
-  it 'should manage blacklist' do
-    @user.should.respond_to?(:add_blacklist)
-    @user.add_blacklist(@nm.create_blacklist(@server_id)).should.equal(@server_id)
-    @user.time_period = @cur_time_period + 1
-    @user.add_blacklist(@nm.create_blacklist(@server_id)).should.be.nil
-  end
-  
-  it 'should manage credentials' do
-    @user.should.respond_to?(:add_credential)
-    @user.should.not.add_credential(@credential)
-    @user.add_blacklist(@blacklist).should.equal(@server_id)
-    @user.should.add_credential(@credential)
+  it 'should manage entries' do
+    @user.should.respond_to?(:find_or_create_entry)
+    user_entry = @user.find_or_create_entry(@server_id)
   end
 end
 
-context 'Credential' do
+context 'UserEntry' do
+  before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
+    @verify_key_n = File.expand_path('verify_n.key')
+    @user_id = Nymble.digest('user_id')
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 1)
+    @user = Nymble::User.new(@pseudonym, @verify_key_n)
+    @user_entry = @user.find_or_create_entry(@server_id)
+  end
+  
+  it 'should manage blacklists' do
+    @user_entry.should.respond_to?(:add_blacklist)
+    @user_entry.blacklist = @blacklist
+  end
+  
+  it 'should manage credentials' do
+    @user_entry.should.respond_to?(:add_credential)
+    @user_entry.credential = @credential
+  end
+end
+
+context 'Ticket' do
   before(:each) do
     @cur_link_window = 10
     @cur_time_period = 2
@@ -316,15 +337,17 @@ context 'Credential' do
     @server_id = Nymble.digest('server_id')
     @hmac_key_ns = @nm.add_server(@server_id)
     @blacklist = @nm.create_blacklist(@server_id)
-    @credential = @nm.create_credential(@server_id, @pseudonym, 10)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 3)
     
     @user = Nymble::User.new(@pseudonym, @verify_key_n)
     @user.link_window = @cur_link_window
     @user.time_period = @cur_time_period
-    @user.add_blacklist(@blacklist)
-    @user.add_credential(@credential)
     
-    @ticket = @user.ticket(@server_id)
+    @user_entry = @user.find_or_create_entry(@server_id)
+    @user_entry.blacklist = @blacklist
+    @user_entry.credential = @credential
+    
+    @ticket = @user_entry.ticket(@user.time_period)
   end
   
   it 'should be (un)marshalable' do
@@ -334,7 +357,57 @@ context 'Credential' do
     ticket.should.not.be.nil
     bytes.should.equal(ticket.marshal)
   end
+  
+  it 'should able to be transformed into a complaint' do
+    @ticket.should.respond_to?(:complain)
+    
+    @ticket.complain(@user.time_period).should.not.be.nil
+  end
 end
+
+context 'Complaint' do
+  before(:each) do
+    @cur_link_window = 10
+    @cur_time_period = 2
+    @hmac_key_np = Nymble.digest('hmac_key_np')
+    @sign_key_n = File.expand_path('sign_n.key')
+    @verify_key_n = File.expand_path('verify_n.key')
+    @user_id = Nymble.digest('user_id')
+    
+    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+    @pm.link_window = @cur_link_window
+    @pm.time_period = @cur_time_period
+    @pseudonym = @pm.create_pseudonym(@user_id)
+    
+    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
+    @nm.link_window = @cur_link_window
+    @nm.time_period = @cur_time_period
+    @server_id = Nymble.digest('server_id')
+    @hmac_key_ns = @nm.add_server(@server_id)
+    @blacklist = @nm.create_blacklist(@server_id)
+    @credential = @nm.create_credential(@server_id, @pseudonym, 3)
+    
+    @user = Nymble::User.new(@pseudonym, @verify_key_n)
+    @user.link_window = @cur_link_window
+    @user.time_period = @cur_time_period
+    
+    @user_entry = @user.find_or_create_entry(@server_id)
+    @user_entry.blacklist = @blacklist
+    @user_entry.credential = @credential
+    
+    @ticket = @user_entry.ticket(@user.time_period)
+    @complaint = @ticket.complain(@user.time_period)
+  end
+  
+  it 'should be (un)marshalable' do
+    bytes = @complaint.marshal
+    bytes.should.not.be.nil
+    complaint = Nymble::Complaint.unmarshal(bytes)
+    complaint.should.not.be.nil
+    bytes.should.equal(complaint.marshal)
+  end
+end
+
 
 context 'Server' do
   before(:each) do
@@ -361,9 +434,13 @@ context 'Server' do
     @user = Nymble::User.new(@pseudonym, @verify_key_n)
     @user.link_window = @cur_link_window
     @user.time_period = @cur_time_period
-    @user.add_blacklist(@blacklist)
-    @user.add_credential(@credential)
-    @ticket = @user.ticket(@server_id)
+    
+    @user_entry = @user.find_or_create_entry(@server_id)
+    @user_entry.blacklist = @blacklist
+    @user_entry.credential = @credential
+    
+    @ticket = @user_entry.ticket(@user.time_period)
+    @complaints = [ @ticket.complain(@user.time_period) ]
     
     @server = Nymble::Server.new(@server_id)
   end
@@ -440,25 +517,22 @@ context 'Server' do
     @server.time_period = @cur_time_period
     @server.link_window = @cur_link_window
     
-    @user.time_period = @cur_time_period - 1
-    @server.should.not.valid_ticket?(@user.ticket(@server_id))
-    
-    @user.time_period = @cur_time_period + 1
-    @server.should.not.valid_ticket?(@user.ticket(@server_id))
+    @server.should.not.valid_ticket?(@user_entry.ticket(@cur_time_period - 1))
+    @server.should.not.valid_ticket?(@user_entry.ticket(@cur_time_period + 1))
   end
   
   it 'should manage linking tokens' do
     @nm.time_period = @cur_time_period + 1
     @server.time_period = @cur_time_period + 1
-    @user.time_period = @cur_time_period + 1
     
     @server.should.respond_to(:add_linking_tokens)
-    linking_tokens = @nm.create_linking_tokens(@server_id, @blacklist, [@ticket])
+    linking_tokens = @nm.create_linking_tokens(@server_id, @blacklist, @complaints)
     linking_tokens.should.not.be.empty?
     
     @server.add_linking_tokens(linking_tokens)
-    @server.should.not.valid_ticket?(@user.ticket(@server_id))
+    @server.should.not.valid_ticket?(@user_entry.ticket(@cur_time_period + 1))
   end
+
 end
 
 context 'Linking Token' do
@@ -486,14 +560,17 @@ context 'Linking Token' do
     @user = Nymble::User.new(@pseudonym, @verify_key_n)
     @user.link_window = @cur_link_window
     @user.time_period = @cur_time_period
-    @user.add_blacklist(@blacklist)
-    @user.add_credential(@credential)
-    @ticket = @user.ticket(@server_id)
+    
+    @user_entry = @user.find_or_create_entry(@server_id)
+    @user_entry.blacklist = @blacklist
+    @user_entry.credential = @credential
+    @ticket = @user_entry.ticket(@user.time_period)
+    @complaints = [ @ticket.complain(@user.time_period) ]
     
     @server = Nymble::Server.new(@server_id)
     @server.link_window = @cur_link_window
     @server.time_period = @cur_time_period
-    @linking_token = @nm.create_linking_tokens(@server_id, @blacklist, [@ticket]).first
+    @linking_token = @nm.create_linking_tokens(@server_id, @blacklist, @complaints).first
   end
   
   it 'should be (un)marshalable' do

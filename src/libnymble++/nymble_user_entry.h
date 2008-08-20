@@ -15,7 +15,8 @@ class UserEntry
   Blacklist* blacklist;
   
   public:
-    UserEntry(Blacklist* blacklist);
+    UserEntry();
+    UserEntry(u_char* server_id);
     
     u_char* getServerId();
     bool isBlacklisted();

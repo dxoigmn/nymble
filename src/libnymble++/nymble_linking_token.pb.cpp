@@ -28,8 +28,7 @@ void protobuf_BuildDesc_nymble_5flinking_5ftoken_2eproto() {
 
   const ::google::protobuf::FileDescriptor* file = pool->InternalBuildGeneratedFile(
     "\n\032nymble_linking_token.proto\022\016Nymble.Mar"
-    "shal\"5\n\014LinkingToken\022\023\n\013time_period\030\001 \002("
-    "\005\022\020\n\010trapdoor\030\002 \002(\014", 99);
+    "shal\" \n\014LinkingToken\022\020\n\010trapdoor\030\001 \002(\014", 78);
   LinkingToken_descriptor_ = file->message_type(0);
   LinkingToken_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -56,16 +55,13 @@ struct StaticDescriptorInitializer_nymble_5flinking_5ftoken_2eproto {
 
 const LinkingToken LinkingToken::default_instance_;
 
-
 const ::std::string LinkingToken::_default_trapdoor_;
-const int LinkingToken::_offsets_[2] = {
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LinkingToken, time_period_),
+const int LinkingToken::_offsets_[1] = {
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LinkingToken, trapdoor_),
 };
 
 LinkingToken::LinkingToken()
   : _cached_size_(0),
-    time_period_(0),
     trapdoor_(const_cast< ::std::string*>(&_default_trapdoor_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
@@ -74,7 +70,6 @@ LinkingToken::LinkingToken()
 
 LinkingToken::LinkingToken(const LinkingToken& from)
   : _cached_size_(0),
-    time_period_(0),
     trapdoor_(const_cast< ::std::string*>(&_default_trapdoor_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);

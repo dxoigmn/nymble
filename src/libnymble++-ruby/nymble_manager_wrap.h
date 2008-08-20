@@ -9,6 +9,7 @@
 #include "nymble_pseudonym_wrap.h"
 #include "nymble_ticket_wrap.h"
 #include "nymble_manager.h"
+#include "nymble_complaint_wrap.h"
 
 extern VALUE rb_cNymbleManager;
 
@@ -22,9 +23,9 @@ VALUE rb_nm_add_server(VALUE rb_self, VALUE rb_server_id);
 VALUE rb_nm_verify_pseudonym(VALUE rb_self, VALUE rb_pseudonym);
 VALUE rb_nm_verify_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist);
 VALUE rb_nm_create_blacklist(VALUE rb_self, VALUE rb_server_id);
-VALUE rb_nm_update_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_tickets);
+VALUE rb_nm_update_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints);
 VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_pseudonym, VALUE rb_time_periods);
-VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_tickets);
+VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints);
 
 void rb_nm_delete(Nymble::NymbleManager* nm);
 

@@ -9,7 +9,7 @@ require File.join(File.dirname(__FILE__), '..', 'libnymble++-ruby', 'nymble')
 Sinatra::Application.default_options[:port] = 3002
 
 configure do
-  @@server = Nymble::Server.new(Nymble.digest('http://localhost:3001'))
+  @@server = Nymble::Server.new(Nymble.digest('http://localhost:3002'))
 end
 
 before do

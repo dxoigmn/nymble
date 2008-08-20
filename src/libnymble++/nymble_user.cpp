@@ -38,50 +38,7 @@ void User::readVerifyKey(char* verify_key_path)
   fclose(verify_key);
 }
 
-u_char* User::addBlacklist(Blacklist* blacklist)
-{
-  if (!blacklist->verify(this->verify_key_n, this->cur_link_window, this->cur_time_period)) {
-    return NULL;
-  }
-  
-  UserEntry* entry = this->findEntry(blacklist->getServerId());
-  
-  if (entry == NULL) {
-    entry = new UserEntry(blacklist);
-    this->push_back(entry);
-  } else {
-    entry->setBlacklist(blacklist);
-  }
-  
-  return entry->getServerId();
-}
-
-bool User::addCredential(Credential* credential)
-{
-  Ticket* ticket = credential->front();
-  UserEntry* entry = this->findEntry(ticket->getServerId());
-  
-  if (entry == NULL) {
-    return false;
-  }
-  
-  entry->setCredential(credential);
-  
-  return true;
-}
-
-Ticket* User::getTicket(u_char* server_id)
-{
-  UserEntry* entry = this->findEntry(server_id);
-  
-  if (entry == NULL || entry->isBlacklisted()) {
-    return NULL;
-  }
-  
-  return entry->getTicket(this->cur_time_period);
-}
-
-UserEntry* User::findEntry(u_char* server_id)
+UserEntry* User::findOrCreateEntry(u_char* server_id)
 {
   for (UserEntries::iterator entry = this->begin(); entry != this->end(); ++entry) {
     if (memcmp((*entry)->getServerId(), server_id, DIGEST_SIZE) == 0) {
@@ -89,7 +46,11 @@ UserEntry* User::findEntry(u_char* server_id)
     }
   }
   
-  return NULL;
+  UserEntry* entry = new UserEntry(server_id);
+  
+  this->push_back(entry);
+  
+  return entry;
 }
 
 }; // namespace Nymble

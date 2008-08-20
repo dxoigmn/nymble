@@ -7,6 +7,8 @@
 #include "nymble_blacklist.h"
 #include "nymble_manager_entry.h"
 #include "nymble_pseudonym.h"
+#include "nymble_ticket.h"
+#include "nymble_complaint.h"
 #include "nymble_linking_token.h"
 
 namespace Nymble {
@@ -48,8 +50,8 @@ class NymbleManager : public Nymble
     bool verifyPseudonym(Pseudonym* pseudonym);
     bool verifyBlacklist(u_char* server_id, Blacklist* blacklist);
     Blacklist* createBlacklist(u_char* server_id);
-    Blacklist* updateBlacklist(u_char* server_id, Blacklist* blacklist, Tickets* complaints);
-    LinkingTokens* createLinkingTokens(u_char* server_id, Blacklist* blacklist, Tickets* complaints);
+    Blacklist* updateBlacklist(u_char* server_id, Blacklist* blacklist, Complaints* complaints);
+    LinkingTokens* createLinkingTokens(u_char* server_id, Blacklist* blacklist, Complaints* complaints);
     Credential* createCredential(u_char* server_id, Pseudonym* pseudonym, u_int time_periods);
     
     void encryptTrapdoor(Ticket* ticket, Pseudonym* pseudonym, u_char *seed);

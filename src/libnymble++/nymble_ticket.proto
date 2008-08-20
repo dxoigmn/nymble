@@ -1,11 +1,8 @@
 package Nymble.Marshal;
 
 message Ticket {
-  required int32 link_window = 1;
-  required int32 time_period = 2;
-  required bytes server_id = 3;
-  required bytes nymble = 4;
-  required bytes mac_n = 5;
-  required bytes mac_ns = 6;
-  required bytes trapdoorenc = 7;
+  required bytes nymble = 1;
+  required bytes mac_n = 2;
+  required bytes mac_ns = 3;
+  required bytes trapdoorenc = 4;
 }

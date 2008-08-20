@@ -27,11 +27,9 @@ void protobuf_BuildDesc_nymble_5fticket_2eproto() {
     ::google::protobuf::DescriptorPool::internal_generated_pool();
 
   const ::google::protobuf::FileDescriptor* file = pool->InternalBuildGeneratedFile(
-    "\n\023nymble_ticket.proto\022\016Nymble.Marshal\"\211\001"
-    "\n\006Ticket\022\023\n\013link_window\030\001 \002(\005\022\023\n\013time_pe"
-    "riod\030\002 \002(\005\022\021\n\tserver_id\030\003 \002(\014\022\016\n\006nymble\030"
-    "\004 \002(\014\022\r\n\005mac_n\030\005 \002(\014\022\016\n\006mac_ns\030\006 \002(\014\022\023\n\013"
-    "trapdoorenc\030\007 \002(\014", 177);
+    "\n\023nymble_ticket.proto\022\016Nymble.Marshal\"L\n"
+    "\006Ticket\022\016\n\006nymble\030\001 \002(\014\022\r\n\005mac_n\030\002 \002(\014\022\016"
+    "\n\006mac_ns\030\003 \002(\014\022\023\n\013trapdoorenc\030\004 \002(\014", 115);
   Ticket_descriptor_ = file->message_type(0);
   Ticket_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -58,17 +56,11 @@ struct StaticDescriptorInitializer_nymble_5fticket_2eproto {
 
 const Ticket Ticket::default_instance_;
 
-
-
-const ::std::string Ticket::_default_server_id_;
 const ::std::string Ticket::_default_nymble_;
 const ::std::string Ticket::_default_mac_n_;
 const ::std::string Ticket::_default_mac_ns_;
 const ::std::string Ticket::_default_trapdoorenc_;
-const int Ticket::_offsets_[7] = {
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, link_window_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, time_period_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, server_id_),
+const int Ticket::_offsets_[4] = {
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, nymble_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, mac_n_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, mac_ns_),
@@ -77,9 +69,6 @@ const int Ticket::_offsets_[7] = {
 
 Ticket::Ticket()
   : _cached_size_(0),
-    link_window_(0),
-    time_period_(0),
-    server_id_(const_cast< ::std::string*>(&_default_server_id_)),
     nymble_(const_cast< ::std::string*>(&_default_nymble_)),
     mac_n_(const_cast< ::std::string*>(&_default_mac_n_)),
     mac_ns_(const_cast< ::std::string*>(&_default_mac_ns_)),
@@ -91,9 +80,6 @@ Ticket::Ticket()
 
 Ticket::Ticket(const Ticket& from)
   : _cached_size_(0),
-    link_window_(0),
-    time_period_(0),
-    server_id_(const_cast< ::std::string*>(&_default_server_id_)),
     nymble_(const_cast< ::std::string*>(&_default_nymble_)),
     mac_n_(const_cast< ::std::string*>(&_default_mac_n_)),
     mac_ns_(const_cast< ::std::string*>(&_default_mac_ns_)),
@@ -103,9 +89,6 @@ Ticket::Ticket(const Ticket& from)
 }
 
 Ticket::~Ticket() {
-  if (server_id_ != &_default_server_id_) {
-    delete server_id_;
-  }
   if (nymble_ != &_default_nymble_) {
     delete nymble_;
   }

@@ -23,10 +23,8 @@ class User : public Nymble, public UserEntries
     Pseudonym* getPseudonym();
     
     void readVerifyKey(char* verify_key_path);
-    
-    u_char* addBlacklist(Blacklist* blacklist);
-    bool addCredential(Credential* credential);
-    Ticket* getTicket(u_char* server_id);
+
+    UserEntry* findOrCreateEntry(u_char* server_id);
 };
 
 }

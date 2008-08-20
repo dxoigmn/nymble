@@ -1,5 +1,18 @@
 #include "nymble_ticket_wrap.h"
 
+VALUE rb_ticket_complain(VALUE rb_self, VALUE rb_time_period)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cTicket);
+  
+  Nymble::Ticket* ticket = (Nymble::Ticket*) DATA_PTR(rb_self);
+  u_int time_period = NUM2UINT(rb_time_period);
+  
+  Nymble::Complaint* complaint = ticket->createComplaint(time_period);
+  
+  return Data_Wrap_Struct(rb_cComplaint, NULL, rb_complaint_delete, complaint);
+}
+
 VALUE rb_ticket_unmarshal(VALUE rb_self, VALUE rb_bytes)
 {
   Check_Type(rb_bytes, T_STRING);

@@ -24,8 +24,6 @@ class NymbleManagerEntry {
     
     void setHmacKeyNS(u_char* hmac_key_ns);
     u_char* getHmacKeyNS();
-    
-    void signCredential(Credential* credential);
 };
 
 }; // namespace Nymble
