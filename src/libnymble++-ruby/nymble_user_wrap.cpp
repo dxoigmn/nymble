@@ -71,6 +71,7 @@ VALUE rb_user_time_period_set(VALUE rb_self, VALUE rb_time_period)
   return rb_self;
 }
 
+
 VALUE rb_user_pseudonym(VALUE rb_self)
 {
   Check_Type(rb_self, T_DATA);
@@ -81,7 +82,49 @@ VALUE rb_user_pseudonym(VALUE rb_self)
   return Data_Wrap_Struct(rb_cPseudonym, NULL, NULL, user->getPseudonym());
 }
 
-VALUE rb_user_find_or_create_entry(VALUE rb_self, VALUE rb_server_id)
+VALUE rb_user_add_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  Check_Type(rb_server_id, T_STRING);
+  Check_Size(rb_server_id, DIGEST_SIZE);
+  Check_Type(rb_blacklist, T_DATA);
+  Check_Class(rb_blacklist, rb_cBlacklist);
+  
+  Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
+  u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
+  Nymble::Blacklist* blacklist = (Nymble::Blacklist*) DATA_PTR(rb_blacklist);
+  
+  Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
+  
+  if (user->verifyBlacklist(blacklist)) {
+    entry->setBlacklist(blacklist);
+    
+    return Qtrue;
+  }
+  
+  return Qfalse;
+}
+
+VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_credential)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  Check_Type(rb_credential, T_DATA);
+  Check_Class(rb_credential, rb_cCredential);
+  
+  Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
+  u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
+  Nymble::Credential* credential = (Nymble::Credential*) DATA_PTR(rb_credential);
+  
+  Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
+  
+  entry->setCredential(credential);
+  
+  return Qnil;
+}
+
+VALUE rb_user_ticket(VALUE rb_self, VALUE rb_server_id)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cUser);
@@ -92,8 +135,13 @@ VALUE rb_user_find_or_create_entry(VALUE rb_self, VALUE rb_server_id)
   u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
   
   Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
+  Nymble::Ticket* ticket = entry->getTicket(user->getTimePeriod());
   
-  return Data_Wrap_Struct(rb_cUserEntry, NULL, NULL, entry);
+  if (ticket ==  NULL) {
+    return Qnil;
+  }
+  
+  return Data_Wrap_Struct(rb_cTicket, NULL, NULL, ticket);
 }
 
 void rb_user_delete(Nymble::User* user)

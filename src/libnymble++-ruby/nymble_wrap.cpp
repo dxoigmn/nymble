@@ -21,8 +21,8 @@ void Init_nymble() {
   rb_define_method(rb_cCredential, "marshal", RUBY_METHOD_FUNC(rb_credential_marshal), 0);
   
   rb_cTicket = rb_define_class_under(rb_mNymble, "Ticket", rb_cObject);
-  rb_define_method(rb_cTicket, "complain", RUBY_METHOD_FUNC(rb_ticket_complain), 1);
   rb_define_singleton_method(rb_cTicket, "unmarshal", RUBY_METHOD_FUNC(rb_ticket_unmarshal), 1);
+  rb_define_method(rb_cTicket, "complain", RUBY_METHOD_FUNC(rb_ticket_complain), 1);
   rb_define_method(rb_cTicket, "marshal", RUBY_METHOD_FUNC(rb_ticket_marshal), 0);
   
   rb_cComplaint = rb_define_class_under(rb_mNymble, "Complaint", rb_cObject);
@@ -80,14 +80,9 @@ void Init_nymble() {
   rb_define_method(rb_cUser, "time_period", RUBY_METHOD_FUNC(rb_user_time_period), 0);
   rb_define_method(rb_cUser, "time_period=", RUBY_METHOD_FUNC(rb_user_time_period_set), 1);
   rb_define_method(rb_cUser, "pseudonym", RUBY_METHOD_FUNC(rb_user_pseudonym), 0);
-  rb_define_method(rb_cUser, "find_or_create_entry", RUBY_METHOD_FUNC(rb_user_find_or_create_entry), 1);
-  
-  rb_cUserEntry = rb_define_class_under(rb_mNymble, "UserEntry", rb_cObject);
-  rb_define_method(rb_cUserEntry, "blacklist=", RUBY_METHOD_FUNC(rb_user_entry_blacklist_set), 1);
-  rb_define_method(rb_cUserEntry, "credential=", RUBY_METHOD_FUNC(rb_user_entry_credential_set), 1);
-  rb_define_method(rb_cUserEntry, "blacklisted?", RUBY_METHOD_FUNC(rb_user_entry_is_blacklisted), 0);
-  rb_define_method(rb_cUserEntry, "ticket", RUBY_METHOD_FUNC(rb_user_entry_ticket), 1);
-  
+  rb_define_method(rb_cUser, "add_blacklist", RUBY_METHOD_FUNC(rb_user_add_blacklist), 2);
+  rb_define_method(rb_cUser, "add_credential", RUBY_METHOD_FUNC(rb_user_add_credential), 2);
+  rb_define_method(rb_cUser, "ticket", RUBY_METHOD_FUNC(rb_user_ticket), 1);
 }
 
 VALUE rb_nymble_digest(VALUE rb_self, VALUE rb_value)
