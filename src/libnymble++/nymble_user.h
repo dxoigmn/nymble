@@ -25,6 +25,7 @@ class User : public Nymble, public UserEntries
     void readVerifyKey(char* verify_key_path);
 
     UserEntry* findOrCreateEntry(u_char* server_id);
+    bool User::verifyBlacklist(Blacklist* blacklist);
 };
 
 }

@@ -19,16 +19,16 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   @users.size.times do |number_of_users|
     @server = create_server(@nm, @server_id)
     
-    tickets = []
+    complaints = []
     
     @users.each_with_index do |user, index|
       next unless index <= number_of_users
       
-      tickets << user.ticket(@server.server_id)
+      complaints << user.ticket(@server.server_id).complain(user.time_period)
     end
     
     server_id = @server.server_id
-    blacklist = @nm.update_blacklist(server_id, @server.blacklist, tickets)
+    blacklist = @nm.update_blacklist(server_id, @server.blacklist, complaints)
     
     bm = Benchmark.measure do
       RETEST_COUNT.times do

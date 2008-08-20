@@ -47,8 +47,8 @@ def create_users(count, pm, nm, server)
     user = Nymble::User.new(pm.create_pseudonym(Nymble.digest(user_id)), @verify_key_n)
     user.link_window = @cur_link_window
     user.time_period = @cur_time_period
-    user.add_blacklist(server.blacklist)
-    user.add_credential(nm.create_credential(server.server_id, user.pseudonym, 2))
+    user.add_blacklist(server.server_id, server.blacklist)
+    user.add_credential(server.server_id, nm.create_credential(server.server_id, user.pseudonym, 2))
     user
   end
 end

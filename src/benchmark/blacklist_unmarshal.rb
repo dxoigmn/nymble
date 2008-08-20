@@ -17,8 +17,8 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   f << "0\t#{bm.real}\n"
   
   @users.each_with_index do |user, index|
-    tickets = [ user.ticket(@server.server_id) ]
-    @server.blacklist = @nm.update_blacklist(@server.server_id, @server.blacklist, tickets)
+    complaints = [ user.ticket(@server.server_id).complain(user.time_period) ]
+    @server.blacklist = @nm.update_blacklist(@server.server_id, @server.blacklist, complaints)
     marshalled = @server.blacklist.marshal
     
     bm = Benchmark.measure do

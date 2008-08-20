@@ -53,4 +53,9 @@ UserEntry* User::findOrCreateEntry(u_char* server_id)
   return entry;
 }
 
+bool User::verifyBlacklist(Blacklist* blacklist)
+{
+  return blacklist->verify(this->verify_key_n, this->cur_link_window, this->cur_time_period);
+}
+
 }; // namespace Nymble

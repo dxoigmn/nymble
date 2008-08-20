@@ -6,7 +6,7 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   f << "0\t0\n"
   
   @users.size.times do |number_of_users|
-    complaints = @users[0..number_of_users].map { |user| user[@server.server_id].ticket(user.time_period).complain(user.time_period) }
+    complaints = @users[0..number_of_users].map { |user| user.ticket(@server.server_id).complain(user.time_period) }
     marshalled = complaints.map { |complaint| complaint.marshal }
     
     bm = Benchmark.measure do

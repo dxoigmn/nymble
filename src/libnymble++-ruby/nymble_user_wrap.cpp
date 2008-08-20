@@ -135,6 +135,11 @@ VALUE rb_user_ticket(VALUE rb_self, VALUE rb_server_id)
   u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
   
   Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
+  
+  if (entry->isBlacklisted()) {
+    return Qnil;
+  }
+  
   Nymble::Ticket* ticket = entry->getTicket(user->getTimePeriod());
   
   if (ticket ==  NULL) {
