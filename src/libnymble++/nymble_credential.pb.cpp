@@ -30,9 +30,9 @@ void protobuf_BuildDesc_nymble_5fcredential_2eproto() {
   ::Nymble::Marshal::protobuf_BuildDesc_nymble_5fticket_2eproto();
   const ::google::protobuf::FileDescriptor* file = pool->InternalBuildGeneratedFile(
     "\n\027nymble_credential.proto\022\016Nymble.Marsha"
-    "l\032\023nymble_ticket.proto\"B\n\nCredential\022\014\n\004"
-    "seed\030\001 \002(\014\022&\n\006ticket\030\002 \003(\0132\026.Nymble.Mars"
-    "hal.Ticket", 130);
+    "l\032\023nymble_ticket.proto\"E\n\nCredential\022\017\n\007"
+    "nymble0\030\001 \002(\014\022&\n\006ticket\030\002 \003(\0132\026.Nymble.M"
+    "arshal.Ticket", 133);
   Credential_descriptor_ = file->message_type(0);
   Credential_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -59,16 +59,16 @@ struct StaticDescriptorInitializer_nymble_5fcredential_2eproto {
 
 const Credential Credential::default_instance_;
 
-const ::std::string Credential::_default_seed_;
+const ::std::string Credential::_default_nymble0_;
 
 const int Credential::_offsets_[2] = {
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Credential, seed_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Credential, nymble0_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Credential, ticket_),
 };
 
 Credential::Credential()
   : _cached_size_(0),
-    seed_(const_cast< ::std::string*>(&_default_seed_)) {
+    nymble0_(const_cast< ::std::string*>(&_default_nymble0_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
@@ -76,14 +76,14 @@ Credential::Credential()
 
 Credential::Credential(const Credential& from)
   : _cached_size_(0),
-    seed_(const_cast< ::std::string*>(&_default_seed_)) {
+    nymble0_(const_cast< ::std::string*>(&_default_nymble0_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
 
 Credential::~Credential() {
-  if (seed_ != &_default_seed_) {
-    delete seed_;
+  if (nymble0_ != &_default_nymble0_) {
+    delete nymble0_;
   }
   if (this != &default_instance_) {
   }

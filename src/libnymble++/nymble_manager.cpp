@@ -217,7 +217,7 @@ LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* 
     } else {
       u_int delta = this->cur_time_period - (*complaint)->getTimePeriod();
       
-      Ticket::evolveTrapdoor(trapdoor, delta, trapdoor);
+      Ticket::evolveSeed(trapdoor, delta, trapdoor);
       
       // FIXME: This should add nymble0 to be checked in userIsBlacklisted.
     }

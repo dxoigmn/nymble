@@ -74,14 +74,14 @@ class Credential : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required bytes seed = 1;
-  inline bool has_seed() const;
-  inline void clear_seed();
-  inline const ::std::string& seed() const;
-  inline void set_seed(const ::std::string& value);
-  inline void set_seed(const char* value);
-  inline void set_seed(const void* value, size_t size);
-  inline ::std::string* mutable_seed();
+  // required bytes nymble0 = 1;
+  inline bool has_nymble0() const;
+  inline void clear_nymble0();
+  inline const ::std::string& nymble0() const;
+  inline void set_nymble0(const ::std::string& value);
+  inline void set_nymble0(const char* value);
+  inline void set_nymble0(const void* value, size_t size);
+  inline ::std::string* mutable_nymble0();
   
   // repeated .Nymble.Marshal.Ticket ticket = 2;
   inline int ticket_size() const;
@@ -96,8 +96,8 @@ class Credential : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   mutable int _cached_size_;
   
-  ::std::string* seed_;
-  static const ::std::string _default_seed_;
+  ::std::string* nymble0_;
+  static const ::std::string _default_nymble0_;
   ::google::protobuf::RepeatedPtrField< ::Nymble::Marshal::Ticket > ticket_;
   friend void protobuf_BuildDesc_nymble_5fcredential_2eproto();
   static const Credential default_instance_;
@@ -126,46 +126,46 @@ class Credential : public ::google::protobuf::Message {
 
 // Credential
 
-// required bytes seed = 1;
-inline bool Credential::has_seed() const {
+// required bytes nymble0 = 1;
+inline bool Credential::has_nymble0() const {
   return _has_bit(0);
 }
-inline void Credential::clear_seed() {
-  if (seed_ != &_default_seed_) {
-    seed_->clear();
+inline void Credential::clear_nymble0() {
+  if (nymble0_ != &_default_nymble0_) {
+    nymble0_->clear();
   }
   _clear_bit(0);
 }
-inline const ::std::string& Credential::seed() const {
-  return *seed_;
+inline const ::std::string& Credential::nymble0() const {
+  return *nymble0_;
 }
-inline void Credential::set_seed(const ::std::string& value) {
+inline void Credential::set_nymble0(const ::std::string& value) {
   _set_bit(0);
-  if (seed_ == &_default_seed_) {
-    seed_ = new ::std::string;
+  if (nymble0_ == &_default_nymble0_) {
+    nymble0_ = new ::std::string;
   }
-  seed_->assign(value);
+  nymble0_->assign(value);
 }
-inline void Credential::set_seed(const char* value) {
+inline void Credential::set_nymble0(const char* value) {
   _set_bit(0);
-  if (seed_ == &_default_seed_) {
-    seed_ = new ::std::string;
+  if (nymble0_ == &_default_nymble0_) {
+    nymble0_ = new ::std::string;
   }
-  seed_->assign(value);
+  nymble0_->assign(value);
 }
-inline void Credential::set_seed(const void* value, size_t size) {
+inline void Credential::set_nymble0(const void* value, size_t size) {
   _set_bit(0);
-  if (seed_ == &_default_seed_) {
-    seed_ = new ::std::string;
+  if (nymble0_ == &_default_nymble0_) {
+    nymble0_ = new ::std::string;
   }
-  seed_->assign(reinterpret_cast<const char*>(value), size);
+  nymble0_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Credential::mutable_seed() {
+inline ::std::string* Credential::mutable_nymble0() {
   _set_bit(0);
-  if (seed_ == &_default_seed_) {
-    seed_ = new ::std::string;
+  if (nymble0_ == &_default_nymble0_) {
+    nymble0_ = new ::std::string;
   }
-  return seed_;
+  return nymble0_;
 }
 
 // repeated .Nymble.Marshal.Ticket ticket = 2;

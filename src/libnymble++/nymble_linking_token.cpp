@@ -28,7 +28,7 @@ LinkingToken::LinkingToken(u_char* trapdoor)
 
 void LinkingToken::evolve(u_int time_period_delta)
 {
-  Ticket::evolveTrapdoor(this->trapdoor, time_period_delta, this->trapdoor);
+  Ticket::evolveSeed(this->trapdoor, time_period_delta, this->trapdoor);
   Ticket::computeNymble(this->trapdoor, this->nymble);
 }
 

@@ -28,9 +28,7 @@ bool UserEntry::isBlacklisted()
     return false;
   }
   
-  u_char nymble0[DIGEST_SIZE];
-  
-  Ticket::computeNymble(this->credential->getSeed(), nymble0);
+  u_char* nymble0 = this->credential->getNymble0();
   
   for (Nymbles::iterator nymble = this->blacklist->begin(); nymble != this->blacklist->end(); ++nymble) {
     if (memcmp(*nymble, nymble0, DIGEST_SIZE) == 0) {

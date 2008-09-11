@@ -30,9 +30,9 @@ class Ticket
     u_char* getNymble();
     u_char* getMacNS();
     
-    void hmac(u_char* hmac_key, u_char* server_id, u_int link_window, u_int time_period, bool include_mac_n = false, u_char* out = NULL);
-    void encrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym);
-    void decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym);
+    void hmac(u_char* mac_key, u_char* sid, u_int t, u_int w, bool include_mac_n = false, u_char* out = NULL);
+    void encrypt(u_char* enc_key, u_char* nymble, u_char* seed);
+    void decrypt(u_char* enc_key, u_char* nymble, u_char* seed);
     
     Complaint* createComplaint(u_int time_period);
     
@@ -41,7 +41,7 @@ class Ticket
     static Ticket* unmarshal(u_char* bytes, u_int size);
     
     static void computeNymble(u_char *trapdoor, u_char *out);
-    static void evolveTrapdoor(u_char* trapdoor, u_int delta, u_char *out);
+    static void evolveSeed(u_char* seed, u_int delta, u_char *out);
 };
 
 }; // namespace Nymble

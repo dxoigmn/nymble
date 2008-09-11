@@ -38,14 +38,15 @@ u_char* Ticket::getMacNS()
   return this->mac_ns;
 }
 
-void Ticket::hmac(u_char* hmac_key, u_char* server_id, u_int link_window, u_int time_period, bool include_mac_n, u_char* out)
+
+void Ticket::hmac(u_char* mac_key, u_char* sid, u_int t, u_int w, bool include_mac_n, u_char* out)
 {
   HMAC_CTX ctx;
   
-  HMAC_Init(&ctx, hmac_key, DIGEST_SIZE, EVP_sha256());
-  HMAC_Update(&ctx, server_id, DIGEST_SIZE);
-  HMAC_Update(&ctx, (u_char *)&link_window, sizeof(link_window));
-  HMAC_Update(&ctx, (u_char *)&time_period, sizeof(time_period));
+  HMAC_Init(&ctx, mac_key, DIGEST_SIZE, EVP_sha256());
+  HMAC_Update(&ctx, sid, DIGEST_SIZE);
+  HMAC_Update(&ctx, (u_char *)&t, sizeof(t));
+  HMAC_Update(&ctx, (u_char *)&w, sizeof(w));
   HMAC_Update(&ctx, this->nymble, DIGEST_SIZE);
   HMAC_Update(&ctx, this->ctxt, CTXT_SIZE);
   
@@ -65,24 +66,24 @@ void Ticket::hmac(u_char* hmac_key, u_char* server_id, u_int link_window, u_int 
   HMAC_CTX_cleanup(&ctx);
 }
 
-void Ticket::encrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
+void Ticket::encrypt(u_char* enc_key, u_char* nymble, u_char* seed)
 {
   u_char in[DIGEST_SIZE * 2];
   u_char iv[CIPHER_BLOCK_SIZE];
   AES_KEY key;
   
-  memcpy(in, trapdoor, DIGEST_SIZE);
-  memcpy(in + DIGEST_SIZE, pseudonym, DIGEST_SIZE);
+  memcpy(in, nymble, DIGEST_SIZE);
+  memcpy(in + DIGEST_SIZE, seed, DIGEST_SIZE);
   
   /* iv must be separate from buffer as the AES function messes with it as it works */
   RAND_bytes(iv, CIPHER_BLOCK_SIZE);
   memcpy(this->ctxt, iv, CIPHER_BLOCK_SIZE);
   
-  AES_set_encrypt_key(encrypt_key_n, CIPHER_BLOCK_SIZE * 8, &key);
+  AES_set_encrypt_key(enc_key, CIPHER_BLOCK_SIZE * 8, &key);
   AES_cbc_encrypt(in, this->ctxt + CIPHER_BLOCK_SIZE, DIGEST_SIZE * 2, &key, iv, AES_ENCRYPT);
 }
 
-void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
+void Ticket::decrypt(u_char* enc_key, u_char* nymble, u_char* seed)
 {
   u_char buffer[CIPHER_BLOCK_SIZE * 4];
   u_char iv[CIPHER_BLOCK_SIZE];
@@ -90,15 +91,15 @@ void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
 
   memcpy(iv, this->ctxt, CIPHER_BLOCK_SIZE);
 
-  AES_set_decrypt_key(encrypt_key_n, CIPHER_BLOCK_SIZE * 8, &key);
+  AES_set_decrypt_key(enc_key, CIPHER_BLOCK_SIZE * 8, &key);
   AES_cbc_encrypt(this->ctxt + CIPHER_BLOCK_SIZE, buffer, CTXT_SIZE - CIPHER_BLOCK_SIZE, &key, iv, AES_DECRYPT);
   
-  if (trapdoor) {
-    memcpy(trapdoor, buffer, DIGEST_SIZE);
+  if (nymble) {
+    memcpy(nymble, buffer, DIGEST_SIZE);
   }
   
-  if (pseudonym) {
-    memcpy(pseudonym, buffer + DIGEST_SIZE, DIGEST_SIZE);
+  if (seed) {
+    memcpy(seed, buffer + DIGEST_SIZE, DIGEST_SIZE);
   }
 }
 
@@ -139,20 +140,20 @@ Ticket* Ticket::unmarshal(u_char* bytes, u_int size)
   return NULL;
 }
 
-void Ticket::computeNymble(u_char *trapdoor, u_char *out)
+void Ticket::computeNymble(u_char *seed, u_char *out)
 {
   u_char nonce[] = "g";
   SHA256_CTX ctx;
   
   SHA256_Init(&ctx);
   SHA256_Update(&ctx, nonce, sizeof(nonce));
-  SHA256_Update(&ctx, trapdoor, DIGEST_SIZE);
+  SHA256_Update(&ctx, seed, DIGEST_SIZE);
   SHA256_Final(out, &ctx);
 }
 
-void Ticket::evolveTrapdoor(u_char* trapdoor, u_int delta, u_char* out)
+void Ticket::evolveSeed(u_char* seed, u_int delta, u_char* out)
 {
-  memcpy(out, trapdoor, DIGEST_SIZE);
+  memcpy(out, seed, DIGEST_SIZE);
   
   for (u_int i = 0; i < delta; i++) {
     SHA256_CTX ctx;
