@@ -100,14 +100,14 @@ class Ticket : public ::google::protobuf::Message {
   inline void set_mac_ns(const void* value, size_t size);
   inline ::std::string* mutable_mac_ns();
   
-  // required bytes trapdoorenc = 4;
-  inline bool has_trapdoorenc() const;
-  inline void clear_trapdoorenc();
-  inline const ::std::string& trapdoorenc() const;
-  inline void set_trapdoorenc(const ::std::string& value);
-  inline void set_trapdoorenc(const char* value);
-  inline void set_trapdoorenc(const void* value, size_t size);
-  inline ::std::string* mutable_trapdoorenc();
+  // required bytes ctxt = 4;
+  inline bool has_ctxt() const;
+  inline void clear_ctxt();
+  inline const ::std::string& ctxt() const;
+  inline void set_ctxt(const ::std::string& value);
+  inline void set_ctxt(const char* value);
+  inline void set_ctxt(const void* value, size_t size);
+  inline ::std::string* mutable_ctxt();
   
  private:
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
@@ -119,8 +119,8 @@ class Ticket : public ::google::protobuf::Message {
   static const ::std::string _default_mac_n_;
   ::std::string* mac_ns_;
   static const ::std::string _default_mac_ns_;
-  ::std::string* trapdoorenc_;
-  static const ::std::string _default_trapdoorenc_;
+  ::std::string* ctxt_;
+  static const ::std::string _default_ctxt_;
   friend void protobuf_BuildDesc_nymble_5fticket_2eproto();
   static const Ticket default_instance_;
   static const int _offsets_[4];
@@ -274,46 +274,46 @@ inline ::std::string* Ticket::mutable_mac_ns() {
   return mac_ns_;
 }
 
-// required bytes trapdoorenc = 4;
-inline bool Ticket::has_trapdoorenc() const {
+// required bytes ctxt = 4;
+inline bool Ticket::has_ctxt() const {
   return _has_bit(3);
 }
-inline void Ticket::clear_trapdoorenc() {
-  if (trapdoorenc_ != &_default_trapdoorenc_) {
-    trapdoorenc_->clear();
+inline void Ticket::clear_ctxt() {
+  if (ctxt_ != &_default_ctxt_) {
+    ctxt_->clear();
   }
   _clear_bit(3);
 }
-inline const ::std::string& Ticket::trapdoorenc() const {
-  return *trapdoorenc_;
+inline const ::std::string& Ticket::ctxt() const {
+  return *ctxt_;
 }
-inline void Ticket::set_trapdoorenc(const ::std::string& value) {
+inline void Ticket::set_ctxt(const ::std::string& value) {
   _set_bit(3);
-  if (trapdoorenc_ == &_default_trapdoorenc_) {
-    trapdoorenc_ = new ::std::string;
+  if (ctxt_ == &_default_ctxt_) {
+    ctxt_ = new ::std::string;
   }
-  trapdoorenc_->assign(value);
+  ctxt_->assign(value);
 }
-inline void Ticket::set_trapdoorenc(const char* value) {
+inline void Ticket::set_ctxt(const char* value) {
   _set_bit(3);
-  if (trapdoorenc_ == &_default_trapdoorenc_) {
-    trapdoorenc_ = new ::std::string;
+  if (ctxt_ == &_default_ctxt_) {
+    ctxt_ = new ::std::string;
   }
-  trapdoorenc_->assign(value);
+  ctxt_->assign(value);
 }
-inline void Ticket::set_trapdoorenc(const void* value, size_t size) {
+inline void Ticket::set_ctxt(const void* value, size_t size) {
   _set_bit(3);
-  if (trapdoorenc_ == &_default_trapdoorenc_) {
-    trapdoorenc_ = new ::std::string;
+  if (ctxt_ == &_default_ctxt_) {
+    ctxt_ = new ::std::string;
   }
-  trapdoorenc_->assign(reinterpret_cast<const char*>(value), size);
+  ctxt_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Ticket::mutable_trapdoorenc() {
+inline ::std::string* Ticket::mutable_ctxt() {
   _set_bit(3);
-  if (trapdoorenc_ == &_default_trapdoorenc_) {
-    trapdoorenc_ = new ::std::string;
+  if (ctxt_ == &_default_ctxt_) {
+    ctxt_ = new ::std::string;
   }
-  return trapdoorenc_;
+  return ctxt_;
 }
 
 

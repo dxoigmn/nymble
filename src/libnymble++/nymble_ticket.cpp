@@ -15,7 +15,7 @@ Ticket::Ticket(u_char* nymble)
 Ticket::Ticket(Ticket* ticket)
 {
   memcpy(this->nymble, ticket->nymble, DIGEST_SIZE);
-  memcpy(this->trapdoorenc, ticket->trapdoorenc, TRAPDOORENC_SIZE);
+  memcpy(this->ctxt, ticket->ctxt, CTXT_SIZE);
   memcpy(this->mac_n, ticket->mac_n, DIGEST_SIZE);
   memcpy(this->mac_ns, ticket->mac_ns, DIGEST_SIZE);
 }
@@ -23,7 +23,7 @@ Ticket::Ticket(Ticket* ticket)
 Ticket::Ticket(Marshal::Ticket* ticket)
 {
   memcpy(this->nymble, ticket->nymble().data(), DIGEST_SIZE);
-  memcpy(this->trapdoorenc, ticket->trapdoorenc().data(), TRAPDOORENC_SIZE);
+  memcpy(this->ctxt, ticket->ctxt().data(), CTXT_SIZE);
   memcpy(this->mac_n, ticket->mac_n().data(), DIGEST_SIZE);
   memcpy(this->mac_ns, ticket->mac_ns().data(), DIGEST_SIZE);
 }
@@ -47,7 +47,7 @@ void Ticket::hmac(u_char* hmac_key, u_char* server_id, u_int link_window, u_int 
   HMAC_Update(&ctx, (u_char *)&link_window, sizeof(link_window));
   HMAC_Update(&ctx, (u_char *)&time_period, sizeof(time_period));
   HMAC_Update(&ctx, this->nymble, DIGEST_SIZE);
-  HMAC_Update(&ctx, this->trapdoorenc, TRAPDOORENC_SIZE);
+  HMAC_Update(&ctx, this->ctxt, CTXT_SIZE);
   
   if (include_mac_n) {
     HMAC_Update(&ctx, this->mac_n, DIGEST_SIZE);
@@ -76,10 +76,10 @@ void Ticket::encrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
   
   /* iv must be separate from buffer as the AES function messes with it as it works */
   RAND_bytes(iv, CIPHER_BLOCK_SIZE);
-  memcpy(this->trapdoorenc, iv, CIPHER_BLOCK_SIZE);
+  memcpy(this->ctxt, iv, CIPHER_BLOCK_SIZE);
   
   AES_set_encrypt_key(encrypt_key_n, CIPHER_BLOCK_SIZE * 8, &key);
-  AES_cbc_encrypt(in, this->trapdoorenc + CIPHER_BLOCK_SIZE, DIGEST_SIZE * 2, &key, iv, AES_ENCRYPT);
+  AES_cbc_encrypt(in, this->ctxt + CIPHER_BLOCK_SIZE, DIGEST_SIZE * 2, &key, iv, AES_ENCRYPT);
 }
 
 void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
@@ -88,10 +88,10 @@ void Ticket::decrypt(u_char* encrypt_key_n, u_char* trapdoor, u_char* pseudonym)
   u_char iv[CIPHER_BLOCK_SIZE];
   AES_KEY key;
 
-  memcpy(iv, this->trapdoorenc, CIPHER_BLOCK_SIZE);
+  memcpy(iv, this->ctxt, CIPHER_BLOCK_SIZE);
 
   AES_set_decrypt_key(encrypt_key_n, CIPHER_BLOCK_SIZE * 8, &key);
-  AES_cbc_encrypt(this->trapdoorenc + CIPHER_BLOCK_SIZE, buffer, TRAPDOORENC_SIZE - CIPHER_BLOCK_SIZE, &key, iv, AES_DECRYPT);
+  AES_cbc_encrypt(this->ctxt + CIPHER_BLOCK_SIZE, buffer, CTXT_SIZE - CIPHER_BLOCK_SIZE, &key, iv, AES_DECRYPT);
   
   if (trapdoor) {
     memcpy(trapdoor, buffer, DIGEST_SIZE);
@@ -110,7 +110,7 @@ Complaint* Ticket::createComplaint(u_int time_period)
 void Ticket::marshal(Marshal::Ticket* out)
 {
   out->set_nymble(this->nymble, DIGEST_SIZE);
-  out->set_trapdoorenc(this->trapdoorenc, TRAPDOORENC_SIZE);
+  out->set_ctxt(this->ctxt, CTXT_SIZE);
   out->set_mac_n(this->mac_n, DIGEST_SIZE);
   out->set_mac_ns(this->mac_ns, DIGEST_SIZE);
 }

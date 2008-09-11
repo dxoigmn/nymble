@@ -17,7 +17,7 @@ typedef std::vector<Ticket*> Tickets;
 class Ticket
 {
   u_char  nymble[DIGEST_SIZE];
-  u_char  trapdoorenc[TRAPDOORENC_SIZE];
+  u_char  ctxt[CTXT_SIZE];
   u_char  mac_n[DIGEST_SIZE];
   u_char  mac_ns[DIGEST_SIZE];
   

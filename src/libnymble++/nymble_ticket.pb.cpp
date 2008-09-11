@@ -27,9 +27,9 @@ void protobuf_BuildDesc_nymble_5fticket_2eproto() {
     ::google::protobuf::DescriptorPool::internal_generated_pool();
 
   const ::google::protobuf::FileDescriptor* file = pool->InternalBuildGeneratedFile(
-    "\n\023nymble_ticket.proto\022\016Nymble.Marshal\"L\n"
+    "\n\023nymble_ticket.proto\022\016Nymble.Marshal\"E\n"
     "\006Ticket\022\016\n\006nymble\030\001 \002(\014\022\r\n\005mac_n\030\002 \002(\014\022\016"
-    "\n\006mac_ns\030\003 \002(\014\022\023\n\013trapdoorenc\030\004 \002(\014", 115);
+    "\n\006mac_ns\030\003 \002(\014\022\014\n\004ctxt\030\004 \002(\014", 108);
   Ticket_descriptor_ = file->message_type(0);
   Ticket_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -59,12 +59,12 @@ const Ticket Ticket::default_instance_;
 const ::std::string Ticket::_default_nymble_;
 const ::std::string Ticket::_default_mac_n_;
 const ::std::string Ticket::_default_mac_ns_;
-const ::std::string Ticket::_default_trapdoorenc_;
+const ::std::string Ticket::_default_ctxt_;
 const int Ticket::_offsets_[4] = {
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, nymble_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, mac_n_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, mac_ns_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, trapdoorenc_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ticket, ctxt_),
 };
 
 Ticket::Ticket()
@@ -72,7 +72,7 @@ Ticket::Ticket()
     nymble_(const_cast< ::std::string*>(&_default_nymble_)),
     mac_n_(const_cast< ::std::string*>(&_default_mac_n_)),
     mac_ns_(const_cast< ::std::string*>(&_default_mac_ns_)),
-    trapdoorenc_(const_cast< ::std::string*>(&_default_trapdoorenc_)) {
+    ctxt_(const_cast< ::std::string*>(&_default_ctxt_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
@@ -83,7 +83,7 @@ Ticket::Ticket(const Ticket& from)
     nymble_(const_cast< ::std::string*>(&_default_nymble_)),
     mac_n_(const_cast< ::std::string*>(&_default_mac_n_)),
     mac_ns_(const_cast< ::std::string*>(&_default_mac_ns_)),
-    trapdoorenc_(const_cast< ::std::string*>(&_default_trapdoorenc_)) {
+    ctxt_(const_cast< ::std::string*>(&_default_ctxt_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
@@ -98,8 +98,8 @@ Ticket::~Ticket() {
   if (mac_ns_ != &_default_mac_ns_) {
     delete mac_ns_;
   }
-  if (trapdoorenc_ != &_default_trapdoorenc_) {
-    delete trapdoorenc_;
+  if (ctxt_ != &_default_ctxt_) {
+    delete ctxt_;
   }
   if (this != &default_instance_) {
   }
