@@ -7,18 +7,18 @@ namespace Nymble {
 
 class Pseudonym
 {
-  u_char  pseudonym[DIGEST_SIZE];
-  u_char  mac_np[DIGEST_SIZE];
+  u_char  nym[DIGEST_SIZE];
+  u_char  mac[DIGEST_SIZE];
   
   public:
     Pseudonym();
-    Pseudonym(Pseudonym* pseudonym);
-    Pseudonym(u_char* pseudonym, u_char* mac_np);
+    Pseudonym(Pseudonym* pnym);
+    Pseudonym(u_char* nym, u_char* mac);
     
-    void setPseudonym(u_char* pseudonym);
+    void setPseudonym(u_char* nym);
     u_char* getPseudonym();
     
-    void setMacNP(u_char* mac_np);
+    void setMacNP(u_char* mac);
     u_char* getMacNP();
     
     u_int marshal(u_char* out = NULL, u_int size = 0);

@@ -7,44 +7,44 @@ Pseudonym::Pseudonym()
 
 }
 
-Pseudonym::Pseudonym(Pseudonym* pseudonym)
+Pseudonym::Pseudonym(Pseudonym* pnym)
 {
-  this->setPseudonym(pseudonym->getPseudonym());
-  this->setMacNP(pseudonym->getMacNP());
+  this->setPseudonym(pnym->getPseudonym());
+  this->setMacNP(pnym->getMacNP());
 }
 
-Pseudonym::Pseudonym(u_char* pseudonym, u_char* mac_np)
+Pseudonym::Pseudonym(u_char* nym, u_char* mac)
 {
-  this->setPseudonym(pseudonym);
-  this->setMacNP(mac_np);
+  this->setPseudonym(nym);
+  this->setMacNP(mac);
 }
 
-void Pseudonym::setPseudonym(u_char* pseudonym)
+void Pseudonym::setPseudonym(u_char* nym)
 {
-  memcpy(this->pseudonym, pseudonym, DIGEST_SIZE);
+  memcpy(this->nym, nym, DIGEST_SIZE);
 }
 
 u_char* Pseudonym::getPseudonym()
 {
-  return this->pseudonym;
+  return this->nym;
 }
 
-void Pseudonym::setMacNP(u_char* mac_np)
+void Pseudonym::setMacNP(u_char* mac)
 {
-  memcpy(this->mac_np, mac_np, DIGEST_SIZE);
+  memcpy(this->mac, mac, DIGEST_SIZE);
 }
 
 u_char* Pseudonym::getMacNP()
 {
-  return this->mac_np;
+  return this->mac;
 }
 
 u_int Pseudonym::marshal(u_char* out, u_int size)
 {
   u_char in[DIGEST_SIZE*2];
   
-  memcpy(in, this->pseudonym, DIGEST_SIZE);
-  memcpy(in+DIGEST_SIZE, this->mac_np, DIGEST_SIZE);
+  memcpy(in, this->nym, DIGEST_SIZE);
+  memcpy(in+DIGEST_SIZE, this->mac, DIGEST_SIZE);
   
   u_int out_len = hexencode(in, DIGEST_SIZE*2);
   
