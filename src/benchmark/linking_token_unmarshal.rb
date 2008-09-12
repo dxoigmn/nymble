@@ -10,12 +10,12 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     @server = create_server(@nm, @server_id)
     complaints = @users[0..number_of_users].map { |user| user.ticket(@server.server_id).complain(user.time_period) }
     blacklist = @nm.create_blacklist(@server.server_id)
-    linking_tokens = @nm.create_linking_tokens(@server.server_id, blacklist, complaints)
-    marshalled = linking_tokens.map { |linking_token| linking_token.marshal }
+    tokens = @nm.create_tokens(@server.server_id, blacklist, complaints)
+    marshalled = tokens.map { |token| token.marshal }
     
     bm = Benchmark.measure do
       RETEST_COUNT.times do
-        marshalled.map { |linking_token| Nymble::LinkingToken::unmarshal(linking_token) }
+        marshalled.map { |token| Nymble::Token::unmarshal(token) }
       end
     end
     

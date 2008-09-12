@@ -5,7 +5,7 @@
 #include "nymble_wrap_util.h"
 #include "nymble_blacklist_wrap.h"
 #include "nymble_credential_wrap.h"
-#include "nymble_linking_token_wrap.h"
+#include "nymble_token_wrap.h"
 #include "nymble_pseudonym_wrap.h"
 #include "nymble_ticket_wrap.h"
 #include "nymble_manager.h"
@@ -25,7 +25,7 @@ VALUE rb_nm_verify_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blackli
 VALUE rb_nm_create_blacklist(VALUE rb_self, VALUE rb_server_id);
 VALUE rb_nm_update_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints);
 VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_pseudonym, VALUE rb_time_periods);
-VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints);
+VALUE rb_nm_create_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints);
 
 void rb_nm_delete(Nymble::NymbleManager* nm);
 

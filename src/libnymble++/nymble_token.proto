@@ -1,5 +1,5 @@
 package Nymble.Marshal;
 
-message LinkingToken {
-  required bytes trapdoor = 1;
+message Token {
+  required bytes seed = 1;
 }

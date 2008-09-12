@@ -180,7 +180,7 @@ context 'Nymble Manager' do
     blacklist = @nm.create_blacklist(@server_id)
     tickets = []
     
-    @nm.create_linking_tokens(@server_id, blacklist, tickets).should.be.empty?
+    @nm.create_tokens(@server_id, blacklist, tickets).should.be.empty?
   end
   
   it 'should create credentials' do
@@ -446,21 +446,21 @@ context 'Server' do
     @server.should.not.valid_ticket?(@user.ticket(@server_id))
   end
   
-  it 'should manage linking tokens' do
+  it 'should manage tokens' do
     @nm.time_period = @cur_time_period + 1
     @server.time_period = @cur_time_period + 1
     @user.time_period = @cur_time_period + 1
     
-    @server.should.respond_to(:add_linking_tokens)
-    linking_tokens = @nm.create_linking_tokens(@server_id, @blacklist, [ @complaint ])
-    linking_tokens.should.not.be.empty?
+    @server.should.respond_to(:add_tokens)
+    tokens = @nm.create_tokens(@server_id, @blacklist, [ @complaint ])
+    tokens.should.not.be.empty?
     
-    @server.add_linking_tokens(linking_tokens)
+    @server.add_tokens(tokens)
     @server.should.not.valid_ticket?(@user.ticket(@server_id))
   end
 end
 
-context 'Linking Token' do
+context 'Token' do
   before(:each) do
     @cur_link_window = 10
     @cur_time_period = 2
@@ -493,14 +493,14 @@ context 'Linking Token' do
     @server = Nymble::Server.new(@server_id)
     @server.link_window = @cur_link_window
     @server.time_period = @cur_time_period
-    @linking_token = @nm.create_linking_tokens(@server_id, @blacklist, [ @complaint ]).first
+    @token = @nm.create_tokens(@server_id, @blacklist, [ @complaint ]).first
   end
   
   it 'should be (un)marshalable' do
-    bytes = @linking_token.marshal
+    bytes = @token.marshal
     bytes.should.not.be.nil
-    linking_token = Nymble::LinkingToken.unmarshal(bytes)
-    linking_token.should.not.be.nil
-    bytes.should.equal(linking_token.marshal)
+    token = Nymble::Token.unmarshal(bytes)
+    token.should.not.be.nil
+    bytes.should.equal(token.marshal)
   end
 end

@@ -15,7 +15,7 @@ Gnuplot.open do |gp|
     
     plot.data << graph('nm_blacklist_update.dat', 'UpdateBL', 1000)
     plot.data << graph('nm_credential_create.dat', 'CreateCredential', 1000)
-    plot.data << graph('nm_linking_tokens_create.dat', 'ComputeTokens', 1000)
+    plot.data << graph('nm_tokens_create.dat', 'ComputeTokens', 1000)
     plot.data << graph('nm_blacklist_verify.dat', 'NMCheckBLIntegrity', 1000)
   end
 end

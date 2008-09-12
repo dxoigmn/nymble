@@ -5,17 +5,17 @@ namespace Nymble {
 Server::Server()
 {
   this->finalized = false;
-  this->linking_tokens = new LinkingTokens();
+  this->tokens = new Tokens();
   this->blacklist = NULL;
 }
 
 Server::~Server()
 {
-  for (LinkingTokens::iterator linking_token = this->linking_tokens->begin(); linking_token != this->linking_tokens->end(); ++linking_token) {
-    delete *linking_token;
+  for (Tokens::iterator token = this->tokens->begin(); token != this->tokens->end(); ++token) {
+    delete *token;
   }
   
-  delete this->linking_tokens;
+  delete this->tokens;
   delete this->blacklist;
 }
 
@@ -35,8 +35,8 @@ void Server::setTimePeriod(u_int time_period)
     return;
   }
   
-  for (LinkingTokens::iterator linking_token = this->linking_tokens->begin(); linking_token != this->linking_tokens->end(); ++linking_token) {
-    (*linking_token)->evolve(time_period - this->cur_time_period);
+  for (Tokens::iterator token = this->tokens->begin(); token != this->tokens->end(); ++token) {
+    (*token)->evolve(time_period - this->cur_time_period);
   }
   
   Nymble::setTimePeriod(time_period);
@@ -65,10 +65,10 @@ void Server::setBlacklist(Blacklist* blacklist)
   this->finalized = true;
 }
 
-void Server::addLinkingTokens(LinkingTokens* linking_tokens)
+void Server::addTokens(Tokens* tokens)
 {
-  for (LinkingTokens::iterator linking_token = linking_tokens->begin(); linking_token != linking_tokens->end(); ++linking_token) {
-    this->linking_tokens->push_back(new LinkingToken(*linking_token));
+  for (Tokens::iterator token = tokens->begin(); token != tokens->end(); ++token) {
+    this->tokens->push_back(new Token(*token));
   }
 }
 
@@ -83,8 +83,8 @@ bool Server::verifyTicket(Ticket* ticket)
     valid = false;
   }
   
-  for (LinkingTokens::iterator linking_token = this->linking_tokens->begin(); linking_token != this->linking_tokens->end(); ++linking_token) {
-    if (memcmp((*linking_token)->getNymble(), ticket->getNymble(), DIGEST_SIZE) == 0) {
+  for (Tokens::iterator token = this->tokens->begin(); token != this->tokens->end(); ++token) {
+    if (memcmp((*token)->getNymble(), ticket->getNymble(), DIGEST_SIZE) == 0) {
       valid = false;
     }
   }

@@ -2,12 +2,12 @@
 #define __NYMBLE_SERVER_H__
 
 #include "nymble.h"
-#include "nymble_linking_token.h"
+#include "nymble_token.h"
 #include "nymble_blacklist.h"
 
 namespace Nymble {
 
-typedef std::vector<LinkingToken*> LinkingTokens;
+typedef std::vector<Token*> Tokens;
 
 class Server : public Nymble
 {
@@ -16,7 +16,7 @@ class Server : public Nymble
   bool    finalized;
   
   Blacklist*  blacklist;
-  LinkingTokens* linking_tokens;
+  Tokens* tokens;
   
   public:
     Server();
@@ -33,7 +33,7 @@ class Server : public Nymble
     Blacklist* getBlacklist();
     void setBlacklist(Blacklist* blacklist);
     
-    void addLinkingTokens(LinkingTokens* linking_tokens);
+    void addTokens(Tokens* tokens);
     
     bool verifyTicket(Ticket* ticket);
 };

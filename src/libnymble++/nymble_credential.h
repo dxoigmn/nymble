@@ -17,8 +17,6 @@ class Credential : public Tickets
 {
   u_char nymble0[DIGEST_SIZE];
   
-  void seedTrapdoor(NymbleManager* nm, NymbleManagerEntry *entry, u_char *pseudonym);
-  
   public:
     Credential();
     Credential(Credential* credential);

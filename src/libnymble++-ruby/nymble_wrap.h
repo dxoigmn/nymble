@@ -14,7 +14,7 @@ VALUE rb_mNymble;
 VALUE rb_cPseudonym;
 VALUE rb_cBlacklist;
 VALUE rb_cCredential;
-VALUE rb_cLinkingToken;
+VALUE rb_cToken;
 VALUE rb_cTicket;
 VALUE rb_cComplaint;
 VALUE rb_cPseudonymManager;

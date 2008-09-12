@@ -26,7 +26,7 @@ before do
       data = JSON.parse(RestClient.put("http://localhost:3001/server/#{Nymble.hexencode(@@server.server_id)}/", data))
       
       blacklist = Nymble::Blacklist::unmarshal(data['blacklist'])
-      linking_tokens = data['linking_tokens'].map { |linking_token| Nymble::LinkingToken.unmarshal(linking_token) } unless data['linking_tokens'].empty?
+      tokens = data['tokens'].map { |token| Nymble::Token.unmarshal(token) } unless data['tokens'].empty?
     else
       # Link window change
       puts "Link window changed!"
@@ -39,7 +39,7 @@ before do
     
     if (@@server.blacklist = blacklist)
       @@server.hmac_key_ns = hmac_key_ns if hmac_key_ns
-      @@server.add_linking_tokens(linking_tokens) if linking_tokens
+      @@server.add_tokens(tokens) if tokens
       @@complaints = []
     else
       puts 'Unable to verify blacklist!'

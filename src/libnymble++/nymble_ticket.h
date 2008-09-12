@@ -40,7 +40,7 @@ class Ticket
     u_int marshal(u_char* out = NULL, u_int size = 0);
     static Ticket* unmarshal(u_char* bytes, u_int size);
     
-    static void computeNymble(u_char *trapdoor, u_char *out);
+    static void computeNymble(u_char *seed, u_char *out);
     static void evolveSeed(u_char* seed, u_int delta, u_char *out);
 };
 

@@ -60,13 +60,11 @@ put '/server/:server_id/' do
     fail 'invalid blacklist'
   end
   
-  linking_tokens = @@nm.create_linking_tokens(server_id, blacklist, complaints || [])
+  tokens = @@nm.create_tokens(server_id, blacklist, complaints || [])
   blacklist = @@nm.update_blacklist(server_id, blacklist, complaints || [])
   
   { 
     :blacklist  => blacklist.marshal,
-    :linking_tokens => linking_tokens.map { |linking_token| linking_token.marshal }
+    :tokens => tokens.map { |token| token.marshal }
   }.to_json
 end
-
-# linking_token

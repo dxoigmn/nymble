@@ -1,15 +1,15 @@
-#ifndef __NYMBLE_LINKING_TOKEN_WRAP_H__
-#define __NYMBLE_LINKING_TOKEN_WRAP_H__
+#ifndef __NYMBLE_TOKEN_WRAP_H__
+#define __NYMBLE_TOKEN_WRAP_H__
 
 #include "ruby.h"
 #include "nymble_wrap_util.h"
-#include "nymble_linking_token.h"
+#include "nymble_token.h"
 
-extern VALUE rb_cLinkingToken;
+extern VALUE rb_cToken;
 
-VALUE rb_linking_token_unmarshal(VALUE rb_self, VALUE rb_bytes);
-VALUE rb_linking_token_marshal(VALUE rb_self);
+VALUE rb_token_unmarshal(VALUE rb_self, VALUE rb_bytes);
+VALUE rb_token_marshal(VALUE rb_self);
 
-void rb_linking_token_delete(Nymble::LinkingToken* linking_token);
+void rb_token_delete(Nymble::Token* token);
 
 #endif

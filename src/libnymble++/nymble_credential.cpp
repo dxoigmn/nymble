@@ -30,7 +30,7 @@ Credential::Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* 
   u_char seed[DIGEST_SIZE];
   u_char nymble[DIGEST_SIZE];
   
-  nm->seedTrapdoor(entry, pseudonym->getPseudonym(), seed);
+  nm->seed(entry, pseudonym->getPseudonym(), seed);
   Ticket::computeNymble(seed, nymble);
   
   memcpy(this->nymble0, nymble, DIGEST_SIZE);

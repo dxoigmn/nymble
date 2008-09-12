@@ -8,7 +8,7 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
   
   bm = Benchmark.measure do
     RETEST_COUNT.times do
-      fail unless @nm.create_linking_tokens(server_id, blacklist, [])
+      fail unless @nm.create_tokens(server_id, blacklist, [])
     end
   end
   
@@ -32,7 +32,7 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     
     bm = Benchmark.measure do
       RETEST_COUNT.times do
-        fail unless @nm.create_linking_tokens(server_id, blacklist, complaints)
+        fail unless @nm.create_tokens(server_id, blacklist, complaints)
       end
     end
     

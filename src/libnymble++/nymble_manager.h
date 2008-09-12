@@ -9,7 +9,7 @@
 #include "nymble_pseudonym.h"
 #include "nymble_ticket.h"
 #include "nymble_complaint.h"
-#include "nymble_linking_token.h"
+#include "nymble_token.h"
 
 namespace Nymble {
 
@@ -18,7 +18,7 @@ class NymbleManagerEntry;
 class Credential;
 
 typedef std::vector<NymbleManagerEntry*> NymbleManagerEntries;
-typedef std::vector<LinkingToken*> LinkingTokens;
+typedef std::vector<Token*> Tokens;
 typedef std::vector<u_char*> Nymbles;
 
 class NymbleManager : public Nymble
@@ -51,11 +51,10 @@ class NymbleManager : public Nymble
     bool verifyBlacklist(u_char* server_id, Blacklist* blacklist);
     Blacklist* createBlacklist(u_char* server_id);
     Blacklist* updateBlacklist(u_char* server_id, Blacklist* blacklist, Complaints* complaints);
-    LinkingTokens* createLinkingTokens(u_char* server_id, Blacklist* blacklist, Complaints* complaints);
+    Tokens* createTokens(u_char* server_id, Blacklist* blacklist, Complaints* complaints);
     Credential* createCredential(u_char* server_id, Pseudonym* pseudonym, u_int time_periods);
     
-    void encryptTrapdoor(Ticket* ticket, Pseudonym* pseudonym, u_char *seed);
-    void seedTrapdoor(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out);
+    void seed(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out);
 };
 
 }; // namespace Nymble

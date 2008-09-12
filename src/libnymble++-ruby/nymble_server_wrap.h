@@ -6,7 +6,7 @@
 #include "nymble_ticket_wrap.h"
 #include "nymble_blacklist_wrap.h"
 #include "nymble_server.h"
-#include "nymble_linking_token_wrap.h"
+#include "nymble_token_wrap.h"
 
 extern VALUE rb_cServer;
 
@@ -21,7 +21,7 @@ VALUE rb_server_finalized(VALUE rb_self);
 VALUE rb_server_hmac_key_ns_set(VALUE rb_self, VALUE rb_hmac_key_ns);
 VALUE rb_server_blacklist(VALUE rb_self);
 VALUE rb_server_blacklist_set(VALUE rb_self, VALUE rb_blacklist);
-VALUE rb_server_add_linking_tokens(VALUE rb_self, VALUE rb_linking_tokens);
+VALUE rb_server_add_tokens(VALUE rb_self, VALUE rb_tokens);
 VALUE rb_server_verify_ticket(VALUE rb_self, VALUE rb_ticket);
 
 void rb_server_delete(Nymble::Server* server);

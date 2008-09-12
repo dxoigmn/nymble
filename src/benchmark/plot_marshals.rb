@@ -15,7 +15,7 @@ Gnuplot.open do |gp|
     
     plot.data << graph('ticket_marshal.dat', 'Complaint Request', 1000)
     plot.data << graph('credential_marshal.dat', 'Credential', 1000)
-    plot.data << graph('linking_token_marshal.dat', 'Linking List', 1000)
+    plot.data << graph('token_marshal.dat', 'Link List', 1000)
     plot.data << graph('blacklist_marshal.dat', 'Blacklist', 1000)
   end
 end

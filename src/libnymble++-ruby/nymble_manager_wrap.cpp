@@ -202,7 +202,7 @@ VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_pseudo
   return Data_Wrap_Struct(rb_cCredential, NULL, rb_credential_delete, credential);
 }
 
-VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints)
+VALUE rb_nm_create_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist, VALUE rb_complaints)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cNymbleManager);
@@ -228,19 +228,19 @@ VALUE rb_nm_create_linking_tokens(VALUE rb_self, VALUE rb_server_id, VALUE rb_bl
     complaints.push_back(complaint);
   }
   
-  Nymble::LinkingTokens* linking_tokens = nm->createLinkingTokens(server_id, blacklist, &complaints);
+  Nymble::Tokens* tokens = nm->createTokens(server_id, blacklist, &complaints);
   
-  VALUE rb_linking_tokens = rb_ary_new();
+  VALUE rb_tokens = rb_ary_new();
   
-  if (linking_tokens) {
-    for (Nymble::LinkingTokens::iterator linking_token = linking_tokens->begin(); linking_token != linking_tokens->end(); ++linking_token) {
-      rb_ary_push(rb_linking_tokens, Data_Wrap_Struct(rb_cLinkingToken, NULL, rb_linking_token_delete, *linking_token));
+  if (tokens) {
+    for (Nymble::Tokens::iterator token = tokens->begin(); token != tokens->end(); ++token) {
+      rb_ary_push(rb_tokens, Data_Wrap_Struct(rb_cToken, NULL, rb_token_delete, *token));
     }
     
-    delete linking_tokens;
+    delete tokens;
   }
   
-  return rb_linking_tokens;
+  return rb_tokens;
 }
 
 void rb_nm_delete(Nymble::NymbleManager* nm)

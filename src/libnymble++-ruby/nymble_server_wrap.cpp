@@ -137,27 +137,27 @@ VALUE rb_server_blacklist_set(VALUE rb_self, VALUE rb_blacklist)
   return rb_self;
 }
 
-VALUE rb_server_add_linking_tokens(VALUE rb_self, VALUE rb_linking_tokens)
+VALUE rb_server_add_tokens(VALUE rb_self, VALUE rb_tokens)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cServer);
-  Check_Type(rb_linking_tokens, T_ARRAY);
+  Check_Type(rb_tokens, T_ARRAY);
   
   Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
-  Nymble::LinkingTokens linking_tokens;
+  Nymble::Tokens tokens;
   
-  for (int i = 0; i < RARRAY_LEN(rb_linking_tokens); i++) {
-    VALUE rb_linking_token = rb_ary_entry(rb_linking_tokens, i);
+  for (int i = 0; i < RARRAY_LEN(rb_tokens); i++) {
+    VALUE rb_token = rb_ary_entry(rb_tokens, i);
     
-    Check_Type(rb_linking_token, T_DATA);
-    Check_Class(rb_linking_token, rb_cLinkingToken);
+    Check_Type(rb_token, T_DATA);
+    Check_Class(rb_token, rb_cToken);
     
-    Nymble::LinkingToken* linking_token = (Nymble::LinkingToken*) DATA_PTR(rb_linking_token);
+    Nymble::Token* token = (Nymble::Token*) DATA_PTR(rb_token);
     
-    linking_tokens.push_back(linking_token);
+    tokens.push_back(token);
   }
   
-  server->addLinkingTokens(&linking_tokens);
+  server->addTokens(&tokens);
   
   return rb_self;
 }

@@ -169,7 +169,7 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
       
       // Compute the nymble0 for the current complaint ticket
       ticket->decrypt(this->encrypt_key_n, NULL, pseudonym);
-      this->seedTrapdoor(entry, pseudonym, seed);
+      this->seed(entry, pseudonym, seed);
       Ticket::computeNymble(seed, nymble0);
       
       if (this->userIsBlacklisted(new_blacklist, nymble0)) {
@@ -191,7 +191,7 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
   return new_blacklist;
 }
 
-LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* blacklist, Complaints* complaints)
+Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Complaints* complaints)
 {
   NymbleManagerEntry* entry = findServer(server_id);
   
@@ -199,7 +199,7 @@ LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* 
     return NULL;
   }
   
-  LinkingTokens* linking_tokens = new LinkingTokens();
+  Tokens* tokens = new Tokens();
   
   for (Complaints::iterator complaint = complaints->begin(); complaint != complaints->end(); ++complaint) {
     u_char trapdoor[DIGEST_SIZE];
@@ -209,7 +209,7 @@ LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* 
     Ticket* ticket = (*complaint)->getTicket();
     
     ticket->decrypt(this->encrypt_key_n, trapdoor, pseudonym);
-    this->seedTrapdoor(entry, pseudonym, seed);
+    this->seed(entry, pseudonym, seed);
     Ticket::computeNymble(seed, nymble0);
     
     if (this->userIsBlacklisted(blacklist, nymble0)) {
@@ -222,10 +222,10 @@ LinkingTokens* NymbleManager::createLinkingTokens(u_char* server_id, Blacklist* 
       // FIXME: This should add nymble0 to be checked in userIsBlacklisted.
     }
     
-    linking_tokens->push_back(new LinkingToken(trapdoor));
+    tokens->push_back(new Token(trapdoor));
   }
   
-  return linking_tokens;
+  return tokens;
 }
 
 bool NymbleManager::userIsBlacklisted(Nymbles* nymbles, u_char* nymble0)
@@ -252,7 +252,7 @@ Credential* NymbleManager::createCredential(u_char* server_id, Pseudonym* pseudo
   return credential;
 }
 
-void NymbleManager::seedTrapdoor(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out)
+void NymbleManager::seed(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out)
 {
   HMAC_CTX ctx;
   

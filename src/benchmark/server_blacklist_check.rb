@@ -23,13 +23,13 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
     @users.each_with_index do |user, index|
       next unless index <= number_of_users
       
-      user.time_period = @server.time_period # FIXME: Causes create_linking_tokens to go into an infinite loop if not present
+      user.time_period = @server.time_period # FIXME: Causes create_tokens to go into an infinite loop if not present
       
       complaints << user.ticket(@server.server_id).complain(user.time_period)
     end
     
-    linking_tokens = @nm.create_linking_tokens(@server.server_id, @server.blacklist, complaints)
-    @server.add_linking_tokens(linking_tokens)
+    tokens = @nm.create_tokens(@server.server_id, @server.blacklist, complaints)
+    @server.add_tokens(tokens)
     
     @server.time_period = @server.time_period + 1
     @users[number_of_users].time_period = @server.time_period

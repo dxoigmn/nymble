@@ -29,9 +29,9 @@ void Init_nymble() {
   rb_define_singleton_method(rb_cComplaint, "unmarshal", RUBY_METHOD_FUNC(rb_complaint_unmarshal), 1);
   rb_define_method(rb_cComplaint, "marshal", RUBY_METHOD_FUNC(rb_complaint_marshal), 0);
   
-  rb_cLinkingToken = rb_define_class_under(rb_mNymble, "LinkingToken", rb_cObject);
-  rb_define_singleton_method(rb_cLinkingToken, "unmarshal", RUBY_METHOD_FUNC(rb_linking_token_unmarshal), 1);
-  rb_define_method(rb_cLinkingToken, "marshal", RUBY_METHOD_FUNC(rb_linking_token_marshal), 0);
+  rb_cToken = rb_define_class_under(rb_mNymble, "Token", rb_cObject);
+  rb_define_singleton_method(rb_cToken, "unmarshal", RUBY_METHOD_FUNC(rb_token_unmarshal), 1);
+  rb_define_method(rb_cToken, "marshal", RUBY_METHOD_FUNC(rb_token_marshal), 0);
   
   rb_cPseudonymManager = rb_define_class_under(rb_mNymble, "PseudonymManager", rb_cObject);
   rb_define_alloc_func(rb_cPseudonymManager, rb_pm_new);
@@ -54,7 +54,7 @@ void Init_nymble() {
   rb_define_method(rb_cNymbleManager, "valid_blacklist?", RUBY_METHOD_FUNC(rb_nm_verify_blacklist), 2);
   rb_define_method(rb_cNymbleManager, "create_blacklist", RUBY_METHOD_FUNC(rb_nm_create_blacklist), 1);
   rb_define_method(rb_cNymbleManager, "update_blacklist", RUBY_METHOD_FUNC(rb_nm_update_blacklist), 3);
-  rb_define_method(rb_cNymbleManager, "create_linking_tokens", RUBY_METHOD_FUNC(rb_nm_create_linking_tokens), 3);
+  rb_define_method(rb_cNymbleManager, "create_tokens", RUBY_METHOD_FUNC(rb_nm_create_tokens), 3);
   rb_define_method(rb_cNymbleManager, "create_credential", RUBY_METHOD_FUNC(rb_nm_create_credential), 3);
   
   rb_cServer = rb_define_class_under(rb_mNymble, "Server", rb_cObject);
@@ -69,7 +69,7 @@ void Init_nymble() {
   rb_define_method(rb_cServer, "hmac_key_ns=", RUBY_METHOD_FUNC(rb_server_hmac_key_ns_set), 1);
   rb_define_method(rb_cServer, "blacklist", RUBY_METHOD_FUNC(rb_server_blacklist), 0);
   rb_define_method(rb_cServer, "blacklist=", RUBY_METHOD_FUNC(rb_server_blacklist_set), 1);
-  rb_define_method(rb_cServer, "add_linking_tokens", RUBY_METHOD_FUNC(rb_server_add_linking_tokens), 1);
+  rb_define_method(rb_cServer, "add_tokens", RUBY_METHOD_FUNC(rb_server_add_tokens), 1);
   rb_define_method(rb_cServer, "valid_ticket?", RUBY_METHOD_FUNC(rb_server_verify_ticket), 1);
   
   rb_cUser = rb_define_class_under(rb_mNymble, "User", rb_cObject);

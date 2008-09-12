@@ -24,8 +24,8 @@ File.open("#{File.basename(__FILE__, '.rb')}.dat", 'w') do |f|
       complaints << user.ticket(@server.server_id).complain(user.time_period)
     end
     
-    linking_tokens = @nm.create_linking_tokens(@server.server_id, @server.blacklist, complaints)
-    @server.add_linking_tokens(linking_tokens)
+    tokens = @nm.create_tokens(@server.server_id, @server.blacklist, complaints)
+    @server.add_tokens(tokens)
     
     bm = Benchmark.measure do
       RETEST_COUNT.times do
