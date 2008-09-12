@@ -215,7 +215,7 @@ Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Com
     if (this->userIsBlacklisted(blacklist, nymble0)) {
       RAND_bytes(trapdoor, DIGEST_SIZE);
     } else {
-      u_int delta = this->cur_time_period - (*complaint)->getTimePeriod();
+      u_int delta = this->cur_time_period - (*complaint)->getTime();
       
       Ticket::evolveSeed(trapdoor, delta, trapdoor);
       

@@ -12,16 +12,16 @@ class Complaint;
 typedef std::vector<Complaint*> Complaints;
 
 class Complaint {
-  u_int time_period;
+  u_int time;
   Ticket* ticket;
   
   public:
     Complaint();
     Complaint(Complaint* complaint);
     Complaint(Marshal::Complaint* complaint);
-    Complaint(u_int time_period, Ticket* ticket);
+    Complaint(u_int time, Ticket* ticket);
     
-    u_int getTimePeriod();
+    u_int getTime();
     Ticket* getTicket();
     
     u_int marshal(u_char* out = NULL, u_int size = 0);

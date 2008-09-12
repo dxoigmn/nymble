@@ -30,9 +30,9 @@ void protobuf_BuildDesc_nymble_5fcomplaint_2eproto() {
   ::Nymble::Marshal::protobuf_BuildDesc_nymble_5fticket_2eproto();
   const ::google::protobuf::FileDescriptor* file = pool->InternalBuildGeneratedFile(
     "\n\026nymble_complaint.proto\022\016Nymble.Marshal"
-    "\032\023nymble_ticket.proto\"H\n\tComplaint\022\023\n\013ti"
-    "me_period\030\001 \002(\005\022&\n\006ticket\030\002 \002(\0132\026.Nymble"
-    ".Marshal.Ticket", 135);
+    "\032\023nymble_ticket.proto\"A\n\tComplaint\022\014\n\004ti"
+    "me\030\001 \002(\005\022&\n\006ticket\030\002 \002(\0132\026.Nymble.Marsha"
+    "l.Ticket", 128);
   Complaint_descriptor_ = file->message_type(0);
   Complaint_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -62,13 +62,13 @@ const Complaint Complaint::default_instance_;
 
 
 const int Complaint::_offsets_[2] = {
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Complaint, time_period_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Complaint, time_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Complaint, ticket_),
 };
 
 Complaint::Complaint()
   : _cached_size_(0),
-    time_period_(0),
+    time_(0),
     ticket_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
@@ -78,7 +78,7 @@ Complaint::Complaint()
 
 Complaint::Complaint(const Complaint& from)
   : _cached_size_(0),
-    time_period_(0),
+    time_(0),
     ticket_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);

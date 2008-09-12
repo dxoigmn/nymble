@@ -9,25 +9,25 @@ Complaint::Complaint()
 
 Complaint::Complaint(Complaint* complaint)
 {
-  this->time_period = complaint->time_period;
+  this->time = complaint->time;
   this->ticket = new Ticket(complaint->ticket);
 }
 
 Complaint::Complaint(Marshal::Complaint* complaint)
 {
-  this->time_period = complaint->time_period();
+  this->time = complaint->time();
   this->ticket = new Ticket((Marshal::Ticket*) &complaint->ticket());
 }
 
-Complaint::Complaint(u_int time_period, Ticket* ticket)
+Complaint::Complaint(u_int time, Ticket* ticket)
 {
-  this->time_period = time_period;
+  this->time = time;
   this->ticket = new Ticket(ticket);
 }
 
-u_int Complaint::getTimePeriod()
+u_int Complaint::getTime()
 {
-  return this->time_period;
+  return this->time;
 }
 
 Ticket* Complaint::getTicket()
@@ -39,7 +39,7 @@ u_int Complaint::marshal(u_char* out, u_int size)
 {
   Marshal::Complaint complaint;
   
-  complaint.set_time_period(this->time_period);
+  complaint.set_time(this->time);
   this->ticket->marshal(complaint.mutable_ticket());
   
   if (out != NULL) {

@@ -74,11 +74,11 @@ class Complaint : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required int32 time_period = 1;
-  inline bool has_time_period() const;
-  inline void clear_time_period();
-  inline ::google::protobuf::int32 time_period() const;
-  inline void set_time_period(::google::protobuf::int32 value);
+  // required int32 time = 1;
+  inline bool has_time() const;
+  inline void clear_time();
+  inline ::google::protobuf::int32 time() const;
+  inline void set_time(::google::protobuf::int32 value);
   
   // required .Nymble.Marshal.Ticket ticket = 2;
   inline bool has_ticket() const;
@@ -90,7 +90,7 @@ class Complaint : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   mutable int _cached_size_;
   
-  ::google::protobuf::int32 time_period_;
+  ::google::protobuf::int32 time_;
   ::Nymble::Marshal::Ticket* ticket_;
   friend void protobuf_BuildDesc_nymble_5fcomplaint_2eproto();
   static const Complaint default_instance_;
@@ -119,20 +119,20 @@ class Complaint : public ::google::protobuf::Message {
 
 // Complaint
 
-// required int32 time_period = 1;
-inline bool Complaint::has_time_period() const {
+// required int32 time = 1;
+inline bool Complaint::has_time() const {
   return _has_bit(0);
 }
-inline void Complaint::clear_time_period() {
-  time_period_ = 0;
+inline void Complaint::clear_time() {
+  time_ = 0;
   _clear_bit(0);
 }
-inline ::google::protobuf::int32 Complaint::time_period() const {
-  return time_period_;
+inline ::google::protobuf::int32 Complaint::time() const {
+  return time_;
 }
-inline void Complaint::set_time_period(::google::protobuf::int32 value) {
+inline void Complaint::set_time(::google::protobuf::int32 value) {
   _set_bit(0);
-  time_period_ = value;
+  time_ = value;
 }
 
 // required .Nymble.Marshal.Ticket ticket = 2;

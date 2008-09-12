@@ -3,6 +3,6 @@ package Nymble.Marshal;
 import "nymble_ticket.proto";
 
 message Complaint {
-  required int32 time_period = 1;
+  required int32 time = 1;
   required Ticket ticket = 2;
 }
