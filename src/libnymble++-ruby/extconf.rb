@@ -11,7 +11,7 @@ have_library('protobuf')
 
 $INCFLAGS << ' -I../libnymble++/'
 
-$srcs = Dir['*.cpp'] + Dir['../libnymble++/*.cpp'] + Dir['../libnymble++/libjson/*.cpp']
-$objs = $srcs.map { |src| File.basename(src, '.cpp') + '.o' }
+$srcs = Dir['*.cc'] + Dir['../libnymble++/*.cc']
+$objs = $srcs.map { |src| File.basename(src, '.cc') + '.o' }
 
 create_makefile('nymble', '.:../libnymble++/')

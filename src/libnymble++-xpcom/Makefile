@@ -4,19 +4,19 @@ GECKO_SDK_PATH = $(GECKO_PATH)/sdk
 CXX = g++
 CC = g++
 
-SRCS =  nymble_user.cpp \
-        nymble_user_entry.cpp \
-        nymble_pseudonym.cpp \
-        nymble_blacklist.cpp \
-        nymble_credential.cpp \
-        nymble_ticket.cpp \
-        nymble_manager.cpp \
-        nymble_manager_entry.cpp \
-        nymble_token.cpp \
-        nymble_util.cpp \
-        nymble.cpp \
-        nsNymbleUser.cpp \
-        nsNymbleUserModule.cpp
+SRCS =  nymble_user.cc \
+        nymble_user_entry.cc \
+        nymble_pseudonym.cc \
+        nymble_blacklist.cc \
+        nymble_credential.cc \
+        nymble_ticket.cc \
+        nymble_manager.cc \
+        nymble_manager_entry.cc \
+        nymble_token.cc \
+        nymble_util.cc \
+        nymble.cc \
+        nsNymbleUser.cc \
+        nsNymbleUserModule.cc
 
 OBJS =  nymble_user.o \
         nymble_user_entry.o \
@@ -49,7 +49,7 @@ build: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) -o $(TARGET) $(DEFINES) $(CXXFLAGS) $(LIBPATH) $(LIBS) $^
 
-%.o: %.cpp
+%.o: %.cc
 	$(CXX) -c $(INCFLAGS) $(CXXFLAGS) $(LIBPATH) -c $< -o $@
 
 %.o: %.c
