@@ -30,7 +30,7 @@ class Ticket
     u_char* getNymble();
     u_char* getMacNS();
     
-    void hmac(u_char* mac_key, u_char* sid, u_int t, u_int w, bool include_mac_n = false, u_char* out = NULL);
+    void mac(u_char* mac_key, u_char* sid, u_int t, u_int w, bool include_mac_n = false, u_char* out = NULL);
     void encrypt(u_char* enc_key, u_char* nymble, u_char* seed);
     void decrypt(u_char* enc_key, u_char* nymble, u_char* seed);
     

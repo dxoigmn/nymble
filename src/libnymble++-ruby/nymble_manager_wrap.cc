@@ -17,7 +17,7 @@ VALUE rb_nm_init(VALUE rb_self, VALUE rb_hmac_key_np, VALUE rb_sign_key_path)
   u_char* hmac_key_np = (u_char*) RSTRING_PTR(rb_hmac_key_np);
   char* sign_key_path = RSTRING_PTR(rb_sign_key_path);
   
-  nm->setHmacKeyNP(hmac_key_np);
+  nm->setMacKeyNP(hmac_key_np);
   nm->readSignKey(sign_key_path);
   
   return rb_self;

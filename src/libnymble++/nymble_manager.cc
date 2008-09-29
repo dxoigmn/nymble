@@ -4,9 +4,9 @@ namespace Nymble {
 
 NymbleManager::NymbleManager()
 {
-  RAND_bytes(this->hmac_key_n, DIGEST_SIZE);
-  RAND_bytes(this->keyedhash_key_n, DIGEST_SIZE);
-  RAND_bytes(this->encrypt_key_n, CIPHER_BLOCK_SIZE);
+  RAND_bytes(this->mac_key_n, DIGEST_SIZE);
+  RAND_bytes(this->seed_key_n, DIGEST_SIZE);
+  RAND_bytes(this->enc_key_n, CIPHER_BLOCK_SIZE);
   
   this->entries = new NymbleManagerEntries();
 }
@@ -22,24 +22,19 @@ NymbleManager::~NymbleManager()
   delete this->entries;
 }
 
-u_char* NymbleManager::getHmacKeyN()
+u_char* NymbleManager::getMacKeyN()
 {
-  return this->hmac_key_n;
+  return this->mac_key_n;
 }
 
 u_char* NymbleManager::getEncryptKeyN()
 {
-  return this->encrypt_key_n;
+  return this->enc_key_n;
 }
 
-u_char* NymbleManager::getKeyedhashKeyN()
+void NymbleManager::setMacKeyNP(u_char* mac_key_np)
 {
-  return this->keyedhash_key_n;
-}
-
-void NymbleManager::setHmacKeyNP(u_char* hmac_key_np)
-{
-  memcpy(this->hmac_key_np, hmac_key_np, DIGEST_SIZE);
+  memcpy(this->mac_key_np, mac_key_np, DIGEST_SIZE);
 }
 
 void NymbleManager::readSignKey(char* sign_key_path)
@@ -60,7 +55,7 @@ u_char* NymbleManager::addServer(u_char* server_id)
     this->entries->push_back(entry);
   }
   
-  return entry->getHmacKeyNS();
+  return entry->getMacKeyNS();
 }
 
 NymbleManagerEntry* NymbleManager::findServer(u_char *server_id)
@@ -79,7 +74,7 @@ bool NymbleManager::verifyPseudonym(Pseudonym* pseudonym)
   u_char mac[DIGEST_SIZE];
   HMAC_CTX ctx;
 
-  HMAC_Init(&ctx, this->hmac_key_np, DIGEST_SIZE, EVP_sha256());
+  HMAC_Init(&ctx, this->mac_key_np, DIGEST_SIZE, EVP_sha256());
   HMAC_Update(&ctx, pseudonym->getPseudonym(), DIGEST_SIZE);
   HMAC_Update(&ctx, (u_char *)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&ctx, mac, NULL);
@@ -109,7 +104,7 @@ bool NymbleManager::verifyBlacklist(u_char* server_id, Blacklist* blacklist)
   }
   
   u_char bmac_n[DIGEST_SIZE];
-  blacklist->hmac(this->hmac_key_n, bmac_n);
+  blacklist->hmac(this->mac_key_n, bmac_n);
 
   if (memcmp(bmac_n, blacklist->getHmac(), DIGEST_SIZE) != 0) {
     valid = false;
@@ -137,7 +132,7 @@ Blacklist* NymbleManager::createBlacklist(u_char* server_id)
   Blacklist *blacklist = new Blacklist(entry->getServerId(), this->cur_link_window, this->cur_time_period);
   
   blacklist->hash();
-  blacklist->hmac(this->hmac_key_n);
+  blacklist->hmac(this->mac_key_n);
   blacklist->sign(this->sign_key_n);
   
   return blacklist;
@@ -168,7 +163,7 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
       Ticket* ticket = (*complaint)->getTicket();
       
       // Compute the nymble0 for the current complaint ticket
-      ticket->decrypt(this->encrypt_key_n, NULL, pseudonym);
+      ticket->decrypt(this->enc_key_n, NULL, pseudonym);
       this->seed(entry, pseudonym, seed);
       Ticket::computeNymble(seed, nymble0);
       
@@ -183,7 +178,7 @@ Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklis
   }
   
   new_blacklist->hash();
-  new_blacklist->hmac(this->hmac_key_n);
+  new_blacklist->hmac(this->mac_key_n);
   new_blacklist->sign(this->sign_key_n);
   
   entry->setLastUpdated(this->cur_time_period);
@@ -208,7 +203,7 @@ Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Com
     u_char nymble0[DIGEST_SIZE];
     Ticket* ticket = (*complaint)->getTicket();
     
-    ticket->decrypt(this->encrypt_key_n, trapdoor, pseudonym);
+    ticket->decrypt(this->enc_key_n, trapdoor, pseudonym);
     this->seed(entry, pseudonym, seed);
     Ticket::computeNymble(seed, nymble0);
     
@@ -230,7 +225,7 @@ Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Com
 
 bool NymbleManager::verifyTicket(Ticket* ticket, u_char* sid)
 {
-  return ticket->verify(this->mac_key_n, sid, this->time_period, this->link_window);
+  return ticket->verify(this->mac_key_n, sid, this->cur_time_period, this->cur_link_window);
 }
 
 bool NymbleManager::userIsBlacklisted(Nymbles* nymbles, u_char* nymble0)
@@ -261,7 +256,7 @@ void NymbleManager::seed(NymbleManagerEntry *entry, u_char *pseudonym, u_char *o
 {
   HMAC_CTX ctx;
   
-  HMAC_Init(&ctx, this->getKeyedhashKeyN(), DIGEST_SIZE, EVP_sha256());
+  HMAC_Init(&ctx, this->seed_key_n, DIGEST_SIZE, EVP_sha256());
   HMAC_Update(&ctx, pseudonym, DIGEST_SIZE);
   HMAC_Update(&ctx, entry->getServerId(), DIGEST_SIZE);
   HMAC_Update(&ctx, (u_char *)&this->cur_link_window, sizeof(this->cur_link_window));

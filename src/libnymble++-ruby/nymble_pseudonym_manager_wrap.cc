@@ -15,7 +15,7 @@ VALUE rb_pm_init(VALUE rb_self, VALUE rb_hmac_key_np)
   Nymble::PseudonymManager* pm = (Nymble::PseudonymManager*) DATA_PTR(rb_self);
   u_char* hmac_key_np = (u_char*) RSTRING_PTR(rb_hmac_key_np);
   
-  pm->setHmacKeyNP(hmac_key_np);
+  pm->setMacKeyNP(hmac_key_np);
   
   return rb_self;
 }

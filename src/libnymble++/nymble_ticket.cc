@@ -39,7 +39,7 @@ u_char* Ticket::getMacNS()
 }
 
 
-void Ticket::hmac(u_char* mac_key, u_char* sid, u_int t, u_int w, bool include_mac_n, u_char* out)
+void Ticket::mac(u_char* mac_key, u_char* sid, u_int t, u_int w, bool include_mac_n, u_char* out)
 {
   HMAC_CTX ctx;
   
@@ -107,7 +107,7 @@ bool Ticket::verify(u_char* mac_key, u_char* sid, u_int t, u_int w)
 {
   u_char mac_n[DIGEST_SIZE];
   
-  this->hmac(mac_key, sid, t, w, false, mac_n);
+  this->mac(mac_key, sid, t, w, false, mac_n);
   
   if (memcmp(mac_n, this->mac_n, DIGEST_SIZE) == 0) {
     return true;

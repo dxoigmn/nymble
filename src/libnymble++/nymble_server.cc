@@ -21,12 +21,12 @@ Server::~Server()
 
 u_char* Server::getServerId()
 {
-  return this->server_id;
+  return this->sid;
 }
 
-void Server::setServerId(u_char* server_id)
+void Server::setServerId(u_char* sid)
 {
-  memcpy(this->server_id, server_id, DIGEST_SIZE);
+  memcpy(this->sid, sid, DIGEST_SIZE);
 }
 
 void Server::setTimePeriod(u_int time_period)
@@ -44,9 +44,9 @@ void Server::setTimePeriod(u_int time_period)
   this->finalized = false;
 }
 
-void Server::setHmacKeyNS(u_char* hmac_key_ns)
+void Server::setMacKeyNS(u_char* mac_key_ns)
 {
-  memcpy(this->hmac_key_ns, hmac_key_ns, DIGEST_SIZE);
+  memcpy(this->mac_key_ns, mac_key_ns, DIGEST_SIZE);
 }
 
 bool Server::isFinalized()
@@ -77,7 +77,7 @@ bool Server::verifyTicket(Ticket* ticket)
   bool valid = true;
   u_char mac_ns[DIGEST_SIZE];
   
-  ticket->hmac(this->hmac_key_ns, this->server_id, this->cur_link_window, this->cur_time_period, true, mac_ns);
+  ticket->mac(this->mac_key_ns, this->sid, this->cur_link_window, this->cur_time_period, true, mac_ns);
   
   if (memcmp(ticket->getMacNS(), mac_ns, DIGEST_SIZE) != 0) {
     valid = false;

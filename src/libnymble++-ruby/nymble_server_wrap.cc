@@ -102,7 +102,7 @@ VALUE rb_server_hmac_key_ns_set(VALUE rb_self, VALUE rb_hmac_key_ns)
   Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
   u_char* hmac_key_ns = (u_char*) RSTRING_PTR(rb_hmac_key_ns);
   
-  server->setHmacKeyNS(hmac_key_ns);
+  server->setMacKeyNS(hmac_key_ns);
   
   return rb_self;
 }

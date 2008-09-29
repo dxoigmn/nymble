@@ -2,24 +2,24 @@
 
 namespace Nymble {
 
-NymbleManagerEntry::NymbleManagerEntry(u_char* server_id, u_int cur_time_period)
+NymbleManagerEntry::NymbleManagerEntry(u_char* sid, u_int cur_time_period)
 {
-  u_char hmac_key_ns[DIGEST_SIZE];
-  RAND_bytes(hmac_key_ns, DIGEST_SIZE);
+  u_char mac_key_ns[DIGEST_SIZE];
+  RAND_bytes(mac_key_ns, DIGEST_SIZE);
 
-  this->setServerId(server_id);
+  this->setServerId(sid);
   this->setLastUpdated(cur_time_period);
-  this->setHmacKeyNS(hmac_key_ns);
+  this->setMacKeyNS(mac_key_ns);
 }
 
-void NymbleManagerEntry::setServerId(u_char* server_id)
+void NymbleManagerEntry::setServerId(u_char* sid)
 {
-  memcpy(this->server_id, server_id, DIGEST_SIZE);
+  memcpy(this->sid, sid, DIGEST_SIZE);
 }
 
 u_char* NymbleManagerEntry::getServerId()
 {
-  return this->server_id;
+  return this->sid;
 }
 
 void NymbleManagerEntry::setLastUpdated(u_int bl_last_updated)
@@ -32,14 +32,14 @@ u_int NymbleManagerEntry::getLastUpdated()
   return this->bl_last_updated;
 }
 
-void NymbleManagerEntry::setHmacKeyNS(u_char* hmac_key_ns)
+void NymbleManagerEntry::setMacKeyNS(u_char* mac_key_ns)
 {
-  memcpy(this->hmac_key_ns, hmac_key_ns, DIGEST_SIZE);
+  memcpy(this->mac_key_ns, mac_key_ns, DIGEST_SIZE);
 }
 
-u_char* NymbleManagerEntry::getHmacKeyNS()
+u_char* NymbleManagerEntry::getMacKeyNS()
 {
-  return this->hmac_key_ns;
+  return this->mac_key_ns;
 }
 
 }; // namespace Nymble

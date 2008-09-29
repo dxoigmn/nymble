@@ -9,21 +9,21 @@ namespace Nymble {
 class Credential;
 
 class NymbleManagerEntry {
-  u_char  server_id[DIGEST_SIZE];
+  u_char  sid[DIGEST_SIZE];
   u_int   bl_last_updated;
-  u_char  hmac_key_ns[DIGEST_SIZE];
+  u_char  mac_key_ns[DIGEST_SIZE];
   
   public:
-    NymbleManagerEntry(u_char* server_id, u_int cur_time_period);
+    NymbleManagerEntry(u_char* sid, u_int cur_time_period);
     
-    void setServerId(u_char* server_id);
+    void setServerId(u_char* sid);
     u_char* getServerId();
     
     void setLastUpdated(u_int bl_last_updated);
     u_int getLastUpdated();
     
-    void setHmacKeyNS(u_char* hmac_key_ns);
-    u_char* getHmacKeyNS();
+    void setMacKeyNS(u_char* mac_key_ns);
+    u_char* getMacKeyNS();
 };
 
 }; // namespace Nymble

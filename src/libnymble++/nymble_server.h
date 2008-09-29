@@ -11,8 +11,8 @@ typedef std::vector<Token*> Tokens;
 
 class Server : public Nymble
 {
-  u_char  server_id[DIGEST_SIZE];
-  u_char  hmac_key_ns[DIGEST_SIZE];
+  u_char  sid[DIGEST_SIZE];
+  u_char  mac_key_ns[DIGEST_SIZE];
   bool    finalized;
   
   Blacklist*  blacklist;
@@ -23,10 +23,10 @@ class Server : public Nymble
     ~Server();
     
     u_char* getServerId();
-    void setServerId(u_char* server_id);
+    void setServerId(u_char* sid);
     
     void setTimePeriod(u_int time_period);
-    void setHmacKeyNS(u_char* hmac_key_ns);
+    void setMacKeyNS(u_char* mac_key_ns);
     
     bool isFinalized();
     

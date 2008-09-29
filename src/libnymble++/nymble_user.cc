@@ -5,12 +5,12 @@ namespace Nymble {
 User::User()
 {
   this->pnym = NULL;
-  this->verify_key_n = NULL;
+  this->ver_key_n = NULL;
 }
 
 User::~User()
 {
-  RSA_free(this->verify_key_n);
+  RSA_free(this->ver_key_n);
   
   for (UserEntries::iterator entry = this->begin(); entry != this->end(); ++entry) {
     delete *entry;
@@ -33,7 +33,7 @@ void User::readVerifyKey(char* verify_key_path)
 {
   FILE* verify_key = fopen(verify_key_path, "r");
   
-  this->verify_key_n  = PEM_read_RSA_PUBKEY(verify_key, NULL, NULL, NULL);
+  this->ver_key_n = PEM_read_RSA_PUBKEY(verify_key, NULL, NULL, NULL);
   
   fclose(verify_key);
 }
@@ -55,7 +55,7 @@ UserEntry* User::findOrCreateEntry(u_char* server_id)
 
 bool User::verifyBlacklist(Blacklist* blacklist)
 {
-  return blacklist->verify(this->verify_key_n, this->cur_link_window, this->cur_time_period);
+  return blacklist->verify(this->ver_key_n, this->cur_link_window, this->cur_time_period);
 }
 
 }; // namespace Nymble

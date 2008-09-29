@@ -42,8 +42,8 @@ Credential::Credential(NymbleManager* nm, NymbleManagerEntry* entry, Pseudonym* 
     Ticket* ticket = new Ticket(nymble);
     
     ticket->encrypt(nm->getEncryptKeyN(), this->nymble0, seed);
-    ticket->hmac(nm->getHmacKeyN(), entry->getServerId(), nm->getLinkWindow(), time_period);
-    ticket->hmac(entry->getHmacKeyNS(), entry->getServerId(), nm->getLinkWindow(), time_period, true);
+    ticket->mac(nm->getMacKeyN(), entry->getServerId(), nm->getLinkWindow(), time_period);
+    ticket->mac(entry->getMacKeyNS(), entry->getServerId(), nm->getLinkWindow(), time_period, true);
     
     this->push_back(ticket);
   }
