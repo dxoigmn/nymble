@@ -228,6 +228,11 @@ Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Com
   return tokens;
 }
 
+bool NymbleManager::verifyTicket(Ticket* ticket, u_char* sid)
+{
+  return ticket->verify(this->mac_key_n, sid, this->time_period, this->link_window);
+}
+
 bool NymbleManager::userIsBlacklisted(Nymbles* nymbles, u_char* nymble0)
 {
   for (Nymbles::iterator nymble = nymbles->begin(); nymble != nymbles->end(); ++nymble) {

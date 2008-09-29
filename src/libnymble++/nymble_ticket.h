@@ -34,6 +34,8 @@ class Ticket
     void encrypt(u_char* enc_key, u_char* nymble, u_char* seed);
     void decrypt(u_char* enc_key, u_char* nymble, u_char* seed);
     
+    bool verify(u_char* mac_key, u_char* sid, u_int t, u_int w);
+    
     Complaint* createComplaint(u_int time_period);
     
     void marshal(Marshal::Ticket* out);

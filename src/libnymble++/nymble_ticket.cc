@@ -103,6 +103,19 @@ void Ticket::decrypt(u_char* enc_key, u_char* nymble, u_char* seed)
   }
 }
 
+bool Ticket::verify(u_char* mac_key, u_char* sid, u_int t, u_int w)
+{
+  u_char mac_n[DIGEST_SIZE];
+  
+  this->hmac(mac_key, sid, t, w, false, mac_n);
+  
+  if (memcmp(mac_n, this->mac_n, DIGEST_SIZE) == 0) {
+    return true;
+  }
+  
+  return false;
+}
+
 Complaint* Ticket::createComplaint(u_int time_period)
 {
   return new Complaint(time_period, this);
