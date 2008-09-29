@@ -4,7 +4,7 @@ namespace Nymble {
 
 User::User()
 {
-  this->pseudonym = NULL;
+  this->pnym = NULL;
   this->verify_key_n = NULL;
 }
 
@@ -16,17 +16,17 @@ User::~User()
     delete *entry;
   }
   
-  delete this->pseudonym;
+  delete this->pnym;
 }
 
-void User::setPseudonym(Pseudonym* pseudonym)
+void User::setPseudonym(Pseudonym* pnym)
 {
-  this->pseudonym = new Pseudonym(pseudonym);
+  this->pnym = new Pseudonym(pnym);
 }
 
 Pseudonym* User::getPseudonym()
 {
-  return this->pseudonym;
+  return this->pnym;
 }
 
 void User::readVerifyKey(char* verify_key_path)

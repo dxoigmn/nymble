@@ -10,8 +10,8 @@ typedef std::vector<UserEntry*> UserEntries;
 
 class User : public Nymble, public UserEntries
 {
-  Pseudonym* pseudonym;
-  RSA* verify_key_n;
+  Pseudonym* pnym;
+  RSA* ver_key_n;
   
   UserEntry* findEntry(u_char* server_id);
   
@@ -19,12 +19,12 @@ class User : public Nymble, public UserEntries
     User();
     ~User();
     
-    void setPseudonym(Pseudonym* pseudonym);
+    void setPseudonym(Pseudonym* pnym);
     Pseudonym* getPseudonym();
     
-    void readVerifyKey(char* verify_key_path);
+    void readVerifyKey(char* ver_key_path);
 
-    UserEntry* findOrCreateEntry(u_char* server_id);
+    UserEntry* findOrCreateEntry(u_char* sid);
     bool User::verifyBlacklist(Blacklist* blacklist);
 };
 
