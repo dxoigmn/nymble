@@ -1,10 +1,9 @@
 #ifndef __NYMBLE_PSEUDONYM_MANAGER_WRAP_H__
 #define __NYMBLE_PSEUDONYM_MANAGER_WRAP_H__
 
-#include "ruby.h"
 #include "nymble_wrap_util.h"
+
 #include "nymble_pseudonym_manager.h"
-#include "nymble_pseudonym_wrap.h"
 
 extern VALUE rb_cPseudonymManager;
 

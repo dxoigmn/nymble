@@ -4,7 +4,8 @@
 #include <openssl/hmac.h>
 
 #include "nymble.h"
-#include "nymble_pseudonym.h"
+
+#include "nymble_pseudonym.pb.h"
 
 namespace Nymble {
 

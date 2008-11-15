@@ -1,5 +1,7 @@
 #include "nymble_pseudonym_manager_wrap.h"
 
+VALUE rb_cPseudonymManager;
+
 VALUE rb_pm_new(VALUE rb_self)
 {
   return Data_Wrap_Struct(rb_self, NULL, rb_pm_delete, new Nymble::PseudonymManager());
@@ -80,7 +82,12 @@ VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id)
   
   Nymble::Pseudonym* pseudonym = pm->createPseudonym(user_id);
   
-  return Data_Wrap_Struct(rb_cPseudonym, NULL, rb_pseudonym_delete, pseudonym);
+  std::string pseudonym_str;
+  pseudonym->SerializeToString(&pseudonym_str);
+  
+  delete pseudonym;
+  
+  return rb_str_new(pseudonym_str.c_str(), pseudonym_str.length());
 }
 
 void rb_pm_delete(Nymble::PseudonymManager* pm)

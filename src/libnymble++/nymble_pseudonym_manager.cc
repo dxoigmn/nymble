@@ -35,14 +35,14 @@ Pseudonym* PseudonymManager::createPseudonym(u_char* user_id)
   HMAC_Update(&ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&ctx, buffer, NULL);
   
-  pseudonym->setPseudonym(buffer);
+  pseudonym->set_nym(buffer, DIGEST_SIZE);
   
   HMAC_Init(&ctx, this->mac_key_np, DIGEST_SIZE, EVP_sha256());
-  HMAC_Update(&ctx, pseudonym->getPseudonym(), DIGEST_SIZE);
+  HMAC_Update(&ctx, (u_char*)pseudonym->nym().c_str(), DIGEST_SIZE);
   HMAC_Update(&ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&ctx, buffer, NULL);
   
-  pseudonym->setMacNP(buffer);
+  pseudonym->set_mac(buffer, DIGEST_SIZE);
   
   return pseudonym;
 }
