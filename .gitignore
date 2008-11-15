@@ -7,4 +7,5 @@
 *.key
 *.dat
 *.pdf
+*.pb.*
 Makefile
