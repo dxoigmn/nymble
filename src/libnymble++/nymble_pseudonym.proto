@@ -1,0 +1,6 @@
+package Nymble;
+
+message Pseudonym {
+  required bytes nym = 1;
+  required bytes mac = 2;
+}

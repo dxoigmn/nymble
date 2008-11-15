@@ -1,5 +1,6 @@
-package Nymble.Marshal;
+package Nymble;
 
 message Token {
   required bytes seed = 1;
+  required bytes nymble = 2;
 }

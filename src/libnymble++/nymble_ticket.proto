@@ -1,8 +1,8 @@
-package Nymble.Marshal;
+package Nymble;
 
 message Ticket {
   required bytes nymble = 1;
-  required bytes mac_n  = 2;
-  required bytes mac_ns = 3;
-  required bytes ctxt   = 4;
+  required bytes ctxt = 2;
+  required bytes mac_n  = 3;
+  required bytes mac_ns = 4;
 }

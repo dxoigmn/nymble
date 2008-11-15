@@ -1,11 +1,5 @@
-package Nymble.Marshal;
+package Nymble;
 
 message Blacklist {
-  required int32 link_window = 1;
-  required int32 time_period = 2;
-  required bytes server_id = 3;
-  required bytes bl_hash = 4;
-  required bytes bmac_n = 5;
-  required bytes sig = 6;
-  repeated bytes nymble = 7;
+  repeated bytes nymble = 2;
 }

@@ -1,0 +1,8 @@
+package Nymble;
+
+message BlacklistCert {
+  required int32 time = 1;
+  required bytes daisy = 2;
+  required bytes mac = 3;
+  required bytes sig = 4;
+}
