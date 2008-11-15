@@ -16,12 +16,10 @@ class PseudonymManager : public Nymble
   
   public:
     PseudonymManager();
-    PseudonymManager(std::string mac_key_np);
     
-    std::string getMacKeyNP();
     void setMacKeyNP(std::string mac_key_np);
     
-    Pseudonym* createPseudonym(std::string user_id);
+    bool createPseudonym(std::string user_id, Pseudonym* pseudonym);
 };
 
 }; // namespace Nymble
