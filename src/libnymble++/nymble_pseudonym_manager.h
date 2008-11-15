@@ -11,17 +11,17 @@ namespace Nymble {
 
 class PseudonymManager : public Nymble
 {
-  u_char  mac_key_np[DIGEST_SIZE];
-  u_char  nym_key_p[DIGEST_SIZE];
+  std::string mac_key_np;
+  std::string nym_key_p;
   
   public:
     PseudonymManager();
-    PseudonymManager(u_char* mac_key_np);
+    PseudonymManager(std::string mac_key_np);
     
-    u_char* getMacKeyNP();
-    void setMacKeyNP(u_char* mac_key_np);
+    std::string getMacKeyNP();
+    void setMacKeyNP(std::string mac_key_np);
     
-    Pseudonym* createPseudonym(u_char* user_id);
+    Pseudonym* createPseudonym(std::string user_id);
 };
 
 }; // namespace Nymble

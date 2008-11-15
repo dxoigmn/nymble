@@ -15,7 +15,7 @@ VALUE rb_pm_init(VALUE rb_self, VALUE rb_hmac_key_np)
   Check_Size(rb_hmac_key_np, DIGEST_SIZE);
   
   Nymble::PseudonymManager* pm = (Nymble::PseudonymManager*) DATA_PTR(rb_self);
-  u_char* hmac_key_np = (u_char*) RSTRING_PTR(rb_hmac_key_np);
+  std::string hmac_key_np(RSTRING_PTR(rb_hmac_key_np), RSTRING_LEN(rb_hmac_key_np));
   
   pm->setMacKeyNP(hmac_key_np);
   
@@ -78,7 +78,7 @@ VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id)
   Check_Size(rb_user_id, DIGEST_SIZE);
   
   Nymble::PseudonymManager* pm = (Nymble::PseudonymManager*) DATA_PTR(rb_self);
-  u_char* user_id = (u_char*) RSTRING_PTR(rb_user_id);
+  std::string user_id(RSTRING_PTR(rb_user_id), RSTRING_LEN(rb_user_id));
   
   Nymble::Pseudonym* pseudonym = pm->createPseudonym(user_id);
   
