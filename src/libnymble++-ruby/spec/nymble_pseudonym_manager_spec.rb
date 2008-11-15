@@ -46,22 +46,3 @@ context 'Pseudonym Manager' do
     @pm.create_pseudonym(@user_id).should.not.be.nil
   end
 end
-
-context 'Pseudonym' do
-  before(:each) do
-    @cur_link_window = 10
-    @cur_time_period = 2
-    @hmac_key_np = Nymble.digest('hmac_key_np')
-    @user_id = Nymble.digest('user_id')
-    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
-    @pseudonym = @pm.create_pseudonym(@user_id)
-  end
-  
-  it 'should be (un)marshalable' do
-    bytes = @pseudonym.marshal
-    bytes.should.not.be.nil
-    pseudonym = Nymble::Pseudonym.unmarshal(bytes)
-    pseudonym.should.not.be.nil
-    bytes.should.equal(pseudonym.marshal)
-  end
-end
