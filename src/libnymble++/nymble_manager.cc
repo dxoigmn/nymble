@@ -174,15 +174,15 @@ bool NymbleManager::verifyTicket(std::string sid, Ticket ticket)
   return false;
 }
 
-bool NymbleManager::signBlacklist(std::string sid, u_int t, u_int w, std::string target, Blacklist blist, BlacklistCert* cert)
+bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist blist, BlacklistCert* cert)
 {
   u_char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
 
   HMAC_Init(&hmac_ctx, this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
   HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
-  HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
-  HMAC_Update(&hmac_ctx, (u_char*)&w, sizeof(w));
+  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
+  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   
   for (int i = 0; i < blist.nymble_size(); i++) {
     std::string nymble = blist.nymble(i);
@@ -198,8 +198,8 @@ bool NymbleManager::signBlacklist(std::string sid, u_int t, u_int w, std::string
   
   SHA256_Init(&hash_ctx);
   SHA256_Update(&hash_ctx, (u_char*)sid.c_str(), sid.size());
-  SHA256_Update(&hash_ctx, (u_char*)&t, sizeof(t));
-  SHA256_Update(&hash_ctx, (u_char*)&w, sizeof(w));
+  SHA256_Update(&hash_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
+  SHA256_Update(&hash_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   
   for (int i = 0; i < blist.nymble_size(); i++) {
     std::string nymble = blist.nymble(i);
@@ -217,7 +217,7 @@ bool NymbleManager::signBlacklist(std::string sid, u_int t, u_int w, std::string
   u_char sig[SIGNATURE_SIZE];
   RSA_private_encrypt(SIGNATURE_SIZE, buffer, sig, this->sign_key_n, RSA_NO_PADDING);
   
-  cert->set_t(t);
+  cert->set_t(this->cur_time_period);
   cert->set_daisy(target);
   cert->set_mac(mac, sizeof(mac));
   cert->set_sig(sig, sizeof(sig));
@@ -269,7 +269,7 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
   Blacklist* blist = server_state->mutable_blist();
   BlacklistCert* cert = server_state->mutable_cert();
   
-  if (!signBlacklist(sid, this->cur_time_period, this->cur_link_window, target, *blist, cert)) {
+  if (!signBlacklist(sid, target, *blist, cert)) {
     return false;
   }
   

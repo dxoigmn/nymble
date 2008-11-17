@@ -30,7 +30,7 @@ class NymbleManager : public Nymble
   NymbleManagerEntry* findServer(std::string sid);
   void computeNymble(std::string seed, std::string* nymble);
   void evolveSeed(std::string seed, int delta, std::string* seed_out);
-  bool signBlacklist(std::string sid, u_int t, u_int w, std::string target, Blacklist blist, BlacklistCert* cert);
+  bool signBlacklist(std::string sid, std::string target, Blacklist blist, BlacklistCert* cert);
   
   public:
     NymbleManager();
