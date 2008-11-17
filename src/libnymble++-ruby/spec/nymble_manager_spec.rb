@@ -73,6 +73,7 @@ context 'Nymble Manager' do
     @@user.link_window = 10
     @@user.time_period = 5
     
+    @@nm.should.respond_to?(:valid_ticket?)
     @@nm.valid_ticket?(@@user.ticket).should.be(true)
   end
 end

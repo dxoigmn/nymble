@@ -143,7 +143,7 @@ VALUE rb_nm_valid_ticket(VALUE rb_self, VALUE rb_sid, VALUE rb_ticket_str)
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cNymbleManager);
   Check_Type(rb_sid, T_STRING);
-  Check_Type(rb_pseudonym_str, T_STRING);
+  Check_Type(rb_ticket_str, T_STRING);
   
   Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
   std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
