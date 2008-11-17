@@ -2,28 +2,29 @@
 #define __NYMBLE_MANAGER_ENTRY_H__
 
 #include "nymble.h"
-#include "nymble_credential.h"
+
+#include "nymble_credential.pb.h"
 
 namespace Nymble {
 
 class Credential;
 
 class NymbleManagerEntry {
-  u_char  sid[DIGEST_SIZE];
+  std::string sid;
   u_int   bl_last_updated;
-  u_char  mac_key_ns[DIGEST_SIZE];
+  std::string mac_key_ns;
   
   public:
-    NymbleManagerEntry(u_char* sid, u_int cur_time_period);
+    NymbleManagerEntry(std::string sid, u_int cur_time_period);
     
-    void setServerId(u_char* sid);
-    u_char* getServerId();
+    void setServerId(std::string sid);
+    std::string getServerId();
     
     void setLastUpdated(u_int bl_last_updated);
     u_int getLastUpdated();
     
-    void setMacKeyNS(u_char* mac_key_ns);
-    u_char* getMacKeyNS();
+    void setMacKeyNS(std::string mac_key_ns);
+    std::string getMacKeyNS();
 };
 
 }; // namespace Nymble

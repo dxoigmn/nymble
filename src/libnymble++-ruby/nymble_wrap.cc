@@ -23,18 +23,12 @@ void Init_nymble() {
 #ifdef __NYMBLE_MANAGER_WRAP_H__
   rb_cNymbleManager = rb_define_class_under(rb_mNymble, "NymbleManager", rb_cObject);
   rb_define_alloc_func(rb_cNymbleManager, rb_nm_new);
-  rb_define_method(rb_cNymbleManager, "initialize", RUBY_METHOD_FUNC(rb_nm_init), 2);
   rb_define_method(rb_cNymbleManager, "link_window", RUBY_METHOD_FUNC(rb_nm_link_window), 0);
   rb_define_method(rb_cNymbleManager, "link_window=", RUBY_METHOD_FUNC(rb_nm_link_window_set), 1);
   rb_define_method(rb_cNymbleManager, "time_period", RUBY_METHOD_FUNC(rb_nm_time_period), 0);
   rb_define_method(rb_cNymbleManager, "time_period=", RUBY_METHOD_FUNC(rb_nm_time_period_set), 1);
-  rb_define_method(rb_cNymbleManager, "add_server", RUBY_METHOD_FUNC(rb_nm_add_server), 1);
-  rb_define_method(rb_cNymbleManager, "valid_pseudonym?", RUBY_METHOD_FUNC(rb_nm_verify_pseudonym), 1);
-  rb_define_method(rb_cNymbleManager, "valid_blacklist?", RUBY_METHOD_FUNC(rb_nm_verify_blacklist), 2);
-  rb_define_method(rb_cNymbleManager, "create_blacklist", RUBY_METHOD_FUNC(rb_nm_create_blacklist), 1);
-  rb_define_method(rb_cNymbleManager, "update_blacklist", RUBY_METHOD_FUNC(rb_nm_update_blacklist), 3);
-  rb_define_method(rb_cNymbleManager, "create_tokens", RUBY_METHOD_FUNC(rb_nm_create_tokens), 3);
-  rb_define_method(rb_cNymbleManager, "create_credential", RUBY_METHOD_FUNC(rb_nm_create_credential), 3);
+  rb_define_method(rb_cNymbleManager, "mac_key_np", RUBY_METHOD_FUNC(rb_nm_mac_key_np), 0);
+  rb_define_method(rb_cNymbleManager, "valid_pseudonym?", RUBY_METHOD_FUNC(rb_nm_valid_pseudonym), 1);
 #endif
 
 #ifdef __NYMBLE_SERVER_WRAP_H__
@@ -45,13 +39,6 @@ void Init_nymble() {
   rb_define_method(rb_cServer, "link_window=", RUBY_METHOD_FUNC(rb_server_link_window_set), 1);
   rb_define_method(rb_cServer, "time_period", RUBY_METHOD_FUNC(rb_server_time_period), 0);
   rb_define_method(rb_cServer, "time_period=", RUBY_METHOD_FUNC(rb_server_time_period_set), 1);
-  rb_define_method(rb_cServer, "server_id", RUBY_METHOD_FUNC(rb_server_server_id), 0);
-  rb_define_method(rb_cServer, "finalized?", RUBY_METHOD_FUNC(rb_server_finalized), 0);
-  rb_define_method(rb_cServer, "hmac_key_ns=", RUBY_METHOD_FUNC(rb_server_hmac_key_ns_set), 1);
-  rb_define_method(rb_cServer, "blacklist", RUBY_METHOD_FUNC(rb_server_blacklist), 0);
-  rb_define_method(rb_cServer, "blacklist=", RUBY_METHOD_FUNC(rb_server_blacklist_set), 1);
-  rb_define_method(rb_cServer, "add_tokens", RUBY_METHOD_FUNC(rb_server_add_tokens), 1);
-  rb_define_method(rb_cServer, "valid_ticket?", RUBY_METHOD_FUNC(rb_server_verify_ticket), 1);
 #endif
 
 #ifdef __NYMBLE_USER_WRAP_H__
@@ -62,10 +49,6 @@ void Init_nymble() {
   rb_define_method(rb_cUser, "link_window=", RUBY_METHOD_FUNC(rb_user_link_window_set), 1);
   rb_define_method(rb_cUser, "time_period", RUBY_METHOD_FUNC(rb_user_time_period), 0);
   rb_define_method(rb_cUser, "time_period=", RUBY_METHOD_FUNC(rb_user_time_period_set), 1);
-  rb_define_method(rb_cUser, "pseudonym", RUBY_METHOD_FUNC(rb_user_pseudonym), 0);
-  rb_define_method(rb_cUser, "add_blacklist", RUBY_METHOD_FUNC(rb_user_add_blacklist), 2);
-  rb_define_method(rb_cUser, "add_credential", RUBY_METHOD_FUNC(rb_user_add_credential), 2);
-  rb_define_method(rb_cUser, "ticket", RUBY_METHOD_FUNC(rb_user_ticket), 1);
 #endif
 }
 

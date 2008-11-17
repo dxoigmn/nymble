@@ -1,44 +1,61 @@
 #!/usr/bin/env ruby
 
+$: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
+
 require 'rubygems'
 require 'test/spec'
 require 'nymble'
 
 context 'Nymble Manager' do
-  before(:each) do
-    @cur_link_window = 10
-    @cur_time_period = 2
-    @hmac_key_np = Nymble.digest('hmac_key_np')
-    @sign_key_n = File.expand_path('sign_n.key')
-    @user_id = Nymble.digest('user_id')
-    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
-    @pseudonym = @pm.create_pseudonym(@user_id)
-    @nm = Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n)
-    @server_id = Nymble.digest('server_id')
+  before(:all) do
+    @@nm = Nymble::NymbleManager.new
   end
   
   it 'should be defined under Nymble' do
     Nymble.should.const_defined?(:NymbleManager)
   end
   
-  it 'should be created with a valid hmac key' do
-    Nymble::NymbleManager.new(@hmac_key_np, @sign_key_n).should.not.be.nil
+  it 'should be createable' do
+    @@nm.should.not.be.nil
   end
   
   it 'should manage the link window' do
-    @nm.should.respond_to?(:link_window=)
-    @nm.link_window = @cur_link_window
-    @nm.should.respond_to?(:link_window)
-    @nm.link_window.should.equal(@cur_link_window)
+    @@nm.should.respond_to?(:link_window=)
+    @@nm.link_window = 10
+    @@nm.should.respond_to?(:link_window)
+    @@nm.link_window.should.equal(10)
   end
   
   it 'should manage the time period' do
-    @nm.should.respond_to?(:time_period=)
-    @nm.time_period = @cur_time_period
-    @nm.should.respond_to?(:time_period)
-    @nm.time_period.should.equal(@cur_time_period)
+    @@nm.should.respond_to?(:time_period=)
+    @@nm.time_period = 5
+    @@nm.should.respond_to?(:time_period)
+    @@nm.time_period.should.equal(5)
   end
   
+  it 'should generate mac_key_np' do
+    @@nm.should.respond_to?(:mac_key_np)
+    @@nm.mac_key_np.should.not.be.nil
+  end
+  
+  it 'should verify pseudonyms' do
+    pm = Nymble::PseudonymManager.new(@@nm.mac_key_np)
+    pm.link_window = 10
+    pseudonym = pm.create_pseudonym('user_id')
+    
+    @@nm.should.respond_to?(:valid_pseudonym?)
+    @@nm.valid_pseudonym?(pseudonym).should.be(true)
+  end
+  
+  it 'should not verify invalid pseudonyms' do
+    pm = Nymble::PseudonymManager.new(@@nm.mac_key_np)
+    pm.link_window = 11
+    pseudonym = pm.create_pseudonym('user_id')
+    
+    @@nm.valid_pseudonym?(pseudonym).should.be(false)
+  end
+
+=begin  
   it 'should register servers with valid ids' do
     @nm.add_server(@server_id).should.not.be.nil
   end
@@ -96,4 +113,5 @@ context 'Nymble Manager' do
     
     @nm.create_credential(@server_id, pseudonym, time_periods).should.not.be.nil
   end
+=end
 end

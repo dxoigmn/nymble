@@ -3,6 +3,7 @@
 
 #include "nymble_wrap_util.h"
 #include "nymble_pseudonym_manager_wrap.h"
+#include "nymble_manager_wrap.h"
 
 #include "nymble.h"
 

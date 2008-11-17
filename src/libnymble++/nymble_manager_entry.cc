@@ -2,22 +2,19 @@
 
 namespace Nymble {
 
-NymbleManagerEntry::NymbleManagerEntry(u_char* sid, u_int cur_time_period)
+NymbleManagerEntry::NymbleManagerEntry(std::string sid, u_int cur_time_period)
 {
-  u_char mac_key_ns[DIGEST_SIZE];
-  RAND_bytes(mac_key_ns, DIGEST_SIZE);
-
-  this->setServerId(sid);
-  this->setLastUpdated(cur_time_period);
-  this->setMacKeyNS(mac_key_ns);
+  this->sid = sid;
+  this->bl_last_updated = cur_time_period;
+  random_bytes(this->mac_key_ns);
 }
 
-void NymbleManagerEntry::setServerId(u_char* sid)
+void NymbleManagerEntry::setServerId(std::string sid)
 {
-  memcpy(this->sid, sid, DIGEST_SIZE);
+  this->sid = sid;
 }
 
-u_char* NymbleManagerEntry::getServerId()
+std::string NymbleManagerEntry::getServerId()
 {
   return this->sid;
 }
@@ -32,12 +29,12 @@ u_int NymbleManagerEntry::getLastUpdated()
   return this->bl_last_updated;
 }
 
-void NymbleManagerEntry::setMacKeyNS(u_char* mac_key_ns)
+void NymbleManagerEntry::setMacKeyNS(std::string mac_key_ns)
 {
-  memcpy(this->mac_key_ns, mac_key_ns, DIGEST_SIZE);
+  this->mac_key_ns = mac_key_ns;
 }
 
-u_char* NymbleManagerEntry::getMacKeyNS()
+std::string NymbleManagerEntry::getMacKeyNS()
 {
   return this->mac_key_ns;
 }
