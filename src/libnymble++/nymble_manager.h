@@ -12,11 +12,11 @@
 #include "nymble_complaint.pb.h"
 #include "nymble_complaints.pb.h"
 #include "nymble_token.pb.h"
+#include "nymble_seeds.pb.h"
 
 namespace Nymble {
 
 typedef std::vector<NymbleManagerEntry*> NymbleManagerEntries;
-typedef std::vector<std::string> Seeds;
 
 class NymbleManager : public Nymble
 {
@@ -44,7 +44,7 @@ class NymbleManager : public Nymble
     bool verifyBlacklist(std::string sid, Blacklist blist, BlacklistCert cert);
     bool registerServer(std::string sid, ServerState* server_state);
     bool computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out);
-    bool computeTokens(u_int t_prime, Blacklist* blist, Complaints clist, Seeds* seeds);
+    bool computeTokens(u_int t_prime, Blacklist blist, Complaints clist, Seeds* seeds);
 };
 
 }; // namespace Nymble

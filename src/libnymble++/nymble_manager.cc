@@ -399,9 +399,45 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
   return true;
 }
 
-bool NymbleManager::computeTokens(u_int t_prime, Blacklist* blist, Complaints clist, Seeds* seeds)
+bool NymbleManager::computeTokens(u_int t_prime, Blacklist blist, Complaints clist, Seeds* seeds)
 {
-  // IMPLEMENT
+  for (int i = 0; i < clist.complaints_size(); i++) {
+    std::string ctxt = clist.complaints(i).ticket().ctxt();
+    
+    EVP_CIPHER_CTX cipher_ctx;
+    char buffer[1024];
+    int buffer_len;
+    int final_len;
+    std::string iv = ctxt.substr(0, CIPHER_BLOCK_SIZE);
+    std::string cipher = ctxt.substr(CIPHER_BLOCK_SIZE, ctxt.size());
+    
+    EVP_CIPHER_CTX_init(&cipher_ctx);
+    EVP_DecryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.c_str(), (u_char*)iv.c_str());
+    EVP_DecryptUpdate(&cipher_ctx, (u_char*)buffer, &buffer_len, (u_char*)cipher.c_str(), cipher.size());
+    EVP_DecryptFinal_ex(&cipher_ctx, (u_char*)buffer + buffer_len, &final_len);
+    EVP_CIPHER_CTX_cleanup(&cipher_ctx);
+    
+    std::string nymble0(buffer, DIGEST_SIZE);
+    std::string seed(buffer + DIGEST_SIZE, DIGEST_SIZE);
+    
+    bool already_blacklisted = false;
+    
+    for (int j = 0; j < blist.nymbles_size(); j++) {
+      if (nymble0 == blist.nymbles(j)) {
+        already_blacklisted = true;
+      }
+    }
+    
+    std::string seed_prime;
+    
+    if (already_blacklisted) {
+      random_bytes(DIGEST_SIZE, &seed_prime);
+    } else {
+      evolveSeed(seed, t_prime - clist.complaints(i).time(), &seed_prime);
+    }
+    
+    seeds->add_seeds(seed_prime);
+  }
   
   return false;
 }

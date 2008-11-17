@@ -1,0 +1,5 @@
+package Nymble;
+
+message Seeds {
+  repeated bytes seeds = 1;
+}
