@@ -54,7 +54,22 @@ context 'Nymble Manager' do
     
     @@nm.valid_pseudonym?(pseudonym).should.be(false)
   end
-
+  
+  it 'should register servers' do
+    @@nm.should.respond_to?(:register_server)
+    @@nm.register_server('server_id').should.not.be(nil)
+  end
+  
+  it 'should create credentials' do
+    pm = Nymble::PseudonymManager.new(@@nm.mac_key_np)
+    pm.link_window = 10
+    pseudonym = pm.create_pseudonym('user_id')
+    
+    @@nm.should.respond_to?(:create_credential)
+    @@nm.create_credential('server_id', pseudonym).should.not.be(nil)
+    @@nm.create_credential('', pseudonym).should.be(nil)
+  end
+  
 =begin  
   it 'should register servers with valid ids' do
     @nm.add_server(@server_id).should.not.be.nil

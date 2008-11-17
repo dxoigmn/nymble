@@ -77,12 +77,65 @@ VALUE rb_nm_valid_pseudonym(VALUE rb_self, VALUE rb_pseudonym_str)
   
   Nymble::Pseudonym pseudonym;
   
-  if (pseudonym.ParseFromString(pseudonym_str) && 
-      nm->verifyPseudonym(pseudonym)) {
-    return Qtrue;
+  if (!pseudonym.ParseFromString(pseudonym_str)) {
+    return Qfalse;
   }
   
-  return Qfalse;
+  if (!nm->verifyPseudonym(pseudonym)) {
+    return Qfalse;
+  }
+  
+  return Qtrue;
+}
+
+VALUE rb_nm_register_server(VALUE rb_self, VALUE rb_sid)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  Check_Type(rb_sid, T_STRING);
+  
+  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
+  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
+  
+  Nymble::ServerState server_state;
+  
+  if (!nm->registerServer(sid, &server_state)) {
+    return Qnil;
+  }
+  
+  std::string server_state_str;
+  server_state.SerializeToString(&server_state_str);
+  
+  return rb_str_new(server_state_str.c_str(), server_state_str.size());
+}
+
+VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_pseudonym_str)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  Check_Type(rb_sid, T_STRING);
+  Check_Type(rb_pseudonym_str, T_STRING);
+  
+  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
+  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
+  std::string pseudonym_str(RSTRING_PTR(rb_pseudonym_str), RSTRING_LEN(rb_pseudonym_str));
+  
+  Nymble::Pseudonym pseudonym;
+  
+  if (!pseudonym.ParseFromString(pseudonym_str)) {
+    return Qnil;
+  }
+  
+  Nymble::Credential credential;
+  
+  if (!nm->createCredential(sid, pseudonym, &credential)) {
+    return Qnil;
+  }
+  
+  std::string credential_str;
+  credential.SerializeToString(&credential_str);
+  
+  return rb_str_new(credential_str.c_str(), credential_str.size());
 }
 
 void rb_nm_delete(Nymble::NymbleManager* nm)

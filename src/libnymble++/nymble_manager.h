@@ -3,8 +3,8 @@
 
 #include "nymble.h"
 #include "nymble_manager_entry.h"
-#include "nymble_server.h"
 
+#include "nymble_server_state.pb.h"
 #include "nymble_blacklist.pb.h"
 #include "nymble_blacklist_cert.pb.h"
 #include "nymble_pseudonym.pb.h"
@@ -24,10 +24,13 @@ class NymbleManager : public Nymble
   std::string mac_key_np;
   std::string seed_key_n;
   std::string enc_key_n;
-  RSA sign_key_n;
+  RSA* sign_key_n;
   NymbleManagerEntries entries;
   
   NymbleManagerEntry* findServer(std::string sid);
+  void computeNymble(std::string seed, std::string* nymble);
+  void evolveSeed(std::string seed, int delta, std::string* seed_out);
+  bool signBlacklist(std::string sid, u_int t, u_int w, std::string target, Blacklist blist, BlacklistCert* cert);
   
   public:
     NymbleManager();
@@ -36,13 +39,12 @@ class NymbleManager : public Nymble
     std::string getMacKeyNP();
     
     bool verifyPseudonym(Pseudonym pseudonym);
-    bool createCredential(std::string sid, Pseudonym pseudonym, Credential& credential);
+    bool createCredential(std::string sid, Pseudonym pseudonym, Credential* credential);
     bool verifyTicket(std::string sid, Ticket ticket);
-    bool signBlacklist(std::string sid, std::string target, Blacklist blist, BlacklistCert& cert);
     bool verifyBlacklist(std::string sid, Blacklist blist, BlacklistCert cert);
-    bool registerServer(std::string sid, Server& server);
-    bool computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist& blist_out, BlacklistCert& cert_out);
-    bool computeTokens(u_int t_prime, Blacklist* blist, Complaints clist, Seeds& seeds);
+    bool registerServer(std::string sid, ServerState* server_state);
+    bool computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out);
+    bool computeTokens(u_int t_prime, Blacklist* blist, Complaints clist, Seeds* seeds);
 };
 
 }; // namespace Nymble

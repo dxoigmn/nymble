@@ -2,11 +2,12 @@
 
 namespace Nymble {
 
-NymbleManagerEntry::NymbleManagerEntry(std::string sid, u_int cur_time_period)
+NymbleManagerEntry::NymbleManagerEntry(std::string sid)
 {
   this->sid = sid;
-  this->bl_last_updated = cur_time_period;
-  random_bytes(this->mac_key_ns);
+  this->time_last_updated = 0;
+  random_bytes(DIGEST_SIZE, &this->daisy_l);
+  random_bytes(DIGEST_SIZE, &this->mac_key_ns);
 }
 
 void NymbleManagerEntry::setServerId(std::string sid)
@@ -19,15 +20,6 @@ std::string NymbleManagerEntry::getServerId()
   return this->sid;
 }
 
-void NymbleManagerEntry::setLastUpdated(u_int bl_last_updated)
-{
-  this->bl_last_updated = bl_last_updated;
-}
-
-u_int NymbleManagerEntry::getLastUpdated()
-{
-  return this->bl_last_updated;
-}
 
 void NymbleManagerEntry::setMacKeyNS(std::string mac_key_ns)
 {
@@ -38,5 +30,27 @@ std::string NymbleManagerEntry::getMacKeyNS()
 {
   return this->mac_key_ns;
 }
+
+
+void NymbleManagerEntry::setDaisyL(std::string daisy_l)
+{
+  this->daisy_l = daisy_l;
+}
+
+std::string NymbleManagerEntry::getDaisyL()
+{
+  return this->daisy_l;
+}
+
+void NymbleManagerEntry::setTimeLastUpdated(u_int time_last_updated)
+{
+  this->time_last_updated = time_last_updated;
+}
+
+u_int NymbleManagerEntry::getTimeLastUpdated()
+{
+  return this->time_last_updated;
+}
+
 
 }; // namespace Nymble

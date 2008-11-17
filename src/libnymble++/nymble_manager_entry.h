@@ -11,20 +11,24 @@ class Credential;
 
 class NymbleManagerEntry {
   std::string sid;
-  u_int   bl_last_updated;
   std::string mac_key_ns;
+  std::string daisy_l;
+  u_int time_last_updated;
   
   public:
-    NymbleManagerEntry(std::string sid, u_int cur_time_period);
+    NymbleManagerEntry(std::string sid);
     
     void setServerId(std::string sid);
     std::string getServerId();
     
-    void setLastUpdated(u_int bl_last_updated);
-    u_int getLastUpdated();
-    
     void setMacKeyNS(std::string mac_key_ns);
     std::string getMacKeyNS();
+    
+    void setDaisyL(std::string daisy_l);
+    std::string getDaisyL();
+    
+    void setTimeLastUpdated(u_int time_last_updated);
+    u_int getTimeLastUpdated();
 };
 
 }; // namespace Nymble

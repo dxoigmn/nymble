@@ -1,0 +1,17 @@
+package Nymble;
+
+import "nymble_blacklist.proto";
+import "nymble_blacklist_cert.proto";
+import "nymble_complaint.proto";
+import "nymble_token.proto";
+
+message ServerState {
+  required bytes sid = 1;
+  required bytes mac_key_ns = 2;
+  required Blacklist blist = 3;
+  required BlacklistCert cert = 4;
+  repeated Complaint clist = 5;
+  repeated Token llist = 6;
+  required int32 time_last_updated = 7;
+  
+}
