@@ -148,7 +148,7 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pseudonym, Crede
     
     std::string mac_ns(mac, sizeof(mac));
     
-    Ticket* ticket = credential->add_ticket();
+    Ticket* ticket = credential->add_tickets();
     
     ticket->set_nymble(nymble);
     ticket->set_ctxt(ctxt);
@@ -177,7 +177,7 @@ bool NymbleManager::verifyTicket(std::string sid, Ticket ticket)
   return (ticket.mac_n() == std::string(mac, sizeof(mac)));
 }
 
-bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist blist, BlacklistCert* cert)
+bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist* blist, BlacklistCert* cert)
 {
   u_char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
@@ -187,9 +187,11 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   
-  for (int i = 0; i < blist.nymble_size(); i++) {
-    std::string nymble = blist.nymble(i);
-    HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
+  if (blist != NULL) {
+    for (int i = 0; i < blist->nymbles_size(); i++) {
+      std::string nymble = blist->nymbles(i);
+      HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
+    }
   }
   
   HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
@@ -205,9 +207,11 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
   SHA256_Update(&hash_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   SHA256_Update(&hash_ctx, (u_char*)target.c_str(), target.size());
   
-  for (int i = 0; i < blist.nymble_size(); i++) {
-    std::string nymble = blist.nymble(i);
-    SHA256_Update(&hash_ctx, (u_char*)nymble.c_str(), nymble.size());
+  if (blist != NULL) {
+    for (int i = 0; i < blist->nymbles_size(); i++) {
+      std::string nymble = blist->nymbles(i);
+      SHA256_Update(&hash_ctx, (u_char*)nymble.c_str(), nymble.size());
+    }
   }
   
   SHA256_Final(hash, &hash_ctx);
@@ -258,8 +262,8 @@ bool NymbleManager::verifyBlacklist(std::string sid, Blacklist blist, BlacklistC
   SHA256_Update(&hash_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   SHA256_Update(&hash_ctx, (u_char*)target.c_str(), target.size());
   
-  for (int i = 0; i < blist.nymble_size(); i++) {
-    std::string nymble = blist.nymble(i);
+  for (int i = 0; i < blist.nymbles_size(); i++) {
+    std::string nymble = blist.nymbles(i);
     SHA256_Update(&hash_ctx, (u_char*)nymble.c_str(), nymble.size());
   }
   
@@ -300,10 +304,8 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
   
   std::string target = std::string(hash, sizeof(hash));
   
-  Blacklist* blist = server_state->mutable_blist();
-  BlacklistCert* cert = server_state->mutable_cert();
   
-  if (!signBlacklist(sid, target, *blist, cert)) {
+  if (!signBlacklist(sid, target, NULL, server_state->mutable_cert())) {
     return false;
   }
   
@@ -316,7 +318,7 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
 
 bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out)
 {
-  // IMPLEMENT
+  
   
   return false;
 }

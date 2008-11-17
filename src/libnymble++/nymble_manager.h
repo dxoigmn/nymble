@@ -10,13 +10,13 @@
 #include "nymble_pseudonym.pb.h"
 #include "nymble_ticket.pb.h"
 #include "nymble_complaint.pb.h"
+#include "nymble_complaints.pb.h"
 #include "nymble_token.pb.h"
 
 namespace Nymble {
 
 typedef std::vector<NymbleManagerEntry*> NymbleManagerEntries;
 typedef std::vector<std::string> Seeds;
-typedef std::vector<Complaint*> Complaints;
 
 class NymbleManager : public Nymble
 {
@@ -30,7 +30,7 @@ class NymbleManager : public Nymble
   NymbleManagerEntry* findServer(std::string sid);
   void computeNymble(std::string seed, std::string* nymble);
   void evolveSeed(std::string seed, int delta, std::string* seed_out);
-  bool signBlacklist(std::string sid, std::string target, Blacklist blist, BlacklistCert* cert);
+  bool signBlacklist(std::string sid, std::string target, Blacklist* blist, BlacklistCert* cert);
   
   public:
     NymbleManager();

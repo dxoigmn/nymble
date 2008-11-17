@@ -1,5 +1,5 @@
 package Nymble;
 
 message Blacklist {
-  repeated bytes nymble = 2;
+  repeated bytes nymbles = 2;
 }
