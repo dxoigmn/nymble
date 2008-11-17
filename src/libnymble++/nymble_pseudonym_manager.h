@@ -1,8 +1,6 @@
 #ifndef __NYMBLE_PSEUDONYM_MANAGER_H__
 #define __NYMBLE_PSEUDONYM_MANAGER_H__
 
-#include <openssl/hmac.h>
-
 #include "nymble.h"
 
 #include "nymble_pseudonym.pb.h"

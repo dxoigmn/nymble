@@ -1,16 +1,14 @@
 #!/usr/bin/env ruby
 
+$: << File.expand_path(File.join(File.dirname(__FILE__), '..'))
+
 require 'rubygems'
 require 'test/spec'
 require 'nymble'
 
 context 'Pseudonym Manager' do
-  before(:each) do
-    @cur_link_window = 10
-    @cur_time_period = 2
-    @hmac_key_np = Nymble.digest('hmac_key_np')
-    @user_id = Nymble.digest('user_id')
-    @pm = Nymble::PseudonymManager.new(@hmac_key_np)
+  before do
+    @@pm = Nymble::PseudonymManager.new('mac_key_np')
   end
   
   it 'should be defined under Nymble' do
@@ -18,31 +16,31 @@ context 'Pseudonym Manager' do
   end
   
   it 'should be creatable with a valid hmac key' do
-    Nymble::PseudonymManager.new(@hmac_key_np).should.not.be.nil
-  end
-  
-  it 'should not be creatable with a invalid hmac key' do
-    should.raise(ArgumentError) { Nymble::PseudonymManager.new() }
-    should.raise(ArgumentError) { Nymble::PseudonymManager.new(@hmac_key_np * 2) }
-    should.raise(ArgumentError) { Nymble::PseudonymManager.new(@hmac_key_np.slice(0, @hmac_key_np.size / 2)) }
+    @@pm.should.not.be.nil
   end
   
   it 'should manage the link window' do
-    @pm.should.respond_to?(:link_window=)
-    @pm.link_window = @cur_link_window
-    @pm.should.respond_to?(:link_window)
-    @pm.link_window.should.equal(@cur_link_window)
+    @@pm.should.respond_to?(:link_window=)
+    @@pm.should.respond_to?(:link_window)
+    
+    @@pm.link_window = 10
+    @@pm.link_window.should.equal(10)
   end
   
   it 'should manage the time period' do
-    @pm.should.respond_to?(:time_period=)
-    @pm.time_period = @cur_time_period
-    @pm.should.respond_to?(:time_period)
-    @pm.time_period.should.equal(@cur_time_period)
+    @@pm.should.respond_to?(:time_period=)
+    @@pm.should.respond_to?(:time_period)
+    
+    @@pm.time_period = 5
+    @@pm.time_period.should.equal(5)
   end
   
   it 'should create pseudonyms' do
-    @pm.should.respond_to?(:create_pseudonym)
-    @pm.create_pseudonym(@user_id).should.not.be.nil
+    @@pm.should.respond_to?(:create_pseudonym)
+    
+    pseudonym = @@pm.create_pseudonym('user_id')
+    
+    pseudonym.should.not.be.nil
+    pseudonym.should.equal(@@pm.create_pseudonym('user_id'))
   end
 end

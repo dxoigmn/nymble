@@ -4,6 +4,9 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <openssl/aes.h>
+#include <openssl/rsa.h>
+#include <openssl/hmac.h>
+#include <openssl/pem.h>
 
 #define DIGEST_SIZE       SHA256_DIGEST_LENGTH
 #define CIPHER_BLOCK_SIZE AES_BLOCK_SIZE

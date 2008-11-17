@@ -7,15 +7,14 @@ VALUE rb_pm_new(VALUE rb_self)
   return Data_Wrap_Struct(rb_self, NULL, rb_pm_delete, new Nymble::PseudonymManager());
 }
 
-VALUE rb_pm_init(VALUE rb_self, VALUE rb_hmac_key_np)
+VALUE rb_pm_init(VALUE rb_self, VALUE rb_mac_key_np)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cPseudonymManager);
-  Check_Type(rb_hmac_key_np, T_STRING);
-  Check_Size(rb_hmac_key_np, DIGEST_SIZE);
+  Check_Type(rb_mac_key_np, T_STRING);
   
   Nymble::PseudonymManager* pm = (Nymble::PseudonymManager*) DATA_PTR(rb_self);
-  std::string hmac_key_np(RSTRING_PTR(rb_hmac_key_np), RSTRING_LEN(rb_hmac_key_np));
+  std::string hmac_key_np(RSTRING_PTR(rb_mac_key_np), RSTRING_LEN(rb_mac_key_np));
   
   pm->setMacKeyNP(hmac_key_np);
   
@@ -75,7 +74,6 @@ VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id)
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cPseudonymManager);
   Check_Type(rb_user_id, T_STRING);
-  Check_Size(rb_user_id, DIGEST_SIZE);
   
   Nymble::PseudonymManager* pm = (Nymble::PseudonymManager*) DATA_PTR(rb_self);
   std::string user_id(RSTRING_PTR(rb_user_id), RSTRING_LEN(rb_user_id));
