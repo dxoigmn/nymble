@@ -318,9 +318,85 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
 
 bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out)
 {
+  NymbleManagerEntry* entry = findServer(sid);
+  
+  if (entry != NULL) {
+    return false;
+  }
+  
+  for (int i = 0; i < clist.complaints_size(); i++) {
+    std::string ctxt = clist.complaints(i).ticket().ctxt();
+    
+    EVP_CIPHER_CTX cipher_ctx;
+    char buffer[1024];
+    int buffer_len;
+    int final_len;
+    std::string iv = ctxt.substr(0, CIPHER_BLOCK_SIZE);
+    std::string cipher = ctxt.substr(CIPHER_BLOCK_SIZE, ctxt.size());
+    
+    EVP_CIPHER_CTX_init(&cipher_ctx);
+    EVP_DecryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.c_str(), (u_char*)iv.c_str());
+    EVP_DecryptUpdate(&cipher_ctx, (u_char*)buffer, &buffer_len, (u_char*)cipher.c_str(), cipher.size());
+    EVP_DecryptFinal_ex(&cipher_ctx, (u_char*)buffer + buffer_len, &final_len);
+    EVP_CIPHER_CTX_cleanup(&cipher_ctx);
+    
+    std::string nymble0(buffer, DIGEST_SIZE);
+    std::string seed(buffer + DIGEST_SIZE, DIGEST_SIZE);
+    
+    bool already_blacklisted = false;
+    
+    for (int j = 0; j < blist.nymbles_size(); j++) {
+      if (nymble0 == blist.nymbles(j)) {
+        already_blacklisted = true;
+      }
+    }
+    
+    if (already_blacklisted) {
+      std::string random;
+      random_bytes(DIGEST_SIZE, &random);
+      blist_out->add_nymbles(random);
+    } else {
+      blist_out->add_nymbles(nymble0);
+    }
+  }
+  
+  std::string daisy_l;
+  random_bytes(DIGEST_SIZE, &daisy_l);
   
   
-  return false;
+  char h[] = "h";
+  char hash[DIGEST_SIZE];
+  SHA256_CTX ctx;
+  
+  memcpy(hash, (u_char*)daisy_l.c_str(), sizeof(hash));
+  
+  for (u_int i = 0; i < TIME_PERIODS - this->cur_time_period + 1; i++) {
+    SHA256_Init(&ctx);
+    SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
+    SHA256_Update(&ctx, (u_char*)h, sizeof(h));
+    SHA256_Final((u_char*)hash, &ctx);
+  }
+  
+  std::string target = std::string(hash, sizeof(hash));
+  
+  Blacklist combined_blist;
+  
+  for (int i = 0; i < blist.nymbles_size(); i++) {
+    combined_blist.add_nymbles(blist.nymbles(i));
+  }
+  
+  for (int i = 0; i < blist_out->nymbles_size(); i++) {
+    combined_blist.add_nymbles(blist_out->nymbles(i));
+  }
+  
+  if (!signBlacklist(sid, target, &combined_blist, cert_out)) {
+    return false;
+  }
+  
+  entry->setDaisyL(daisy_l);
+  entry->setTimeLastUpdated(this->cur_time_period);
+  
+  return true;
 }
 
 bool NymbleManager::computeTokens(u_int t_prime, Blacklist* blist, Complaints clist, Seeds* seeds)
