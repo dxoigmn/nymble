@@ -4,11 +4,7 @@ namespace Nymble {
 
 PseudonymManager::PseudonymManager()
 {
-  char nym_key_p[DIGEST_SIZE];
-  
-  RAND_bytes((u_char*)nym_key_p, sizeof(nym_key_p));
-  
-  this->nym_key_p = std::string(nym_key_p, sizeof(nym_key_p));
+  random_bytes(DIGEST_SIZE, this->nym_key_p);
 }
 
 void PseudonymManager::setMacKeyNP(std::string mac_key_np)
