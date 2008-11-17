@@ -79,13 +79,14 @@ VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id)
   std::string user_id(RSTRING_PTR(rb_user_id), RSTRING_LEN(rb_user_id));
   Nymble::Pseudonym pseudonym;
   
-  if (pm->createPseudonym(user_id, pseudonym)) {
-    std::string pseudonym_str;
-    pseudonym.SerializeToString(&pseudonym_str);
-    return rb_str_new(pseudonym_str.c_str(), pseudonym_str.length());
+  if (!pm->createPseudonym(user_id, &pseudonym)) {
+    return Qnil;
   }
   
-  return Qnil;
+  std::string pseudonym_str;
+  pseudonym.SerializeToString(&pseudonym_str);
+  
+  return rb_str_new(pseudonym_str.c_str(), pseudonym_str.length());
 }
 
 void rb_pm_delete(Nymble::PseudonymManager* pm)
