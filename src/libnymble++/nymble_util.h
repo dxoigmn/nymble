@@ -3,19 +3,24 @@
 
 #include <openssl/rand.h>
 #include <openssl/sha.h>
+#include <openssl/aes.h>
 
-#include <stdio.h>
-#include <string.h>
+#define DIGEST_SIZE       SHA256_DIGEST_LENGTH
+#define CIPHER_BLOCK_SIZE AES_BLOCK_SIZE
+#define SIGNATURE_SIZE    256
+#define CTXT_SIZE         (CIPHER_BLOCK_SIZE + DIGEST_SIZE + DIGEST_SIZE + CIPHER_BLOCK_SIZE)
+
+#include <string>
 
 namespace Nymble {
 
 typedef unsigned char u_char;
 typedef unsigned int  u_int;
 
-void digest(u_char* in, u_int size, u_char* out);
-void random_bytes(u_int size, u_char* out);
-u_int hexencode(u_char* in, u_int size, char* out = NULL);
-u_int hexdecode(char* in, u_char* out = NULL);
+void digest(std::string in, std::string& out);
+void random_bytes(size_t size, std::string& out);
+void hexencode(std::string in, std::string& out);
+void hexdecode(std::string in, std::string& out);
 
 }; // namespace Nymble
 

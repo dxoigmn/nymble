@@ -29,12 +29,13 @@ context 'Nymble' do
   end
   
   it 'should be able to hexencode & hexdecode' do
-    s = ""
-    (0..255).each { |i| s << i.chr }
+    s = (0..255).to_a.map { |i| i.chr }.join
     
     Nymble.hexdecode(Nymble.hexencode(s)).should.equal(s)
   end
 end
+
+__END__
 
 context 'Pseudonym' do
   before(:each) do

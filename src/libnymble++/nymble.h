@@ -5,11 +5,6 @@
 
 #include "nymble_util.h"
 
-#define DIGEST_SIZE       SHA256_DIGEST_LENGTH
-#define CIPHER_BLOCK_SIZE AES_BLOCK_SIZE
-#define SIGNATURE_SIZE    256
-#define CTXT_SIZE         (CIPHER_BLOCK_SIZE + DIGEST_SIZE + DIGEST_SIZE + CIPHER_BLOCK_SIZE)
-
 namespace Nymble {
 
 class Nymble

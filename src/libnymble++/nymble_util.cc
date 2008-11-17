@@ -2,41 +2,45 @@
 
 namespace Nymble {
 
-void digest(u_char* in, u_int size, u_char* out) {
+void digest(std::string in, std::string& out)
+{
+  char buffer[DIGEST_SIZE];
+  
   SHA256_CTX ctx;
   SHA256_Init(&ctx);
-  SHA256_Update(&ctx, in, size);
-  SHA256_Final(out, &ctx);
+  SHA256_Update(&ctx, in.c_str(), in.size());
+  SHA256_Final((u_char*)buffer, &ctx);
+  
+  out = std::string(buffer, sizeof(buffer));
 }
 
-void random_bytes(u_int size, u_char* out) {
-  RAND_bytes(out, size);
-}
-
-u_int hexencode(u_char* in, u_int size, char* out)
+void random_bytes(size_t size, std::string& out)
 {
-  if (out) {
-    for (u_int i = 0; i < size; i++) {
-      sprintf(out + i*2, "%02x", (u_char) in[i]);
-    }
-
-    out[size*2] = 0;
-  }
-
-  return size*2 + 1;
+  char buffer[size];
+  
+  RAND_bytes((u_char*)buffer, size);
+  
+  out = std::string(buffer, sizeof(buffer));
 }
 
-u_int hexdecode(char* in, u_char* out)
+void hexencode(std::string in, std::string& out)
 {
-  u_int len = strlen(in) / 2;
-
-  if (out) {
-    for (u_int i = 0; i < len; i++) {
-      sscanf(in + i*2, "%02x", (u_int*) (out + i));
-    }
+  char buffer[] = "00";
+  
+  for (size_t i = 0; i < in.size(); i++) {
+    sprintf(buffer, "%02x", (u_char)in[i]);
+    out += buffer;
   }
+}
 
-  return len;
+void hexdecode(std::string in, std::string& out)
+{
+  char buffer;
+  
+  for (size_t i = 0; i < in.size(); i += 2) {
+    sscanf(in.substr(i, 2).c_str(), "%02x", (u_int*)&buffer);
+    out += buffer;
+  }
 }
 
 }; // namespace Nymble
