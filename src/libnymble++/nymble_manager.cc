@@ -163,15 +163,18 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pseudonym, Crede
 
 bool NymbleManager::verifyTicket(std::string sid, Ticket ticket)
 {
-  NymbleManagerEntry* entry = findServer(sid);
+  char mac[DIGEST_SIZE];
+  HMAC_CTX hmac_ctx;
   
-  if (entry == NULL) {
-    return false;
-  }
+  HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
+  HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
+  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
+  HMAC_Update(&hmac_ctx, (u_char*)ticket.nymble().c_str(), ticket.nymble().size());
+  HMAC_Update(&hmac_ctx, (u_char*)ticket.ctxt().c_str(), ticket.ctxt().size());
+  HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
   
-  // IMPLEMENT
-  
-  return false;
+  return (ticket->mac() == std::string(mac, sizeof(mac));
 }
 
 bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist blist, BlacklistCert* cert)
