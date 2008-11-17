@@ -4,35 +4,22 @@ namespace Nymble {
 
 NymbleManager::NymbleManager()
 {
-  RAND_bytes(this->mac_key_n, DIGEST_SIZE);
-  RAND_bytes(this->seed_key_n, DIGEST_SIZE);
-  RAND_bytes(this->enc_key_n, CIPHER_BLOCK_SIZE);
-  
-  this->entries = new NymbleManagerEntries();
+  random_bytes(DIGEST_SIZE, this->mac_key_np);
+  random_bytes(DIGEST_SIZE, this->mac_key_n);
+  random_bytes(DIGEST_SIZE, this->seed_key_n);
+  random_bytes(CIPHER_BLOCK_SIZE, this->enc_key_n);
+  RSA_generate_key(SIGNATURE_SIZE * 8, 65537, NULL, NULL);
+  this->entries();
 }
 
 NymbleManager::~NymbleManager()
 {
-  RSA_free(this->sign_key_n);
-  
   for (NymbleManagerEntries::iterator entry = this->entries->begin(); entry != this->entries->end(); entry++) {
     delete *entry;
   }
-  
-  delete this->entries;
 }
 
-u_char* NymbleManager::getMacKeyN()
-{
-  return this->mac_key_n;
-}
-
-u_char* NymbleManager::getEncryptKeyN()
-{
-  return this->enc_key_n;
-}
-
-void NymbleManager::setMacKeyNP(u_char* mac_key_np)
+void NymbleManager::setMacKeyNP(std::string mac_key_np)
 {
   memcpy(this->mac_key_np, mac_key_np, DIGEST_SIZE);
 }
@@ -41,27 +28,15 @@ void NymbleManager::readSignKey(char* sign_key_path)
 {
   FILE* sign_key = fopen(sign_key_path, "r");
   
-  this->sign_key_n = PEM_read_RSAPrivateKey(sign_key, NULL, NULL, NULL);
+  PEM_read_RSAPrivateKey(sign_key, this->sign_key_n, NULL, NULL);
   
   fclose(sign_key);
 }
 
-u_char* NymbleManager::addServer(u_char* server_id)
-{
-  NymbleManagerEntry* entry = this->findServer(server_id);
-  
-  if (entry == NULL) {
-    entry = new NymbleManagerEntry(server_id, this->cur_time_period);
-    this->entries->push_back(entry);
-  }
-  
-  return entry->getMacKeyNS();
-}
-
-NymbleManagerEntry* NymbleManager::findServer(u_char *server_id)
+NymbleManagerEntry* NymbleManager::findServer(std::string sid)
 {
   for (NymbleManagerEntries::iterator entry = this->entries->begin(); entry != this->entries->end(); entry++) {
-    if (memcmp((*entry)->getServerId(), server_id, DIGEST_SIZE) == 0) {
+    if (memcmp((*entry)->getServerId(), sid, DIGEST_SIZE) == 0) {
       return *entry;
     }
   }
@@ -75,193 +50,86 @@ bool NymbleManager::verifyPseudonym(Pseudonym* pseudonym)
   HMAC_CTX ctx;
 
   HMAC_Init(&ctx, this->mac_key_np, DIGEST_SIZE, EVP_sha256());
-  HMAC_Update(&ctx, pseudonym->getPseudonym(), DIGEST_SIZE);
-  HMAC_Update(&ctx, (u_char *)&this->cur_link_window, sizeof(this->cur_link_window));
+  HMAC_Update(&ctx, pseudonym->nym().c_str(), DIGEST_SIZE);
+  HMAC_Update(&ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&ctx, mac, NULL);
 
-  return (memcmp(mac, pseudonym->getMacNP(), DIGEST_SIZE) == 0);
+  return (memcmp(mac, pseudonym->mac().c_str(), DIGEST_SIZE) == 0);
 }
 
-bool NymbleManager::verifyBlacklist(u_char* server_id, Blacklist* blacklist)
+
+bool NymbleManager::createCredential(std::string sid, Pseudonym* pseudonym, Credential* credential);
 {
-  NymbleManagerEntry* entry = findServer(server_id);
+  NymbleManagerEntry* entry = findServer(sid);
   
   if (entry == NULL) {
     return false;
   }
   
-  bool valid = true;
-  
-  if (memcmp(entry->getServerId(), blacklist->getServerId(), DIGEST_SIZE) != 0) {
-    valid = false;
-  }
-  
-  u_char bl_hash[DIGEST_SIZE];
-  blacklist->hash(bl_hash);
-  
-  if (memcmp(bl_hash, blacklist->getHash(), DIGEST_SIZE) != 0) {
-    valid = false;
-  }
-  
-  u_char bmac_n[DIGEST_SIZE];
-  blacklist->hmac(this->mac_key_n, bmac_n);
-
-  if (memcmp(bmac_n, blacklist->getHmac(), DIGEST_SIZE) != 0) {
-    valid = false;
-  }
-  
-  if (blacklist->getLinkWindow() != this->cur_link_window) {
-    valid = false;
-  }
-  
-  if (blacklist->getTimePeriod() != entry->getLastUpdated()) {
-    valid = false;
-  }
-
-  return valid;
-}
-
-Blacklist* NymbleManager::createBlacklist(u_char* server_id)
-{
-  NymbleManagerEntry* entry = findServer(server_id);
-  
-  if (entry == NULL) {
-    return NULL;
-  }
-  
-  Blacklist *blacklist = new Blacklist(entry->getServerId(), this->cur_link_window, this->cur_time_period);
-  
-  blacklist->hash();
-  blacklist->hmac(this->mac_key_n);
-  blacklist->sign(this->sign_key_n);
-  
-  return blacklist;
-}
-
-Blacklist* NymbleManager::updateBlacklist(u_char* server_id, Blacklist* blacklist, Complaints* complaints)
-{
-  NymbleManagerEntry* entry = findServer(server_id);
-  
-  if (entry == NULL) {
-    return NULL;
-  }
-  
-  Blacklist* new_blacklist = new Blacklist(blacklist->getServerId(), this->cur_link_window, this->cur_time_period);
-  
-  for (Nymbles::iterator nymble = blacklist->begin(); nymble != blacklist->end(); ++nymble) {
-    u_char* new_nymble = new u_char[DIGEST_SIZE];
-    memcpy(new_nymble, *nymble, DIGEST_SIZE);
-    new_blacklist->push_back(new_nymble);
-  }
-  
-  if (!complaints->empty()) {
-    for (Complaints::iterator complaint = complaints->begin(); complaint != complaints->end(); ++complaint) {
-      u_char* new_nymble = new u_char[DIGEST_SIZE];
-      u_char pseudonym[DIGEST_SIZE];
-      u_char seed[DIGEST_SIZE];
-      u_char nymble0[DIGEST_SIZE];
-      Ticket* ticket = (*complaint)->getTicket();
-      
-      // Compute the nymble0 for the current complaint ticket
-      ticket->decrypt(this->enc_key_n, NULL, pseudonym);
-      this->seed(entry, pseudonym, seed);
-      Ticket::computeNymble(seed, nymble0);
-      
-      if (this->userIsBlacklisted(new_blacklist, nymble0)) {
-        RAND_bytes(new_nymble, DIGEST_SIZE);
-      } else {
-        memcpy(new_nymble, nymble0, DIGEST_SIZE);
-      }
-      
-      new_blacklist->push_back(new_nymble);
-    }
-  }
-  
-  new_blacklist->hash();
-  new_blacklist->hmac(this->mac_key_n);
-  new_blacklist->sign(this->sign_key_n);
-  
-  entry->setLastUpdated(this->cur_time_period);
-  
-  return new_blacklist;
-}
-
-Tokens* NymbleManager::createTokens(u_char* server_id, Blacklist* blacklist, Complaints* complaints)
-{
-  NymbleManagerEntry* entry = findServer(server_id);
-  
-  if (entry == NULL) {
-    return NULL;
-  }
-  
-  Tokens* tokens = new Tokens();
-  
-  for (Complaints::iterator complaint = complaints->begin(); complaint != complaints->end(); ++complaint) {
-    u_char trapdoor[DIGEST_SIZE];
-    u_char pseudonym[DIGEST_SIZE];
-    u_char seed[DIGEST_SIZE];
-    u_char nymble0[DIGEST_SIZE];
-    Ticket* ticket = (*complaint)->getTicket();
-    
-    ticket->decrypt(this->enc_key_n, trapdoor, pseudonym);
-    this->seed(entry, pseudonym, seed);
-    Ticket::computeNymble(seed, nymble0);
-    
-    if (this->userIsBlacklisted(blacklist, nymble0)) {
-      RAND_bytes(trapdoor, DIGEST_SIZE);
-    } else {
-      u_int delta = this->cur_time_period - (*complaint)->getTime();
-      
-      Ticket::evolveSeed(trapdoor, delta, trapdoor);
-      
-      // FIXME: This should add nymble0 to be checked in userIsBlacklisted.
-    }
-    
-    tokens->push_back(new Token(trapdoor));
-  }
-  
-  return tokens;
-}
-
-bool NymbleManager::verifyTicket(Ticket* ticket, u_char* sid)
-{
-  return ticket->verify(this->mac_key_n, sid, this->cur_time_period, this->cur_link_window);
-}
-
-bool NymbleManager::userIsBlacklisted(Nymbles* nymbles, u_char* nymble0)
-{
-  for (Nymbles::iterator nymble = nymbles->begin(); nymble != nymbles->end(); ++nymble) {
-    if (memcmp(nymble0, *nymble, DIGEST_SIZE) == 0) {
-      return true;
-    }
-  }
+  // IMPLEMENT
   
   return false;
 }
 
-Credential* NymbleManager::createCredential(u_char* server_id, Pseudonym* pseudonym, u_int time_periods)
+bool NymbleManager::verifyTicket(std::string sid, Ticket* ticket)
 {
-  NymbleManagerEntry* entry = findServer(server_id);
+  NymbleManagerEntry* entry = findServer(sid);
   
   if (entry == NULL) {
-    return NULL;
+    return false;
   }
   
-  Credential* credential = new Credential(this, entry, pseudonym, time_periods);
+  // IMPLEMENT
   
-  return credential;
+  return false;
 }
 
-void NymbleManager::seed(NymbleManagerEntry *entry, u_char *pseudonym, u_char *out)
+bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist* blist, BlacklistCert* cert)
 {
-  HMAC_CTX ctx;
+  NymbleManagerEntry* entry = findServer(sid);
   
-  HMAC_Init(&ctx, this->seed_key_n, DIGEST_SIZE, EVP_sha256());
-  HMAC_Update(&ctx, pseudonym, DIGEST_SIZE);
-  HMAC_Update(&ctx, entry->getServerId(), DIGEST_SIZE);
-  HMAC_Update(&ctx, (u_char *)&this->cur_link_window, sizeof(this->cur_link_window));
-  HMAC_Final(&ctx, out, NULL);
-  HMAC_CTX_cleanup(&ctx);
+  if (entry == NULL) {
+    return false;
+  }
+  
+  // IMPLEMENT
+  
+  return false;
+}
+
+bool NymbleManager::verifyBlacklist(std::string sid, Blacklist* blist, BlacklistCert* cert)
+{
+  NymbleManagerEntry* entry = findServer(sid);
+  
+  if (entry == NULL) {
+    return false;
+  }
+  
+  // IMPLEMENT
+  
+  return false;
+}
+
+
+bool NymbleManager::registerServer(std::string sid, Server* server)
+{
+  // IMPLEMENT
+  
+  return false;
+}
+
+bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist* blist, Complaints clist)
+{
+  // IMPLEMENT
+  
+  return false;
+}
+
+bool NymbleManager::computeTokens(u_int t_prime, Blacklist* blist, Complaints clist)
+{
+  // IMPLEMENT
+  
+  return false;
 }
 
 }; // namespace Nymble
