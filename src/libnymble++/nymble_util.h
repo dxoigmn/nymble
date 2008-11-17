@@ -20,10 +20,10 @@ namespace Nymble {
 typedef unsigned char u_char;
 typedef unsigned int  u_int;
 
-void digest(std::string in, std::string& out);
-void random_bytes(size_t size, std::string& out);
-void hexencode(std::string in, std::string& out);
-void hexdecode(std::string in, std::string& out);
+void digest(std::string in, std::string* out);
+void random_bytes(size_t size, std::string* out);
+void hexencode(std::string in, std::string* out);
+void hexdecode(std::string in, std::string* out);
 
 }; // namespace Nymble
 

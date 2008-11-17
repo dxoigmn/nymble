@@ -59,7 +59,7 @@ VALUE rb_nymble_digest(VALUE rb_self, VALUE rb_value)
   std::string in(RSTRING_PTR(rb_value), RSTRING_LEN(rb_value));
   std::string out;
   
-  Nymble::digest(in, out);
+  Nymble::digest(in, &out);
   
   return rb_str_new(out.c_str(), out.size());
 }
@@ -71,7 +71,7 @@ VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count)
   size_t size = NUM2UINT(rb_count);
   std::string out;
   
-  Nymble::random_bytes(size, out);
+  Nymble::random_bytes(size, &out);
   
   return rb_str_new(out.c_str(), out.size());
 }
@@ -83,7 +83,7 @@ VALUE rb_nymble_hexencode(VALUE rb_self, VALUE rb_string)
   std::string in(RSTRING_PTR(rb_string), RSTRING_LEN(rb_string));
   std::string out;
   
-  Nymble::hexencode(in, out);
+  Nymble::hexencode(in, &out);
   
   return rb_str_new(out.c_str(), out.size());
 }
@@ -95,7 +95,7 @@ VALUE rb_nymble_hexdecode(VALUE rb_self, VALUE rb_string)
   std::string in(RSTRING_PTR(rb_string), RSTRING_LEN(rb_string));
   std::string out;
   
-  Nymble::hexdecode(in, out);
+  Nymble::hexdecode(in, &out);
   
   return rb_str_new(out.c_str(), out.size());
 }
