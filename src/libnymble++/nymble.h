@@ -1,8 +1,6 @@
 #ifndef __NYMBLE_H__
 #define __NYMBLE_H__
 
-#include <vector>
-
 #include "nymble_util.h"
 
 namespace Nymble {
