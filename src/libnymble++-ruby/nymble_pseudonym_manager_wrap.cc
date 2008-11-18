@@ -84,7 +84,10 @@ VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id)
   }
   
   std::string pseudonym_str;
-  pseudonym.SerializeToString(&pseudonym_str);
+  
+  if (!pseudonym.SerializeToString(&pseudonym_str)) {
+    return Qnil;
+  }
   
   return rb_str_new(pseudonym_str.c_str(), pseudonym_str.length());
 }

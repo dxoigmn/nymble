@@ -7,7 +7,7 @@ require 'test/spec'
 require 'nymble'
 
 context 'Pseudonym Manager' do
-  before do
+  before(:all) do
     @@pm = Nymble::PseudonymManager.new('mac_key_np')
   end
   
