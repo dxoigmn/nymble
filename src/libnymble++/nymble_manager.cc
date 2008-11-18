@@ -128,7 +128,7 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
   
   computeNymble(seed, &nymble0);
   
-  for (int t = 1; t < TIME_PERIODS; t++) {
+  for (u_int t = 1; t <= TIME_PERIODS; t++) {
     evolveSeed(seed, 1, &seed);
     computeNymble(seed, &nymble);
     

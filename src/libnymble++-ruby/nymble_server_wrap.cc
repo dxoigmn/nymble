@@ -117,6 +117,28 @@ VALUE rb_server_blacklist_cert(VALUE rb_self)
   return rb_str_new(cert_str.c_str(), cert_str.size());
 }
 
+VALUE rb_server_valid_ticket(VALUE rb_self, VALUE rb_ticket_str)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cServer);
+  Check_Type(rb_ticket_str, T_STRING);
+  
+  Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
+  std::string ticket_str(RSTRING_PTR(rb_ticket_str), RSTRING_LEN(rb_ticket_str));
+  
+  Nymble::Ticket ticket;
+  
+  if (!ticket.ParseFromString(ticket_str)) {
+    return Qfalse;
+  }
+  
+  if (!server->verifyTicket(ticket)) {
+    return Qfalse;
+  }
+  
+  return Qtrue;
+}
+
 void rb_server_delete(Nymble::Server* server)
 {
   delete server;

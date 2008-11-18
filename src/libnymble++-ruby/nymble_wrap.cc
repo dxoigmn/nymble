@@ -43,6 +43,7 @@ void Init_nymble() {
   rb_define_method(rb_cServer, "time_period=", RUBY_METHOD_FUNC(rb_server_time_period_set), 1);
   rb_define_method(rb_cServer, "blacklist", RUBY_METHOD_FUNC(rb_server_blacklist), 0);
   rb_define_method(rb_cServer, "cert", RUBY_METHOD_FUNC(rb_server_blacklist_cert), 0);
+  rb_define_method(rb_cServer, "valid_ticket?", RUBY_METHOD_FUNC(rb_server_valid_ticket), 1);
 #endif
 
 #ifdef __NYMBLE_USER_WRAP_H__

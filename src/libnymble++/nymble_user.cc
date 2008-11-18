@@ -65,11 +65,11 @@ Ticket* User::getTicket(std::string sid)
   
   Credential* cred = entry->getCredential();
   
-  if (this->cur_time_period < 0 || this->cur_time_period > (u_int)cred->tickets_size()) {
+  if (this->cur_time_period < 1 || this->cur_time_period >= (u_int)cred->tickets_size()) {
     return NULL;
   }
   
-  return cred->mutable_tickets(this->cur_time_period);
+  return cred->mutable_tickets(this->cur_time_period - 1);
 }
 
 bool User::isBlacklisted(std::string sid, Blacklist blist, BlacklistCert cert)

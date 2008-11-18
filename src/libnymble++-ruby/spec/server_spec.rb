@@ -11,6 +11,7 @@ context 'Server' do
     @@nm = Nymble::NymbleManager.new
     @@nm.link_window = 10
     @@nm.time_period = 5
+    @@nm.write_verify_key_n('verify_key_n.pem')
     
     @@pm = Nymble::PseudonymManager.new(@@nm.mac_key_np)
     @@pm.link_window = 10
@@ -26,6 +27,20 @@ context 'Server' do
     @@server.should.not.be.nil
   end
   
+  it 'should manage the link window' do
+    @@server.should.respond_to?(:link_window=)
+    @@server.link_window = 10
+    @@server.should.respond_to?(:link_window)
+    @@server.link_window.should.equal(10)
+  end
+  
+  it 'should manage the time period' do
+    @@server.should.respond_to?(:time_period=)
+    @@server.time_period = 5
+    @@server.should.respond_to?(:time_period)
+    @@server.time_period.should.equal(5)
+  end
+  
   it 'should manage blacklist' do
     @@server.should.respond_to?(:blacklist)
     @@server.blacklist.should.not.be.nil
@@ -34,5 +49,13 @@ context 'Server' do
   it 'should manage cert' do
     @@server.should.respond_to?(:cert)
     @@server.cert.should.not.be.nil
+  end
+  
+  it 'should validate tickets' do
+    user = Nymble::User.new(@@pm.create_pseudonym('user_id'), 'verify_key_n.pem')
+    user.link_window = 10
+    user.time_period = 5
+    user.add_credential('server_id', @@nm.create_credential('server_id', user.pseudonym))
+    @@server.should.valid_ticket?(user.ticket('server_id'))
   end
 end
