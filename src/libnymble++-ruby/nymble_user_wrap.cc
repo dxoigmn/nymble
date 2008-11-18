@@ -1,24 +1,34 @@
 #include "nymble_user_wrap.h"
 
+VALUE rb_cUser;
+
 VALUE rb_user_new(VALUE rb_self)
 {
   return Data_Wrap_Struct(rb_self, NULL, rb_user_delete, new Nymble::User());
 }
 
-VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym, VALUE rb_verify_key_path)
+VALUE rb_user_init(VALUE rb_self, VALUE rb_pseudonym_str, VALUE rb_verify_key_path)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cUser);
-  Check_Type(rb_pseudonym, T_DATA);
-  Check_Class(rb_pseudonym, rb_cPseudonym);
+  Check_Type(rb_pseudonym_str, T_STRING);
   Check_Type(rb_verify_key_path, T_STRING);
   
   Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
-  Nymble::Pseudonym* pseudonym = (Nymble::Pseudonym*) DATA_PTR(rb_pseudonym);
-  char* verify_key_path = RSTRING_PTR(rb_verify_key_path);
+  std::string pseudonym_str(RSTRING_PTR(rb_pseudonym_str), RSTRING_LEN(rb_pseudonym_str));
+  std::string verify_key_path(RSTRING_PTR(rb_verify_key_path), RSTRING_LEN(rb_verify_key_path));
+  
+  Nymble::Pseudonym pseudonym;
+  
+  if (!pseudonym.ParseFromString(pseudonym_str)) {
+    return Qnil;
+  }
   
   user->setPseudonym(pseudonym);
-  user->readVerifyKey(verify_key_path);
+  
+  if (!user->readVerifyKeyN(verify_key_path)) {
+    return Qnil;
+  }
   
   return rb_self;
 }
@@ -71,82 +81,103 @@ VALUE rb_user_time_period_set(VALUE rb_self, VALUE rb_time_period)
   return rb_self;
 }
 
-
 VALUE rb_user_pseudonym(VALUE rb_self)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cUser);
   
   Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
+  Nymble::Pseudonym* pseudonym = user->getPseudonym();
   
-  return Data_Wrap_Struct(rb_cPseudonym, NULL, NULL, user->getPseudonym());
+  if (pseudonym == NULL) {
+    return Qnil;
+  }
+  
+  std::string pseudonym_str;
+  
+  if (!pseudonym->SerializeToString(&pseudonym_str)) {
+    return Qnil;
+  }
+  
+  return rb_str_new(pseudonym_str.c_str(), pseudonym_str.size());
 }
 
-VALUE rb_user_add_blacklist(VALUE rb_self, VALUE rb_server_id, VALUE rb_blacklist)
+VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_credential_str)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cUser);
-  Check_Type(rb_server_id, T_STRING);
-  Check_Size(rb_server_id, DIGEST_SIZE);
-  Check_Type(rb_blacklist, T_DATA);
-  Check_Class(rb_blacklist, rb_cBlacklist);
+  Check_Type(rb_sid, T_STRING);
+  Check_Type(rb_credential_str, T_STRING);
   
   Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
-  u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
-  Nymble::Blacklist* blacklist = (Nymble::Blacklist*) DATA_PTR(rb_blacklist);
+  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
+  std::string credential_str(RSTRING_PTR(rb_credential_str), RSTRING_LEN(rb_credential_str));
   
-  Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
+  Nymble::Credential credential;
   
-  if (user->verifyBlacklist(blacklist)) {
-    entry->setBlacklist(blacklist);
-    
+  if (!credential.ParseFromString(credential_str)) {
+    return Qfalse;
+  }
+  
+  user->addCredential(sid, credential);
+  
+  return Qtrue;
+}
+
+VALUE rb_user_ticket(VALUE rb_self, VALUE rb_sid)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  Check_Type(rb_sid, T_STRING);
+  
+  Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
+  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
+  
+  Nymble::Ticket* ticket = user->getTicket(sid);
+  
+  if (ticket == NULL) {
+    return Qnil;
+  }
+  
+  std::string ticket_str;
+  
+  if (!ticket->SerializeToString(&ticket_str)) {
+    return Qnil;
+  }
+  
+  return rb_str_new(ticket_str.c_str(), ticket_str.size());
+}
+
+VALUE rb_user_blacklisted(VALUE rb_self, VALUE rb_sid, VALUE rb_blacklist_str, VALUE rb_cert_str)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cUser);
+  Check_Type(rb_sid, T_STRING);
+  Check_Type(rb_blacklist_str, T_STRING);
+  Check_Type(rb_cert_str, T_STRING);
+  
+  Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
+  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
+  std::string blacklist_str(RSTRING_PTR(rb_blacklist_str), RSTRING_LEN(rb_blacklist_str));
+  std::string cert_str(RSTRING_PTR(rb_cert_str), RSTRING_LEN(rb_cert_str));
+  
+  Nymble::Blacklist blacklist;
+  
+  if (!blacklist.ParseFromString(blacklist_str)) {
+    return Qtrue; // Assume blacklisted
+  }
+  
+  Nymble::BlacklistCert cert;
+  
+  if (!cert.ParseFromString(cert_str)) {
+    return Qtrue; // Assume blacklisted
+  }
+  
+  if (user->isBlacklisted(sid, blacklist, cert)) {
     return Qtrue;
   }
   
   return Qfalse;
-}
-
-VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_server_id, VALUE rb_credential)
-{
-  Check_Type(rb_self, T_DATA);
-  Check_Class(rb_self, rb_cUser);
-  Check_Type(rb_credential, T_DATA);
-  Check_Class(rb_credential, rb_cCredential);
-  
-  Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
-  u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
-  Nymble::Credential* credential = (Nymble::Credential*) DATA_PTR(rb_credential);
-  
-  Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
-  
-  entry->setCredential(credential);
-  
-  return Qnil;
-}
-
-VALUE rb_user_ticket(VALUE rb_self, VALUE rb_server_id)
-{
-  Check_Type(rb_self, T_DATA);
-  Check_Class(rb_self, rb_cUser);
-  Check_Type(rb_server_id, T_STRING);
-  Check_Size(rb_server_id, DIGEST_SIZE);
-  
-  Nymble::User* user = (Nymble::User*) DATA_PTR(rb_self);
-  u_char* server_id = (u_char*) RSTRING_PTR(rb_server_id);
-  
-  Nymble::UserEntry* entry = user->findOrCreateEntry(server_id);
-  
-  if (entry->isBlacklisted()) {
-    return Qnil;
-  }
-  
-  Nymble::Ticket* ticket = entry->getTicket(user->getTimePeriod());
-  
-  if (ticket ==  NULL) {
-    return Qnil;
-  }
-  
-  return Data_Wrap_Struct(rb_cTicket, NULL, NULL, ticket);
 }
 
 void rb_user_delete(Nymble::User* user)

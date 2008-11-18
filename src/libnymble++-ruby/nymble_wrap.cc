@@ -51,6 +51,10 @@ void Init_nymble() {
   rb_define_method(rb_cUser, "link_window=", RUBY_METHOD_FUNC(rb_user_link_window_set), 1);
   rb_define_method(rb_cUser, "time_period", RUBY_METHOD_FUNC(rb_user_time_period), 0);
   rb_define_method(rb_cUser, "time_period=", RUBY_METHOD_FUNC(rb_user_time_period_set), 1);
+  rb_define_method(rb_cUser, "pseudonym", RUBY_METHOD_FUNC(rb_user_pseudonym), 0);
+  rb_define_method(rb_cUser, "add_credential", RUBY_METHOD_FUNC(rb_user_add_credential), 2);
+  rb_define_method(rb_cUser, "blacklisted?", RUBY_METHOD_FUNC(rb_user_blacklisted), 3);
+  rb_define_method(rb_cUser, "ticket", RUBY_METHOD_FUNC(rb_user_ticket), 1);
 #endif
 }
 

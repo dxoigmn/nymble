@@ -2,28 +2,22 @@
 #define __NYMBLE_USER_ENTRY_H__
 
 #include "nymble.h"
-#include "nymble_credential.h"
-#include "nymble_blacklist.h"
+
+#include "nymble_credential.pb.h"
 
 namespace Nymble {
 
 class UserEntry
 {
-  u_char  server_id[DIGEST_SIZE];
-  
-  Credential* credential;
-  Blacklist* blacklist;
+  std::string sid;
+  Credential credential;
+  bool has_been_silent;
   
   public:
-    UserEntry();
-    UserEntry(u_char* server_id);
+    UserEntry(std::string sid, Credential credential);
     
-    u_char* getServerId();
-    bool isBlacklisted();
-    Ticket* getTicket(u_int time_period);
-    
-    void setCredential(Credential* credential);
-    void setBlacklist(Blacklist* blacklist);
+    std::string getServerId();
+    Credential* getCredential();
 };
 
 }; // namespace Nymble
