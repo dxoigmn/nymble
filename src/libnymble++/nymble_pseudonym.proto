@@ -1,5 +1,7 @@
 package Nymble;
 
+option optimize_for = SPEED;
+
 message Pseudonym {
   required bytes nym = 1;
   required bytes mac = 2;

@@ -1,5 +1,7 @@
 package Nymble;
 
+option optimize_for = SPEED;
+
 message Ticket {
   required bytes nymble = 1;
   required bytes ctxt = 2;

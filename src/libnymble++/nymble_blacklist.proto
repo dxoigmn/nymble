@@ -1,5 +1,7 @@
 package Nymble;
 
+option optimize_for = SPEED;
+
 message Blacklist {
   repeated bytes nymbles = 2;
 }
