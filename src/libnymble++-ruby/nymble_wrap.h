@@ -5,6 +5,7 @@
 #include "nymble_pseudonym_manager_wrap.h"
 #include "nymble_manager_wrap.h"
 #include "nymble_user_wrap.h"
+#include "nymble_server_wrap.h"
 
 #include "nymble.h"
 
