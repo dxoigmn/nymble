@@ -37,6 +37,7 @@ class NymbleManager : public Nymble
     ~NymbleManager();
     
     std::string getMacKeyNP();
+    bool writeVerifyKeyN(std::string path);
     
     bool verifyPseudonym(Pseudonym pseudonym);
     bool createCredential(std::string sid, Pseudonym pseudonym, Credential* credential);

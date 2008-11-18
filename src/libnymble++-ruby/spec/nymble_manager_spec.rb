@@ -38,13 +38,18 @@ context 'Nymble Manager' do
     @@nm.mac_key_np.should.not.be.nil
   end
   
+  it 'should generate verify_key_n' do
+    @@nm.should.respond_to?(:write_verify_key_n)
+    @@nm.should.write_verify_key_n(File.expand_path(File.join(File.dirname(__FILE__), '..', 'verify_key_n.pem')))
+  end
+  
   it 'should verify pseudonyms' do
     @@pm = Nymble::PseudonymManager.new(@@nm.mac_key_np)
     @@pm.link_window = 10
     pseudonym = @@pm.create_pseudonym('user_id')
     
     @@nm.should.respond_to?(:valid_pseudonym?)
-    @@nm.valid_pseudonym?(pseudonym).should.be(true)
+    @@nm.should.valid_pseudonym?(pseudonym)
   end
   
   it 'should not verify invalid pseudonyms' do
@@ -52,7 +57,7 @@ context 'Nymble Manager' do
     pm.link_window = 11
     pseudonym = pm.create_pseudonym('user_id')
     
-    @@nm.valid_pseudonym?(pseudonym).should.be(false)
+    @@nm.should.not.valid_pseudonym?(pseudonym)
   end
   
   it 'should register servers' do
@@ -74,6 +79,6 @@ context 'Nymble Manager' do
     @@user.time_period = 5
     
     @@nm.should.respond_to?(:valid_ticket?)
-    @@nm.valid_ticket?(@@user.ticket).should.be(true)
+    @@nm.should.valid_ticket?(@@user.ticket)
   end
 end

@@ -69,6 +69,20 @@ std::string NymbleManager::getMacKeyNP()
   return this->mac_key_np;
 }
 
+bool NymbleManager::writeVerifyKeyN(std::string path)
+{
+  FILE* verify_key_n = fopen(path.c_str(), "w+b");
+  
+  if (verify_key_n == NULL) {
+    return false;
+  }
+  
+  int ret = PEM_write_RSA_PUBKEY(verify_key_n, this->sign_key_n);
+  fclose(verify_key_n);
+  
+  return (ret != 0);
+}
+
 bool NymbleManager::verifyPseudonym(Pseudonym pseudonym)
 {
   char mac[DIGEST_SIZE];

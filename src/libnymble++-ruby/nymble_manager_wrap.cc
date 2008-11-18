@@ -66,6 +66,22 @@ VALUE rb_nm_mac_key_np(VALUE rb_self)
   return rb_str_new(mac_key_np.c_str(), mac_key_np.size());
 }
 
+VALUE rb_nm_write_verify_key_n(VALUE rb_self, VALUE rb_path)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  Check_Type(rb_path, T_STRING);
+  
+  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
+  std::string path(RSTRING_PTR(rb_path), RSTRING_LEN(rb_path));
+  
+  if (!nm->writeVerifyKeyN(path)) {
+    return Qfalse;
+  }
+  
+  return Qtrue;
+}
+
 VALUE rb_nm_valid_pseudonym(VALUE rb_self, VALUE rb_pseudonym_str)
 {
   Check_Type(rb_self, T_DATA);
