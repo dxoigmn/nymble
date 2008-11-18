@@ -73,8 +73,10 @@ context 'Nymble Manager' do
     
     @@nm.time_period = 6
     
-    @@nm.update_server('server_id', @@server.complain!).should.not.be.nil
+    server_state = @@nm.update_server('server_id', @@server.complain!)
+    server_state.should.not.be.nil
     
+    @@server.update!(server_state)
     @@server.time_period = 7
     @@nm.time_period = 7
     

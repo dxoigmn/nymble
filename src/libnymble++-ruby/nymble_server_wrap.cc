@@ -197,7 +197,7 @@ VALUE rb_server_update(VALUE rb_self, VALUE rb_server_state_str)
     return Qnil;
   }
   
-  server->MergeFrom(server_state);
+  server->update(server_state);
   
   return rb_self;
 }

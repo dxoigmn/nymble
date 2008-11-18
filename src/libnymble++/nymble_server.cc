@@ -63,10 +63,39 @@ bool Server::complain(ServerState* server_state)
   server_state->mutable_cert()->CopyFrom(this->cert());
   server_state->mutable_clist()->CopyFrom(this->clist());
   
-  this->mutable_clist()->clear_complaints();
-  
   return true;
 }
 
+void Server::update(ServerState new_server_state)
+{
+  this->MergeFrom(new_server_state);
+  this->mutable_clist()->clear_complaints();
+  
+  if (this->has_seeds()) {
+    for (int i = 0; i < this->seeds().seeds_size(); i++) {
+      Token* token = this->mutable_llist()->add_tokens();
+      
+      token->set_seed(this->seeds().seeds(i));
+      
+      std::string nymble;
+      this->computeNymble(this->seeds().seeds(i), &nymble);
+      token->set_nymble(nymble);
+    }
+  }
+}
+
+void Server::computeNymble(std::string seed, std::string* nymble)
+{
+  char g[] = "g";
+  char hash[DIGEST_SIZE];
+  SHA256_CTX ctx;
+  
+  SHA256_Init(&ctx);
+  SHA256_Update(&ctx, (u_char*)seed.c_str(), seed.size());
+  SHA256_Update(&ctx, (u_char*)g, sizeof(g));
+  SHA256_Final((u_char*)hash, &ctx);
+  
+  *nymble = std::string(hash, sizeof(hash));
+}
 
 }; // namespace Nymble
