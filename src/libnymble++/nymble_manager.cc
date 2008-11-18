@@ -101,17 +101,14 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
   NymbleManagerEntry* entry = findServer(sid);
   
   if (entry == NULL) {
-    fprintf(stderr, "Couldn't find sid\n");
     return false;
   }
   
   if (!this->verifyPseudonym(pnym)) {
-    fprintf(stderr, "Unable to verify pseudonym\n");
     return false;
   }
   
   if (cred == NULL) {
-    fprintf(stderr, "Credential can't be NULL\n");
     return false;
   }
   
