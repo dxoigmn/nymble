@@ -139,6 +139,27 @@ VALUE rb_server_valid_ticket(VALUE rb_self, VALUE rb_ticket_str)
   return Qtrue;
 }
 
+VALUE rb_server_complain(VALUE rb_self, VALUE rb_ticket_str, VALUE rb_time_period)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cServer);
+  Check_Type(rb_ticket_str, T_STRING);
+  
+  Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
+  std::string ticket_str(RSTRING_PTR(rb_ticket_str), RSTRING_LEN(rb_ticket_str));
+  u_int time_period = NUM2UINT(rb_time_period);
+  
+  Nymble::Ticket ticket;
+  
+  if (!ticket.ParseFromString(ticket_str)) {
+    return Qfalse;
+  }
+  
+  server->complain(ticket, time_period);
+  
+  return rb_self;
+}
+
 void rb_server_delete(Nymble::Server* server)
 {
   delete server;

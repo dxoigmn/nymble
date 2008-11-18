@@ -52,10 +52,14 @@ context 'Server' do
   end
   
   it 'should validate tickets' do
-    user = Nymble::User.new(@@pm.create_pseudonym('user_id'), 'verify_key_n.pem')
-    user.link_window = 10
-    user.time_period = 5
-    user.add_credential('server_id', @@nm.create_credential('server_id', user.pseudonym))
-    @@server.should.valid_ticket?(user.ticket('server_id'))
+    @@user = Nymble::User.new(@@pm.create_pseudonym('user_id'), 'verify_key_n.pem')
+    @@user.link_window = 10
+    @@user.time_period = 5
+    @@user.add_credential('server_id', @@nm.create_credential('server_id', @@user.pseudonym))
+    @@server.should.valid_ticket?(@@user.ticket('server_id'))
+  end
+  
+  it 'should handle complaining' do
+    @@server.should.complain!(@@user.ticket('server_id'), @@user.time_period)
   end
 end

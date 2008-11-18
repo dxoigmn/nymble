@@ -16,6 +16,7 @@ VALUE rb_server_time_period_set(VALUE rb_self, VALUE rb_time_period);
 VALUE rb_server_blacklist(VALUE rb_self);
 VALUE rb_server_blacklist_cert(VALUE rb_self);
 VALUE rb_server_valid_ticket(VALUE rb_self, VALUE rb_ticket_str);
+VALUE rb_server_complain(VALUE rb_self, VALUE rb_ticket_str, VALUE rb_time_period);
 
 void rb_server_delete(Nymble::Server* server);
 

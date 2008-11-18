@@ -44,5 +44,13 @@ bool Server::isValidTicket(Ticket ticket)
   
   return true;
 }
+
+void Server::complain(Ticket ticket, u_int time)
+{
+  Complaint* complaint = this->mutable_clist()->add_complaints();
+  
+  complaint->mutable_ticket()->CopyFrom(ticket);
+  complaint->set_time(time);
+}
   
 }; // namespace Nymble
