@@ -29,7 +29,6 @@ void Init_nymble() {
   rb_define_method(rb_cNymbleManager, "time_period=", RUBY_METHOD_FUNC(rb_nm_time_period_set), 1);
   rb_define_method(rb_cNymbleManager, "mac_key_np", RUBY_METHOD_FUNC(rb_nm_mac_key_np), 0);
   rb_define_method(rb_cNymbleManager, "write_verify_key_n", RUBY_METHOD_FUNC(rb_nm_write_verify_key_n), 1);
-  rb_define_method(rb_cNymbleManager, "valid_pseudonym?", RUBY_METHOD_FUNC(rb_nm_valid_pseudonym), 1);
   rb_define_method(rb_cNymbleManager, "register_server", RUBY_METHOD_FUNC(rb_nm_register_server), 1);
   rb_define_method(rb_cNymbleManager, "create_credential", RUBY_METHOD_FUNC(rb_nm_create_credential), 2);
 #endif

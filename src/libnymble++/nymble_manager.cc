@@ -96,11 +96,22 @@ bool NymbleManager::verifyPseudonym(Pseudonym pseudonym)
   return (std::string(mac, sizeof(mac)) == pseudonym.mac());
 }
 
-bool NymbleManager::createCredential(std::string sid, Pseudonym pseudonym, Credential* credential)
+bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential* cred)
 {
   NymbleManagerEntry* entry = findServer(sid);
   
   if (entry == NULL) {
+    fprintf(stderr, "Couldn't find sid\n");
+    return false;
+  }
+  
+  if (!this->verifyPseudonym(pnym)) {
+    fprintf(stderr, "Unable to verify pseudonym\n");
+    return false;
+  }
+  
+  if (cred == NULL) {
+    fprintf(stderr, "Credential can't be NULL\n");
     return false;
   }
   
@@ -108,8 +119,8 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pseudonym, Crede
   HMAC_CTX hmac_ctx;
 
   HMAC_Init(&hmac_ctx, this->seed_key_n.c_str(), this->seed_key_n.size(), EVP_sha256());
-  HMAC_Update(&hmac_ctx, (u_char*)pseudonym.nym().c_str(), pseudonym.nym().size());
-  HMAC_Update(&hmac_ctx, (u_char*)pseudonym.mac().c_str(), pseudonym.mac().size());
+  HMAC_Update(&hmac_ctx, (u_char*)pnym.nym().c_str(), pnym.nym().size());
+  HMAC_Update(&hmac_ctx, (u_char*)pnym.mac().c_str(), pnym.mac().size());
   HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
@@ -162,7 +173,7 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pseudonym, Crede
     
     std::string mac_ns(mac, sizeof(mac));
     
-    Ticket* ticket = credential->add_tickets();
+    Ticket* ticket = cred->add_tickets();
     
     ticket->set_nymble(nymble);
     ticket->set_ctxt(ctxt);
@@ -170,7 +181,7 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pseudonym, Crede
     ticket->set_mac_ns(mac_ns);
   }
   
-  credential->set_nymble0(nymble0);
+  cred->set_nymble0(nymble0);
   
   return true;
 }
@@ -200,6 +211,7 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
   HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
+  HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
   
   if (blist != NULL) {
     for (int i = 0; i < blist->nymbles_size(); i++) {
@@ -208,7 +220,6 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
     }
   }
   
-  HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
   HMAC_Final(&hmac_ctx, mac, NULL);
   
   
@@ -268,26 +279,23 @@ bool NymbleManager::verifyBlacklist(std::string sid, Blacklist blist, BlacklistC
   std::string target = std::string(hash, sizeof(hash));
   
   
-  SHA256_CTX hash_ctx;
-  
-  SHA256_Init(&hash_ctx);
-  SHA256_Update(&hash_ctx, (u_char*)sid.c_str(), sid.size());
-  SHA256_Update(&hash_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
-  SHA256_Update(&hash_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
-  SHA256_Update(&hash_ctx, (u_char*)target.c_str(), target.size());
+  char mac[DIGEST_SIZE];
+  HMAC_CTX hmac_ctx;
+
+  HMAC_Init(&hmac_ctx, this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
+  HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
+  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
+  HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
   
   for (int i = 0; i < blist.nymbles_size(); i++) {
     std::string nymble = blist.nymbles(i);
-    SHA256_Update(&hash_ctx, (u_char*)nymble.c_str(), nymble.size());
+    HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
   }
   
-  SHA256_Final((u_char*)hash, &hash_ctx);
+  HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
   
-  
-  u_char buffer[SIGNATURE_SIZE];
-  RSA_public_decrypt(SIGNATURE_SIZE, (u_char*)cert.sig().c_str(), buffer, this->sign_key_n, RSA_NO_PADDING);
-  
-  return (RSA_verify_PKCS1_PSS(this->sign_key_n, (u_char*)hash, EVP_sha256(), buffer, -2) != 0);
+  return (cert.mac() == std::string(mac, sizeof(mac)));
 }
 
 

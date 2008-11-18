@@ -82,28 +82,6 @@ VALUE rb_nm_write_verify_key_n(VALUE rb_self, VALUE rb_path)
   return Qtrue;
 }
 
-VALUE rb_nm_valid_pseudonym(VALUE rb_self, VALUE rb_pseudonym_str)
-{
-  Check_Type(rb_self, T_DATA);
-  Check_Class(rb_self, rb_cNymbleManager);
-  Check_Type(rb_pseudonym_str, T_STRING);
-  
-  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
-  std::string pseudonym_str(RSTRING_PTR(rb_pseudonym_str), RSTRING_LEN(rb_pseudonym_str));
-  
-  Nymble::Pseudonym pseudonym;
-  
-  if (!pseudonym.ParseFromString(pseudonym_str)) {
-    return Qfalse;
-  }
-  
-  if (!nm->verifyPseudonym(pseudonym)) {
-    return Qfalse;
-  }
-  
-  return Qtrue;
-}
-
 VALUE rb_nm_register_server(VALUE rb_self, VALUE rb_sid)
 {
   Check_Type(rb_self, T_DATA);
@@ -120,7 +98,10 @@ VALUE rb_nm_register_server(VALUE rb_self, VALUE rb_sid)
   }
   
   std::string server_state_str;
-  server_state.SerializeToString(&server_state_str);
+  
+  if (!server_state.SerializeToString(&server_state_str)) {
+    return Qnil;
+  }
   
   return rb_str_new(server_state_str.c_str(), server_state_str.size());
 }
@@ -149,33 +130,12 @@ VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_pseudonym_st
   }
   
   std::string credential_str;
-  credential.SerializeToString(&credential_str);
+  
+  if (!credential.SerializeToString(&credential_str)) {
+    return Qnil;
+  }
   
   return rb_str_new(credential_str.c_str(), credential_str.size());
-}
-
-VALUE rb_nm_valid_ticket(VALUE rb_self, VALUE rb_sid, VALUE rb_ticket_str)
-{
-  Check_Type(rb_self, T_DATA);
-  Check_Class(rb_self, rb_cNymbleManager);
-  Check_Type(rb_sid, T_STRING);
-  Check_Type(rb_ticket_str, T_STRING);
-  
-  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
-  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
-  std::string ticket_str(RSTRING_PTR(rb_ticket_str), RSTRING_LEN(rb_ticket_str));
-  
-  Nymble::Ticket ticket;
-  
-  if (!ticket.ParseFromString(ticket_str)) {
-    return Qfalse;
-  }
-  
-  if (!nm->verifyTicket(sid, ticket)) {
-    return Qfalse;
-  }
-  
-  return Qtrue;
 }
 
 void rb_nm_delete(Nymble::NymbleManager* nm)

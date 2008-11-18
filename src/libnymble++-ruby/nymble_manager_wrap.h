@@ -14,10 +14,8 @@ VALUE rb_nm_time_period(VALUE rb_self);
 VALUE rb_nm_time_period_set(VALUE rb_self, VALUE rb_time_period);
 VALUE rb_nm_mac_key_np(VALUE rb_self);
 VALUE rb_nm_write_verify_key_n(VALUE rb_self, VALUE rb_path);
-VALUE rb_nm_valid_pseudonym(VALUE rb_self, VALUE rb_pseudonym_str);
 VALUE rb_nm_register_server(VALUE rb_self, VALUE rb_sid);
 VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_pseudonym_str);
-VALUE rb_nm_valid_ticket(VALUE rb_self, VALUE rb_sid, VALUE rb_ticket_str);
 
 void rb_nm_delete(Nymble::NymbleManager* nm);
 

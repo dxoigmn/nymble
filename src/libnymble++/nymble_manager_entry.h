@@ -3,11 +3,7 @@
 
 #include "nymble.h"
 
-#include "nymble_credential.pb.h"
-
 namespace Nymble {
-
-class Credential;
 
 class NymbleManagerEntry {
   std::string sid;
