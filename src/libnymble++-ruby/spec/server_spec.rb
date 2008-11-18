@@ -65,7 +65,6 @@ context 'Server' do
   
   it 'should be able to complain' do
     @@server.complain!.should.not.be.nil
-    @@server.complain!.should.be.empty?
   end
   
   it 'should handle updating' do
@@ -74,5 +73,6 @@ context 'Server' do
     @@nm.time_period = 6
     
     @@server.update!(@@nm.update_server('server_id', @@server.complain!)).should.not.be.nil
+    @@server.complain!.should.be.empty?
   end
 end
