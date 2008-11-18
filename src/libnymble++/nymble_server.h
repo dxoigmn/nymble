@@ -10,8 +10,11 @@ namespace Nymble {
 
 class Server : public Nymble, public ServerState
 {
+  bool verifyTicket(Ticket ticket);
+  bool linkTicket(Ticket ticket);
+  
   public:
-    bool verifyTicket(Ticket ticket);
+    bool isValidTicket(Ticket ticket);
     
 };
 

@@ -18,5 +18,31 @@ bool Server::verifyTicket(Ticket ticket)
   
   return (ticket.mac_ns() == std::string(mac, sizeof(mac)));
 }
+
+bool Server::linkTicket(Ticket ticket)
+{
+  bool isLinked = false;
+  
+  for (int i = 0; i < this->llist().tokens_size(); i++) {
+    if (ticket.nymble() == this->llist().tokens(i).nymble()) {
+      isLinked = true;
+    }
+  }
+  
+  return isLinked;
+}
+
+bool Server::isValidTicket(Ticket ticket)
+{
+  if (!this->verifyTicket(ticket)) {
+    return false;
+  }
+  
+  if (this->linkTicket(ticket)) {
+    return false;
+  }
+  
+  return true;
+}
   
 }; // namespace Nymble

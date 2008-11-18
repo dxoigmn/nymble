@@ -132,7 +132,7 @@ VALUE rb_server_valid_ticket(VALUE rb_self, VALUE rb_ticket_str)
     return Qfalse;
   }
   
-  if (!server->verifyTicket(ticket)) {
+  if (!server->isValidTicket(ticket)) {
     return Qfalse;
   }
   
