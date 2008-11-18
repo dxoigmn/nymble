@@ -7,7 +7,7 @@ require 'test/spec'
 require 'nymble'
 
 context 'Server' do
-  before(:each) do
+  before(:all) do
     @@nm = Nymble::NymbleManager.new
     @@nm.link_window = 10
     @@nm.time_period = 5
@@ -24,5 +24,15 @@ context 'Server' do
   it 'should be creatable' do
     @@server = Nymble::Server.new(@@nm.register_server('server_id'))
     @@server.should.not.be.nil
+  end
+  
+  it 'should manage blacklist' do
+    @@server.should.respond_to?(:blacklist)
+    @@server.blacklist.should.not.be.nil
+  end
+  
+  it 'should manage cert' do
+    @@server.should.respond_to?(:cert)
+    @@server.cert.should.not.be.nil
   end
 end

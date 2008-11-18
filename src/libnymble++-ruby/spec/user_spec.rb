@@ -50,6 +50,6 @@ context 'User' do
   end
   
   it 'should verify blacklists' do
-    @@user.blacklisted?('server_id', blacklist, cert)
+    @@user.should.not.blacklisted?('server_id', @@server.blacklist, @@server.cert)
   end
 end

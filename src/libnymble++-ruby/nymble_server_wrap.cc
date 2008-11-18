@@ -75,6 +75,48 @@ VALUE rb_server_time_period_set(VALUE rb_self, VALUE rb_time_period)
   return rb_self;
 }
 
+VALUE rb_server_blacklist(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cServer);
+  
+  Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
+  Nymble::Blacklist* blacklist = server->mutable_blist();
+  
+  if (blacklist == NULL) {
+    return Qnil;
+  }
+  
+  std::string blacklist_str;
+  
+  if (!blacklist->SerializeToString(&blacklist_str)) {
+    return Qnil;
+  }
+  
+  return rb_str_new(blacklist_str.c_str(), blacklist_str.size());
+}
+
+VALUE rb_server_blacklist_cert(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cServer);
+  
+  Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
+  Nymble::BlacklistCert* cert = server->mutable_cert();
+  
+  if (cert == NULL) {
+    return Qnil;
+  }
+  
+  std::string cert_str;
+  
+  if (!cert->SerializeToString(&cert_str)) {
+    return Qnil;
+  }
+  
+  return rb_str_new(cert_str.c_str(), cert_str.size());
+}
+
 void rb_server_delete(Nymble::Server* server)
 {
   delete server;
