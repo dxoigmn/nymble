@@ -139,7 +139,7 @@ VALUE rb_server_valid_ticket(VALUE rb_self, VALUE rb_ticket_str)
   return Qtrue;
 }
 
-VALUE rb_server_complain(VALUE rb_self, VALUE rb_ticket_str, VALUE rb_time_period)
+VALUE rb_server_add_complaint(VALUE rb_self, VALUE rb_ticket_str, VALUE rb_time_period)
 {
   Check_Type(rb_self, T_DATA);
   Check_Class(rb_self, rb_cServer);
@@ -155,7 +155,49 @@ VALUE rb_server_complain(VALUE rb_self, VALUE rb_ticket_str, VALUE rb_time_perio
     return Qfalse;
   }
   
-  server->complain(ticket, time_period);
+  server->add_complaint(ticket, time_period);
+  
+  return rb_self;
+}
+
+VALUE rb_server_complain(VALUE rb_self)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cServer);
+  
+  Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
+  
+  Nymble::ServerState server_state;
+  
+  if (!server->complain(&server_state)) {
+    return rb_str_new("", 0); // Return empty string
+  }
+  
+  std::string server_state_str;
+  
+  if (!server_state.SerializeToString(&server_state_str)) {
+    return Qnil;
+  }
+  
+  return rb_str_new(server_state_str.c_str(), server_state_str.size());
+}
+
+VALUE rb_server_update(VALUE rb_self, VALUE rb_server_state_str)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cServer);
+  Check_Type(rb_server_state_str, T_STRING);
+  
+  Nymble::Server* server = (Nymble::Server*) DATA_PTR(rb_self);
+  std::string server_state_str(RSTRING_PTR(rb_server_state_str), RSTRING_LEN(rb_server_state_str));
+  
+  Nymble::ServerState server_state;
+  
+  if (!server_state.ParseFromString(server_state_str)) {
+    return Qnil;
+  }
+  
+  server->MergeFrom(server_state);
   
   return rb_self;
 }

@@ -2,10 +2,10 @@
 
 namespace Nymble {
 
-NymbleManagerEntry::NymbleManagerEntry(std::string sid)
+NymbleManagerEntry::NymbleManagerEntry(std::string sid, u_int time_last_updated)
 {
   this->sid = sid;
-  this->time_last_updated = 0;
+  this->time_last_updated = time_last_updated;
   random_bytes(DIGEST_SIZE, &this->daisy_l);
   random_bytes(DIGEST_SIZE, &this->mac_key_ns);
 }

@@ -31,6 +31,7 @@ void Init_nymble() {
   rb_define_method(rb_cNymbleManager, "write_verify_key_n", RUBY_METHOD_FUNC(rb_nm_write_verify_key_n), 1);
   rb_define_method(rb_cNymbleManager, "register_server", RUBY_METHOD_FUNC(rb_nm_register_server), 1);
   rb_define_method(rb_cNymbleManager, "create_credential", RUBY_METHOD_FUNC(rb_nm_create_credential), 2);
+  rb_define_method(rb_cNymbleManager, "update_server", RUBY_METHOD_FUNC(rb_nm_update_server), 2);
 #endif
 
 #ifdef __NYMBLE_SERVER_WRAP_H__
@@ -44,7 +45,9 @@ void Init_nymble() {
   rb_define_method(rb_cServer, "blacklist", RUBY_METHOD_FUNC(rb_server_blacklist), 0);
   rb_define_method(rb_cServer, "cert", RUBY_METHOD_FUNC(rb_server_blacklist_cert), 0);
   rb_define_method(rb_cServer, "valid_ticket?", RUBY_METHOD_FUNC(rb_server_valid_ticket), 1);
-  rb_define_method(rb_cServer, "complain!", RUBY_METHOD_FUNC(rb_server_complain), 2);
+  rb_define_method(rb_cServer, "add_complaint", RUBY_METHOD_FUNC(rb_server_add_complaint), 2);
+  rb_define_method(rb_cServer, "complain!", RUBY_METHOD_FUNC(rb_server_complain), 0);
+  rb_define_method(rb_cServer, "update!", RUBY_METHOD_FUNC(rb_server_update), 1);
 #endif
 
 #ifdef __NYMBLE_USER_WRAP_H__

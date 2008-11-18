@@ -45,7 +45,9 @@ context 'Nymble Manager' do
   
   it 'should register servers' do
     @@nm.should.respond_to?(:register_server)
-    @@nm.register_server('server_id').should.not.be(nil)
+    @@server = @@nm.register_server('server_id')
+    @@server.should.not.be(nil)
+    @@server = Nymble::Server.new(@@server)
   end
   
   it 'should create credentials' do
@@ -57,5 +59,25 @@ context 'Nymble Manager' do
     @@nm.should.respond_to?(:create_credential)
     @@nm.create_credential('server_id', pseudonym).should.not.be(nil)
     @@nm.create_credential('', pseudonym).should.be(nil)
+  end
+  
+  it 'should update servers' do
+    user = Nymble::User.new(@@pm.create_pseudonym('user_id'), 'verify_key_n.pem')
+    user.link_window = 10
+    user.time_period = 5
+    user.add_credential('server_id', @@nm.create_credential('server_id', user.pseudonym))
+    
+    @@server.add_complaint(user.ticket('server_id'), user.time_period)
+    @@server.time_period = 6
+    @@server.link_window = 11
+    
+    @@nm.time_period = 6
+    
+    @@nm.update_server('server_id', @@server.complain!).should.not.be.nil
+    
+    @@server.time_period = 7
+    @@nm.time_period = 7
+    
+    @@nm.update_server('server_id', @@server.complain!).should.not.be.nil
   end
 end

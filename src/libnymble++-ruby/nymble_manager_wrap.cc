@@ -138,6 +138,45 @@ VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_pseudonym_st
   return rb_str_new(credential_str.c_str(), credential_str.size());
 }
 
+VALUE rb_nm_update_server(VALUE rb_self, VALUE rb_sid, VALUE rb_server_state_str)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  Check_Type(rb_sid, T_STRING);
+  Check_Type(rb_server_state_str, T_STRING);
+  
+  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
+  std::string sid(RSTRING_PTR(rb_sid), RSTRING_LEN(rb_sid));
+  std::string server_state_str(RSTRING_PTR(rb_server_state_str), RSTRING_LEN(rb_server_state_str));
+  
+  Nymble::ServerState* server_state = NULL;
+  Nymble::ServerState new_server_state;
+  
+  if (server_state_str != "") {
+    server_state = new Nymble::ServerState();
+    
+    if (!server_state->ParseFromString(server_state_str)) {
+      return Qnil;
+    }
+  }
+  
+  if (!nm->updateServer(sid, server_state, &new_server_state)) {
+    return Qnil;
+  }
+  
+  if (server_state != NULL) {
+    delete server_state;
+  }
+  
+  std::string new_server_state_str;
+  
+  if (!new_server_state.SerializeToString(&new_server_state_str)) {
+    return Qnil;
+  }
+  
+  return rb_str_new(new_server_state_str.c_str(), new_server_state_str.size());
+}
+
 void rb_nm_delete(Nymble::NymbleManager* nm)
 {
   delete nm;

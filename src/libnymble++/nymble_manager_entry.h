@@ -12,7 +12,7 @@ class NymbleManagerEntry {
   u_int time_last_updated;
   
   public:
-    NymbleManagerEntry(std::string sid);
+    NymbleManagerEntry(std::string sid, u_int time_last_updated);
     
     void setServerId(std::string sid);
     std::string getServerId();

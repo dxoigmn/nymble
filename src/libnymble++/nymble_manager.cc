@@ -183,15 +183,15 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
   return true;
 }
 
-bool NymbleManager::verifyTicket(std::string sid, Ticket ticket)
+bool NymbleManager::verifyTicket(std::string sid, u_int t, u_int w, Ticket ticket)
 {
   char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
   
   HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
   HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
-  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
-  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
+  HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
+  HMAC_Update(&hmac_ctx, (u_char*)&w, sizeof(w));
   HMAC_Update(&hmac_ctx, (u_char*)ticket.nymble().c_str(), ticket.nymble().size());
   HMAC_Update(&hmac_ctx, (u_char*)ticket.ctxt().c_str(), ticket.ctxt().size());
   HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
@@ -254,9 +254,10 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
   return true;
 }
 
-bool NymbleManager::verifyBlacklist(std::string sid, Blacklist blist, BlacklistCert cert)
+bool NymbleManager::verifyBlacklist(std::string sid, u_int t, u_int w, Blacklist blist, BlacklistCert cert)
 {
-  if (this->cur_time_period < cert.t()) {
+  if (t < cert.t()) {
+    fprintf(stderr, "verifyBlacklist: t (%d) < cert.t (%d)\n", t, cert.t());
     return false;
   }
   
@@ -266,7 +267,7 @@ bool NymbleManager::verifyBlacklist(std::string sid, Blacklist blist, BlacklistC
   
   memcpy(hash, cert.daisy().c_str(), sizeof(hash));
   
-  for (u_int i = 0; i < this->cur_time_period - cert.t(); i++) {
+  for (u_int i = 0; i < t - cert.t(); i++) {
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
     SHA256_Update(&ctx, (u_char*)h, sizeof(h));
@@ -281,8 +282,8 @@ bool NymbleManager::verifyBlacklist(std::string sid, Blacklist blist, BlacklistC
 
   HMAC_Init(&hmac_ctx, this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
   HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
-  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
-  HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
+  HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
+  HMAC_Update(&hmac_ctx, (u_char*)&w, sizeof(w));
   HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
   
   for (int i = 0; i < blist.nymbles_size(); i++) {
@@ -304,7 +305,7 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
     return false;
   }
   
-  entry = new NymbleManagerEntry(sid);
+  entry = new NymbleManagerEntry(sid, this->cur_time_period);
   
   this->entries.push_back(entry);
   
@@ -335,11 +336,84 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
   return true;
 }
 
+
+bool NymbleManager::updateServer(std::string sid, ServerState* server_state, ServerState* new_server_state)
+{
+  NymbleManagerEntry* entry = findServer(sid);
+  
+  if (entry == NULL) {
+    fprintf(stderr, "Couldn't find entry\n");
+    return false;
+  }
+  
+  if (new_server_state == NULL) {
+    fprintf(stderr, "new_server_state == NULL\n");
+    return false;
+  }
+  
+  // NOTE: What happens if getTimeLastUpdated > cur_time_period? Maybe link_window is different or something.
+  if (entry->getTimeLastUpdated() == this->cur_time_period) {
+    fprintf(stderr, "cur_time_period == last time period\n");
+    return false;
+  }
+  
+  if (server_state == NULL) {
+    char h[] = "h";
+    char hash[DIGEST_SIZE];
+    SHA256_CTX ctx;
+
+    memcpy(hash, (u_char*)entry->getDaisyL().c_str(), sizeof(hash));
+
+    for (u_int i = 0; i < TIME_PERIODS - this->cur_time_period + 1; i++) {
+      SHA256_Init(&ctx);
+      SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
+      SHA256_Update(&ctx, (u_char*)h, sizeof(h));
+      SHA256_Final((u_char*)hash, &ctx);
+    }
+
+    new_server_state->mutable_cert()->set_t(this->cur_time_period);
+    new_server_state->mutable_cert()->set_daisy(hash, sizeof(hash));
+  } else if (server_state->has_blist() && server_state->has_cert() && server_state->has_clist()) {
+    if (!this->verifyBlacklist(sid, entry->getTimeLastUpdated(), this->cur_link_window, server_state->blist(), server_state->cert())) {
+      fprintf(stderr, "invalid blacklist\n");
+      return false;
+    }
+    
+    for (int i = 0; i < server_state->clist().complaints_size(); i++) {
+      if (server_state->clist().complaints(i).time() >= this->cur_time_period) {
+        fprintf(stderr, "bad complaint time\n");
+        return false;
+      }
+      
+      if (!this->verifyTicket(sid, server_state->clist().complaints(i).time(), this->cur_link_window, server_state->clist().complaints(i).ticket())) {
+        fprintf(stderr, "invalid ticket\n");
+        return false;
+      }
+    }
+    
+    if (!this->computeBlacklistUpdate(sid, server_state->blist(), server_state->clist(), new_server_state->mutable_blist(), new_server_state->mutable_cert())) {
+      fprintf(stderr, "computeBlacklistUpdate failed\n");
+      return false;
+    }
+    
+    if (!this->computeTokens(this->cur_time_period, server_state->blist(), server_state->clist(), new_server_state->mutable_seeds())) {
+      fprintf(stderr, "computeTokens failed\n");
+      return false;
+    }
+  } else {
+    return false;
+  }
+  
+  entry->setTimeLastUpdated(this->cur_time_period);
+  
+  return true;
+}
+
 bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out)
 {
   NymbleManagerEntry* entry = findServer(sid);
   
-  if (entry != NULL) {
+  if (entry == NULL) {
     return false;
   }
   
@@ -413,7 +487,6 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
   }
   
   entry->setDaisyL(daisy_l);
-  entry->setTimeLastUpdated(this->cur_time_period);
   
   return true;
 }
@@ -458,7 +531,7 @@ bool NymbleManager::computeTokens(u_int t_prime, Blacklist blist, Complaints cli
     seeds->add_seeds(seed_prime);
   }
   
-  return false;
+  return true;
 }
 
 }; // namespace Nymble

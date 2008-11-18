@@ -33,8 +33,10 @@ class NymbleManager : public Nymble
   void evolveSeed(std::string seed, int delta, std::string* seed_out);
   bool signBlacklist(std::string sid, std::string target, Blacklist* blist, BlacklistCert* cert);
   bool verifyPseudonym(Pseudonym pseudonym);
-  bool verifyTicket(std::string sid, Ticket ticket);
-  bool verifyBlacklist(std::string sid, Blacklist blist, BlacklistCert cert);
+  bool verifyTicket(std::string sid, u_int t, u_int w, Ticket ticket);
+  bool verifyBlacklist(std::string sid, u_int t, u_int w, Blacklist blist, BlacklistCert cert);
+  bool computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out);
+  bool computeTokens(u_int t_prime, Blacklist blist, Complaints clist, Seeds* seeds);
   
   public:
     NymbleManager();
@@ -45,8 +47,7 @@ class NymbleManager : public Nymble
     
     bool createCredential(std::string sid, Pseudonym pnym, Credential* cred);
     bool registerServer(std::string sid, ServerState* server_state);
-    bool computeBlacklistUpdate(std::string sid, Blacklist blist, Complaints clist, Blacklist* blist_out, BlacklistCert* cert_out);
-    bool computeTokens(u_int t_prime, Blacklist blist, Complaints clist, Seeds* seeds);
+    bool updateServer(std::string sid, ServerState* server_state, ServerState* new_server_state);
 };
 
 }; // namespace Nymble

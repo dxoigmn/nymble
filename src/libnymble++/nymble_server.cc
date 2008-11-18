@@ -45,12 +45,28 @@ bool Server::isValidTicket(Ticket ticket)
   return true;
 }
 
-void Server::complain(Ticket ticket, u_int time)
+void Server::add_complaint(Ticket ticket, u_int time)
 {
   Complaint* complaint = this->mutable_clist()->add_complaints();
   
   complaint->mutable_ticket()->CopyFrom(ticket);
   complaint->set_time(time);
 }
+
+bool Server::complain(ServerState* server_state)
+{
+  if (this->clist().complaints_size() == 0) {
+    return false;
+  }
   
+  server_state->mutable_blist()->CopyFrom(this->blist());
+  server_state->mutable_cert()->CopyFrom(this->cert());
+  server_state->mutable_clist()->CopyFrom(this->clist());
+  
+  this->mutable_clist()->clear_complaints();
+  
+  return true;
+}
+
+
 }; // namespace Nymble

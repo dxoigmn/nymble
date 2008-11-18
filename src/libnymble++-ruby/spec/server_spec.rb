@@ -59,7 +59,20 @@ context 'Server' do
     @@server.should.valid_ticket?(@@user.ticket('server_id'))
   end
   
-  it 'should handle complaining' do
-    @@server.should.complain!(@@user.ticket('server_id'), @@user.time_period)
+  it 'should handle complaints' do
+    @@server.should.add_complaint(@@user.ticket('server_id'), @@user.time_period)
+  end
+  
+  it 'should be able to complain' do
+    @@server.complain!.should.not.be.nil
+    @@server.complain!.should.be.empty?
+  end
+  
+  it 'should handle updating' do
+    @@server.should.add_complaint(@@user.ticket('server_id'), @@user.time_period)
+    @@server.time_period = 6
+    @@nm.time_period = 6
+    
+    @@server.update!(@@nm.update_server('server_id', @@server.complain!)).should.not.be.nil
   end
 end

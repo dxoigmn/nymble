@@ -8,4 +8,5 @@
 *.dat
 *.pdf
 *.pb.*
+*.pem
 Makefile

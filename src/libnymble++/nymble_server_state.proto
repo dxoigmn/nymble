@@ -4,13 +4,15 @@ import "nymble_blacklist.proto";
 import "nymble_blacklist_cert.proto";
 import "nymble_complaints.proto";
 import "nymble_tokens.proto";
+import "nymble_seeds.proto";
 
 message ServerState {
-  required bytes sid = 1;
-  required bytes mac_key_ns = 2;
+  optional bytes sid = 1;
+  optional bytes mac_key_ns = 2;
   optional Blacklist blist = 3;
   required BlacklistCert cert = 4;
   optional Complaints clist = 5;
   optional Tokens llist = 6;
-  required int32 time_last_updated = 7;
+  optional int32 time_last_updated = 7;
+  optional Seeds seeds = 8;
 }

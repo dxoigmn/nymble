@@ -15,7 +15,8 @@ class Server : public Nymble, public ServerState
   
   public:
     bool isValidTicket(Ticket ticket);
-    void complain(Ticket ticket, u_int t);
+    void add_complaint(Ticket ticket, u_int t);
+    bool complain(ServerState* server_state);
 };
 
 } // namespace Nymble

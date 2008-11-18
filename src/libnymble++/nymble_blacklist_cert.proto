@@ -3,6 +3,6 @@ package Nymble;
 message BlacklistCert {
   required uint32 t = 1;
   required bytes daisy = 2;
-  required bytes mac = 3;
-  required bytes sig = 4;
+  optional bytes mac = 3;
+  optional bytes sig = 4;
 }
