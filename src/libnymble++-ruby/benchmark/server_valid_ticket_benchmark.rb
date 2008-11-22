@@ -2,13 +2,14 @@
 
 require 'benchmark_setup'
 
-plot __FILE__ do
+def benchmark
   nm = create_nm
   pm = create_pm(nm)
   
-  benchmarks = Hash.new(0.0)
+  benchmarks = {}
 
-  101.times do |count|
+  1001.times do |count|
+    next unless count % 50 == 0
     puts count
     
     nm.reset!
@@ -27,12 +28,14 @@ plot __FILE__ do
     
     fail unless server.valid_ticket?(ticket)
     
-    100.times do
-      benchmarks[count] += Benchmark.realtime { server.valid_ticket?(ticket) }
+    bm = Benchmark::Tms.new
+    
+    10.times do
+      bm += Benchmark.measure { server.valid_ticket?(ticket) }
     end
     
-    benchmarks[count] /= 100
+    yield count, bm / 10
   end
-  
-  benchmarks
 end
+
+write __FILE__

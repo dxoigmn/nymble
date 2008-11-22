@@ -2,17 +2,17 @@
 
 require 'benchmark_setup'
 
-plot __FILE__ do
+def benchmark
   nm = create_nm
   pm = create_pm(nm)
   server = create_server(nm, 'server_id')
-  users = create_users(100, nm, pm, 'server_id')
-
-  benchmarks = {}
-
-  benchmarks[0] = server.blacklist.size
-
+  users = create_users(1500, nm, pm, 'server_id')
+  
+  yield 0, server.blacklist.size
+  
   users.size.times do |count|
+    next unless (count + 1) % 50 == 0
+    
     nm.reset!
     server = create_server(nm, 'server_id')
     nm.time_period += 1
@@ -22,9 +22,9 @@ plot __FILE__ do
     end
   
     server.update!(nm.update_server('server_id', server.complain!))
-  
-    benchmarks[count + 1] = server.blacklist.size
+    
+    yield count + 1, server.blacklist.size
   end
-  
-  benchmarks
 end
+
+write __FILE__

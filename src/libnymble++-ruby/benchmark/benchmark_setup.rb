@@ -23,10 +23,15 @@ def create_users(count, nm, pm, server_id)
   users
 end
 
-def plot(name, options = {}, &block)
-  data = block.call
+def write(name)
+  data = []
   
-  File.open("#{name}.dat", 'w') do |f|
-    f << data.to_a.sort_by { |x, y| x }.map { |a| a.flatten.join(',') }.join("\n")
+  File.open("#{name}.dat", 'a+') do |f|
+    benchmark do |x, y|
+      y = y.real if y.kind_of?(Benchmark::Tms)
+      f << "#{x},#{y}\n"
+      f.flush
+      GC.start
+    end
   end
 end

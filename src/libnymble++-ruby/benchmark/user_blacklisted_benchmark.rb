@@ -2,13 +2,12 @@
 
 require 'benchmark_setup'
 
-plot __FILE__ do
+def benchmark
   nm = create_nm
   pm = create_pm(nm)
   
-  benchmarks = Hash.new(0.0)
-
-  101.times do |count|
+  1001.times do |count|
+    next unless count % 50 == 0
     puts count
     
     nm.reset!
@@ -28,12 +27,14 @@ plot __FILE__ do
     
     fail if test_user.blacklisted?('server_id', blacklist, cert)
     
-    100.times do
-      benchmarks[count] += Benchmark.realtime { test_user.blacklisted?('server_id', blacklist, cert) }
+    bm = Benchmark::Tms.new
+    
+    10.times do
+      bm += Benchmark.measure { test_user.blacklisted?('server_id', blacklist, cert) }
     end
     
-    benchmarks[count] /= 100
+    yield count, bm
   end
-  
-  benchmarks
 end
+
+write __FILE__
