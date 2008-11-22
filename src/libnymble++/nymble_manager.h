@@ -28,6 +28,8 @@ class NymbleManager : public Nymble
   RSA* sign_key_n;
   NymbleManagerEntries entries;
   
+  u_int time_periods;
+  
   NymbleManagerEntry* findServer(std::string sid);
   void computeNymble(std::string seed, std::string* nymble);
   void evolveSeed(std::string seed, int delta, std::string* seed_out);
@@ -48,6 +50,8 @@ class NymbleManager : public Nymble
     bool createCredential(std::string sid, Pseudonym pnym, Credential* cred);
     bool registerServer(std::string sid, ServerState* server_state);
     bool updateServer(std::string sid, ServerState* server_state, ServerState* new_server_state);
+    
+    void reset(u_int time_periods = TIME_PERIODS);
 };
 
 }; // namespace Nymble

@@ -32,6 +32,7 @@ void Init_nymble() {
   rb_define_method(rb_cNymbleManager, "register_server", RUBY_METHOD_FUNC(rb_nm_register_server), 1);
   rb_define_method(rb_cNymbleManager, "create_credential", RUBY_METHOD_FUNC(rb_nm_create_credential), 2);
   rb_define_method(rb_cNymbleManager, "update_server", RUBY_METHOD_FUNC(rb_nm_update_server), 2);
+  rb_define_method(rb_cNymbleManager, "reset!", RUBY_METHOD_FUNC(rb_nm_reset), -2);
 #endif
 
 #ifdef __NYMBLE_SERVER_WRAP_H__

@@ -177,6 +177,26 @@ VALUE rb_nm_update_server(VALUE rb_self, VALUE rb_sid, VALUE rb_server_state_str
   return rb_str_new(new_server_state_str.c_str(), new_server_state_str.size());
 }
 
+VALUE rb_nm_reset(VALUE rb_self, VALUE rb_args)
+{
+  Check_Type(rb_self, T_DATA);
+  Check_Class(rb_self, rb_cNymbleManager);
+  
+  VALUE rb_time_periods = rb_ary_entry(rb_args, 0);
+  
+  Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
+  
+  
+  if (NIL_P(rb_time_periods)) {
+    nm->reset();
+  } else {
+    Check_Type(rb_time_periods, T_FIXNUM);
+    nm->reset(NUM2UINT(rb_time_periods));
+  }
+  
+  return rb_self;
+}
+
 void rb_nm_delete(Nymble::NymbleManager* nm)
 {
   delete nm;

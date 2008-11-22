@@ -10,6 +10,7 @@ NymbleManager::NymbleManager()
   random_bytes(CIPHER_BLOCK_SIZE, &this->enc_key_n);
   
   this->sign_key_n = RSA_generate_key(SIGNATURE_SIZE * 8, 65537, NULL, NULL);
+  this->time_periods = TIME_PERIODS;
 }
 
 NymbleManager::~NymbleManager()
@@ -19,6 +20,18 @@ NymbleManager::~NymbleManager()
   }
   
   RSA_free(this->sign_key_n);
+}
+
+void NymbleManager::reset(u_int time_periods)
+{
+  for (NymbleManagerEntries::iterator entry = this->entries.begin(); entry != this->entries.end(); entry++) {
+    delete *entry;
+  }
+  
+  this->entries.clear();
+  this->setTimePeriod(1);
+  this->setLinkWindow(0);
+  this->time_periods = time_periods;
 }
 
 NymbleManagerEntry* NymbleManager::findServer(std::string sid)
@@ -128,7 +141,7 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
   
   computeNymble(seed, &nymble0);
   
-  for (u_int t = 1; t <= TIME_PERIODS; t++) {
+  for (u_int t = 1; t <= this->time_periods; t++) {
     evolveSeed(seed, 1, &seed);
     computeNymble(seed, &nymble);
     
@@ -147,7 +160,7 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
     EVP_EncryptFinal_ex(&cipher_ctx, (u_char*)(cipher + cipher_len), &final_len);
     EVP_CIPHER_CTX_cleanup(&cipher_ctx);
     
-    std::string ctxt(cipher, cipher_len + final_len);
+    std::string ctxt = iv + std::string(cipher, cipher_len + final_len);
     
     HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
     HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
@@ -315,7 +328,7 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
   
   memcpy(hash, entry->getDaisyL().c_str(), sizeof(hash));
   
-  for (u_int i = 0; i < TIME_PERIODS - this->cur_time_period + 1; i++) {
+  for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
     SHA256_Update(&ctx, (u_char*)h, sizeof(h));
@@ -364,7 +377,7 @@ bool NymbleManager::updateServer(std::string sid, ServerState* server_state, Ser
 
     memcpy(hash, (u_char*)entry->getDaisyL().c_str(), sizeof(hash));
 
-    for (u_int i = 0; i < TIME_PERIODS - this->cur_time_period + 1; i++) {
+    for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
       SHA256_Init(&ctx);
       SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
       SHA256_Update(&ctx, (u_char*)h, sizeof(h));
@@ -463,7 +476,7 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
   
   memcpy(hash, (u_char*)daisy_l.c_str(), sizeof(hash));
   
-  for (u_int i = 0; i < TIME_PERIODS - this->cur_time_period + 1; i++) {
+  for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
     SHA256_Update(&ctx, (u_char*)h, sizeof(h));
