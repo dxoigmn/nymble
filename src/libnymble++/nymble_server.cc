@@ -71,17 +71,56 @@ void Server::update(ServerState new_server_state)
   this->MergeFrom(new_server_state);
   this->mutable_clist()->clear_complaints();
   
+  if (this->has_llist()) {
+    for (int i = 0; i < this->llist().tokens_size(); i++) {
+      Token* token = this->mutable_llist()->mutable_tokens(i);
+      
+      std::string seed;
+      std::string nymble;
+      
+      this->evolveSeed(token->seed(), this->cert().t() - this->getTimePeriod(), &seed);
+      this->computeNymble(seed, &nymble);
+      
+      token->set_seed(seed);
+      token->set_nymble(nymble);
+    }
+  }
+  
   if (this->has_seeds()) {
     for (int i = 0; i < this->seeds().seeds_size(); i++) {
       Token* token = this->mutable_llist()->add_tokens();
       
-      token->set_seed(this->seeds().seeds(i));
-      
+      std::string seed = this->seeds().seeds(i);
       std::string nymble;
-      this->computeNymble(this->seeds().seeds(i), &nymble);
+      
+      this->computeNymble(seed, &nymble);
+      
+      token->set_seed(seed);
       token->set_nymble(nymble);
     }
+    
+    this->clear_seeds();
   }
+  
+  this->setTimePeriod(this->cert().t());
+}
+
+void Server::evolveSeed(std::string seed, int delta, std::string* seed_out)
+{
+  char f[] = "f";
+  char hash[DIGEST_SIZE];
+  SHA256_CTX ctx;
+  
+  memcpy(hash, seed.c_str(), sizeof(hash));
+  
+  for (int i = 0; i < delta; i++) {
+    SHA256_Init(&ctx);
+    SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
+    SHA256_Update(&ctx, (u_char*)f, sizeof(f));
+    SHA256_Final((u_char*)hash, &ctx);
+  }
+  
+  *seed_out = std::string(hash, sizeof(hash));
 }
 
 void Server::computeNymble(std::string seed, std::string* nymble)

@@ -13,6 +13,7 @@ class Server : public Nymble, public ServerState
   bool verifyTicket(Ticket ticket);
   bool linkTicket(Ticket ticket);
   void computeNymble(std::string seed, std::string* nymble);
+  void evolveSeed(std::string seed, int delta, std::string* seed_out);
   
   public:
     bool isValidTicket(Ticket ticket);

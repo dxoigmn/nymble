@@ -34,13 +34,6 @@ context 'Server' do
     @@server.link_window.should.equal(10)
   end
   
-  it 'should manage the time period' do
-    @@server.should.respond_to?(:time_period=)
-    @@server.time_period = 5
-    @@server.should.respond_to?(:time_period)
-    @@server.time_period.should.equal(5)
-  end
-  
   it 'should manage blacklist' do
     @@server.should.respond_to?(:blacklist)
     @@server.blacklist.should.not.be.nil
@@ -53,9 +46,18 @@ context 'Server' do
   
   it 'should validate tickets' do
     @@user = Nymble::User.new(@@pm.create_pseudonym('user_id'), 'verify_key_n.pem')
-    @@user.link_window = 10
-    @@user.time_period = 5
-    @@user.add_credential('server_id', @@nm.create_credential('server_id', @@user.pseudonym))
+    @@user.link_window = @@server.link_window
+    @@user.time_period = @@server.time_period - 1
+    
+    @@user.should.add_credential('server_id', @@nm.create_credential('server_id', @@user.pseudonym))
+    
+    @@user.time_period = @@server.time_period - 1
+    @@server.should.not.valid_ticket?(@@user.ticket('server_id'))
+    
+    @@user.time_period = @@server.time_period + 1
+    @@server.should.not.valid_ticket?(@@user.ticket('server_id'))
+    
+    @@user.time_period = @@server.time_period
     @@server.should.valid_ticket?(@@user.ticket('server_id'))
   end
   
@@ -68,11 +70,34 @@ context 'Server' do
   end
   
   it 'should handle updating' do
-    @@server.should.add_complaint(@@user.ticket('server_id'), @@user.time_period)
-    @@server.time_period = 6
-    @@nm.time_period = 6
+    @@nm.time_period += 1
+    @@user.time_period += 1
     
     @@server.update!(@@nm.update_server('server_id', @@server.complain!)).should.not.be.nil
+    @@server.time_period.should.equal(@@nm.time_period)
     @@server.complain!.should.be.empty?
+    @@server.should.not.valid_ticket?(@@user.ticket('server_id'))
+  end
+  
+  it 'should not validate tickets' do
+    @@nm.time_period += 1
+    @@user.time_period += 1
+    
+    @@server.update!(@@nm.update_server('server_id', @@server.complain!)).should.not.be.nil
+    @@server.should.not.valid_ticket?(@@user.ticket('server_id'))
+    
+    @@server.should.add_complaint(@@user.ticket('server_id'), @@user.time_period)
+    
+    @@nm.time_period += 1
+    @@user.time_period += 1
+    
+    @@server.update!(@@nm.update_server('server_id', @@server.complain!)).should.not.be.nil
+    @@server.should.not.valid_ticket?(@@user.ticket('server_id'))
+    
+    @@nm.time_period += 1
+    @@user.time_period += 1
+    
+    @@server.update!(@@nm.update_server('server_id', @@server.complain!)).should.not.be.nil
+    @@server.should.not.valid_ticket?(@@user.ticket('server_id'))
   end
 end

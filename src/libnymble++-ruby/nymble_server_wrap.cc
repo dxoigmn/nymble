@@ -23,6 +23,7 @@ VALUE rb_server_init(VALUE rb_self, VALUE rb_server_state_str)
   }
   
   server->CopyFrom(server_state);
+  server->setTimePeriod(server->cert().t());
   
   return rb_self;
 }

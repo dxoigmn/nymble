@@ -145,22 +145,30 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
     evolveSeed(seed, 1, &seed);
     computeNymble(seed, &nymble);
     
+    
     EVP_CIPHER_CTX cipher_ctx;
     char cipher[1024];
     int cipher_len;
-    int final_len;
     std::string iv;
+    std::string ctxt;
     
     random_bytes(CIPHER_BLOCK_SIZE, &iv);
     
     EVP_CIPHER_CTX_init(&cipher_ctx);
     EVP_EncryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.c_str(), (u_char*)iv.c_str());
+    ctxt += iv;
+    
     EVP_EncryptUpdate(&cipher_ctx, (u_char*)cipher, &cipher_len, (u_char*)nymble0.c_str(), nymble0.size());
+    ctxt += std::string(cipher, cipher_len);
+    
     EVP_EncryptUpdate(&cipher_ctx, (u_char*)cipher, &cipher_len, (u_char*)seed.c_str(), seed.size());
-    EVP_EncryptFinal_ex(&cipher_ctx, (u_char*)(cipher + cipher_len), &final_len);
+    ctxt += std::string(cipher, cipher_len);
+    
+    EVP_EncryptFinal_ex(&cipher_ctx, (u_char*)cipher, &cipher_len);
+    ctxt += std::string(cipher, cipher_len);
+    
     EVP_CIPHER_CTX_cleanup(&cipher_ctx);
     
-    std::string ctxt = iv + std::string(cipher, cipher_len + final_len);
     
     HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
     HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
@@ -292,7 +300,9 @@ bool NymbleManager::verifyBlacklist(std::string sid, u_int t, u_int w, Blacklist
   
   char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
-
+  
+  t = cert.t();
+  
   HMAC_Init(&hmac_ctx, this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
   HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
@@ -374,17 +384,16 @@ bool NymbleManager::updateServer(std::string sid, ServerState* server_state, Ser
     char h[] = "h";
     char hash[DIGEST_SIZE];
     SHA256_CTX ctx;
-
+    
     memcpy(hash, (u_char*)entry->getDaisyL().c_str(), sizeof(hash));
-
+    
     for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
       SHA256_Init(&ctx);
       SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
       SHA256_Update(&ctx, (u_char*)h, sizeof(h));
       SHA256_Final((u_char*)hash, &ctx);
     }
-
-    new_server_state->mutable_cert()->set_t(this->cur_time_period);
+    
     new_server_state->mutable_cert()->set_daisy(hash, sizeof(hash));
   } else if (server_state->has_blist() && server_state->has_cert() && server_state->has_clist()) {
     if (!this->verifyBlacklist(sid, entry->getTimeLastUpdated(), this->cur_link_window, server_state->blist(), server_state->cert())) {
@@ -437,6 +446,7 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
     char buffer[1024];
     int buffer_len;
     int final_len;
+    
     std::string iv = ctxt.substr(0, CIPHER_BLOCK_SIZE);
     std::string cipher = ctxt.substr(CIPHER_BLOCK_SIZE, ctxt.size());
     
@@ -461,6 +471,7 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
       std::string random;
       random_bytes(DIGEST_SIZE, &random);
       blist_out->add_nymbles(random);
+      fprintf(stderr, "User already blacklisted, adding random nymble!\n");
     } else {
       blist_out->add_nymbles(nymble0);
     }
@@ -537,6 +548,7 @@ bool NymbleManager::computeTokens(u_int t_prime, Blacklist blist, Complaints cli
     
     if (already_blacklisted) {
       random_bytes(DIGEST_SIZE, &seed_prime);
+      fprintf(stderr, "User already blacklisted, adding random seed!\n");
     } else {
       evolveSeed(seed, t_prime - clist.complaints(i).time(), &seed_prime);
     }

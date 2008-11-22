@@ -3,7 +3,7 @@ package Nymble;
 option optimize_for = SPEED;
 
 message BlacklistCert {
-  required uint32 t = 1;
+  optional uint32 t = 1;
   required bytes daisy = 2;
   optional bytes mac = 3;
   optional bytes sig = 4;

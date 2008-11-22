@@ -68,16 +68,12 @@ context 'Nymble Manager' do
     user.add_credential('server_id', @@nm.create_credential('server_id', user.pseudonym))
     
     @@server.add_complaint(user.ticket('server_id'), user.time_period)
-    @@server.time_period = 6
-    @@server.link_window = 11
-    
     @@nm.time_period = 6
     
     server_state = @@nm.update_server('server_id', @@server.complain!)
     server_state.should.not.be.nil
     
     @@server.update!(server_state)
-    @@server.time_period = 7
     @@nm.time_period = 7
     
     @@nm.update_server('server_id', @@server.complain!).should.not.be.nil
