@@ -33,7 +33,7 @@ def benchmark
       bm += Benchmark.measure { test_user.blacklisted?('server_id', blacklist, cert) }
     end
     
-    yield count, bm
+    yield count, bm / 10
   end
 end
 
