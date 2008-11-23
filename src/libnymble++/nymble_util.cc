@@ -8,7 +8,7 @@ void digest(std::string in, std::string* out)
   
   SHA256_CTX ctx;
   SHA256_Init(&ctx);
-  SHA256_Update(&ctx, in.c_str(), in.size());
+  SHA256_Update(&ctx, in.data(), in.size());
   SHA256_Final((u_char*)buffer, &ctx);
   
   *out = std::string(buffer, sizeof(buffer));
@@ -38,7 +38,7 @@ void hexdecode(std::string in, std::string* out)
   char buffer;
   
   for (size_t i = 0; i < in.size(); i += 2) {
-    sscanf(in.substr(i, 2).c_str(), "%02x", (u_int*)&buffer);
+    sscanf(in.substr(i, 2).data(), "%02x", (u_int*)&buffer);
     *out += buffer;
   }
 }

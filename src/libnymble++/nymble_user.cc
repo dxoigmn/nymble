@@ -105,39 +105,37 @@ bool User::verifyBlacklist(std::string sid, Blacklist blist, BlacklistCert cert)
   }
   
   char h[] = "h";
-  char hash[DIGEST_SIZE];
+  char target[DIGEST_SIZE];
   SHA256_CTX ctx;
   
-  memcpy(hash, cert.daisy().c_str(), sizeof(hash));
+  memcpy(target, cert.daisy().data(), sizeof(target));
   
   for (u_int i = 0; i < this->cur_time_period - cert.t(); i++) {
     SHA256_Init(&ctx);
-    SHA256_Update(&ctx, (u_char*)hash, sizeof(hash));
+    SHA256_Update(&ctx, (u_char*)target, sizeof(target));
     SHA256_Update(&ctx, (u_char*)h, sizeof(h));
-    SHA256_Final((u_char*)hash, &ctx);
+    SHA256_Final((u_char*)target, &ctx);
   }
   
-  std::string target = std::string(hash, sizeof(hash));
   
-  
+  char hash[DIGEST_SIZE];
   SHA256_CTX hash_ctx;
   
   SHA256_Init(&hash_ctx);
-  SHA256_Update(&hash_ctx, (u_char*)sid.c_str(), sid.size());
+  SHA256_Update(&hash_ctx, (u_char*)sid.data(), sid.size());
   SHA256_Update(&hash_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
   SHA256_Update(&hash_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
-  SHA256_Update(&hash_ctx, (u_char*)target.c_str(), target.size());
+  SHA256_Update(&hash_ctx, (u_char*)target, sizeof(target));
   
   for (int i = 0; i < blist.nymbles_size(); i++) {
-    std::string nymble = blist.nymbles(i);
-    SHA256_Update(&hash_ctx, (u_char*)nymble.c_str(), nymble.size());
+    SHA256_Update(&hash_ctx, (u_char*)blist.nymbles(i).data(), blist.nymbles(i).size());
   }
   
   SHA256_Final((u_char*)hash, &hash_ctx);
   
   
   u_char buffer[SIGNATURE_SIZE];
-  RSA_public_decrypt(SIGNATURE_SIZE, (u_char*)cert.sig().c_str(), buffer, this->ver_key_n, RSA_NO_PADDING);
+  RSA_public_decrypt(SIGNATURE_SIZE, (u_char*)cert.sig().data(), buffer, this->ver_key_n, RSA_NO_PADDING);
   
   return (RSA_verify_PKCS1_PSS(this->ver_key_n, (u_char*)hash, EVP_sha256(), buffer, -2) != 0);
 }

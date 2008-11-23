@@ -52,7 +52,7 @@ void NymbleManager::computeNymble(std::string seed, std::string* nymble)
   SHA256_CTX ctx;
   
   SHA256_Init(&ctx);
-  SHA256_Update(&ctx, (u_char*)seed.c_str(), seed.size());
+  SHA256_Update(&ctx, (u_char*)seed.data(), seed.size());
   SHA256_Update(&ctx, (u_char*)g, sizeof(g));
   SHA256_Final((u_char*)hash, &ctx);
   
@@ -65,7 +65,7 @@ void NymbleManager::evolveSeed(std::string seed, int delta, std::string* seed_ou
   char hash[DIGEST_SIZE];
   SHA256_CTX ctx;
   
-  memcpy(hash, seed.c_str(), sizeof(hash));
+  memcpy(hash, seed.data(), sizeof(hash));
   
   for (int i = 0; i < delta; i++) {
     SHA256_Init(&ctx);
@@ -101,8 +101,8 @@ bool NymbleManager::verifyPseudonym(Pseudonym pseudonym)
   char mac[DIGEST_SIZE];
   HMAC_CTX ctx;
 
-  HMAC_Init(&ctx, this->mac_key_np.c_str(), this->mac_key_np.size(), EVP_sha256());
-  HMAC_Update(&ctx, (u_char*)pseudonym.nym().c_str(), pseudonym.nym().size());
+  HMAC_Init(&ctx, this->mac_key_np.data(), this->mac_key_np.size(), EVP_sha256());
+  HMAC_Update(&ctx, (u_char*)pseudonym.nym().data(), pseudonym.nym().size());
   HMAC_Update(&ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&ctx, (u_char*)mac, NULL);
   
@@ -128,10 +128,10 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
   char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
 
-  HMAC_Init(&hmac_ctx, this->seed_key_n.c_str(), this->seed_key_n.size(), EVP_sha256());
-  HMAC_Update(&hmac_ctx, (u_char*)pnym.nym().c_str(), pnym.nym().size());
-  HMAC_Update(&hmac_ctx, (u_char*)pnym.mac().c_str(), pnym.mac().size());
-  HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+  HMAC_Init(&hmac_ctx, this->seed_key_n.data(), this->seed_key_n.size(), EVP_sha256());
+  HMAC_Update(&hmac_ctx, (u_char*)pnym.nym().data(), pnym.nym().size());
+  HMAC_Update(&hmac_ctx, (u_char*)pnym.mac().data(), pnym.mac().size());
+  HMAC_Update(&hmac_ctx, (u_char*)sid.data(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
   HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
   
@@ -155,13 +155,13 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
     random_bytes(CIPHER_BLOCK_SIZE, &iv);
     
     EVP_CIPHER_CTX_init(&cipher_ctx);
-    EVP_EncryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.c_str(), (u_char*)iv.c_str());
+    EVP_EncryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.data(), (u_char*)iv.data());
     ctxt += iv;
     
-    EVP_EncryptUpdate(&cipher_ctx, (u_char*)cipher, &cipher_len, (u_char*)nymble0.c_str(), nymble0.size());
+    EVP_EncryptUpdate(&cipher_ctx, (u_char*)cipher, &cipher_len, (u_char*)nymble0.data(), nymble0.size());
     ctxt += std::string(cipher, cipher_len);
     
-    EVP_EncryptUpdate(&cipher_ctx, (u_char*)cipher, &cipher_len, (u_char*)seed.c_str(), seed.size());
+    EVP_EncryptUpdate(&cipher_ctx, (u_char*)cipher, &cipher_len, (u_char*)seed.data(), seed.size());
     ctxt += std::string(cipher, cipher_len);
     
     EVP_EncryptFinal_ex(&cipher_ctx, (u_char*)cipher, &cipher_len);
@@ -170,23 +170,23 @@ bool NymbleManager::createCredential(std::string sid, Pseudonym pnym, Credential
     EVP_CIPHER_CTX_cleanup(&cipher_ctx);
     
     
-    HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
-    HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+    HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.data(), this->mac_key_n.size(), EVP_sha256());
+    HMAC_Update(&hmac_ctx, (u_char*)sid.data(), sid.size());
     HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
     HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
-    HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
-    HMAC_Update(&hmac_ctx, (u_char*)ctxt.c_str(), ctxt.size());
+    HMAC_Update(&hmac_ctx, (u_char*)nymble.data(), nymble.size());
+    HMAC_Update(&hmac_ctx, (u_char*)ctxt.data(), ctxt.size());
     HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
     
     std::string mac_n(mac, sizeof(mac));
     
-    HMAC_Init(&hmac_ctx, (u_char*)entry->getMacKeyNS().c_str(), entry->getMacKeyNS().size(), EVP_sha256());
-    HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+    HMAC_Init(&hmac_ctx, (u_char*)entry->getMacKeyNS().data(), entry->getMacKeyNS().size(), EVP_sha256());
+    HMAC_Update(&hmac_ctx, (u_char*)sid.data(), sid.size());
     HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
     HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
-    HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
-    HMAC_Update(&hmac_ctx, (u_char*)ctxt.c_str(), ctxt.size());
-    HMAC_Update(&hmac_ctx, (u_char*)mac_n.c_str(), mac_n.size());
+    HMAC_Update(&hmac_ctx, (u_char*)nymble.data(), nymble.size());
+    HMAC_Update(&hmac_ctx, (u_char*)ctxt.data(), ctxt.size());
+    HMAC_Update(&hmac_ctx, (u_char*)mac_n.data(), mac_n.size());
     HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
     
     std::string mac_ns(mac, sizeof(mac));
@@ -209,12 +209,12 @@ bool NymbleManager::verifyTicket(std::string sid, u_int t, u_int w, Ticket ticke
   char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
   
-  HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
-  HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+  HMAC_Init(&hmac_ctx, (u_char*)this->mac_key_n.data(), this->mac_key_n.size(), EVP_sha256());
+  HMAC_Update(&hmac_ctx, (u_char*)sid.data(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
   HMAC_Update(&hmac_ctx, (u_char*)&w, sizeof(w));
-  HMAC_Update(&hmac_ctx, (u_char*)ticket.nymble().c_str(), ticket.nymble().size());
-  HMAC_Update(&hmac_ctx, (u_char*)ticket.ctxt().c_str(), ticket.ctxt().size());
+  HMAC_Update(&hmac_ctx, (u_char*)ticket.nymble().data(), ticket.nymble().size());
+  HMAC_Update(&hmac_ctx, (u_char*)ticket.ctxt().data(), ticket.ctxt().size());
   HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
   
   return (ticket.mac_n() == std::string(mac, sizeof(mac)));
@@ -225,16 +225,16 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
   u_char mac[DIGEST_SIZE];
   HMAC_CTX hmac_ctx;
 
-  HMAC_Init(&hmac_ctx, this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
-  HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+  HMAC_Init(&hmac_ctx, this->mac_key_n.data(), this->mac_key_n.size(), EVP_sha256());
+  HMAC_Update(&hmac_ctx, (u_char*)sid.data(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
   HMAC_Update(&hmac_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
-  HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
+  HMAC_Update(&hmac_ctx, (u_char*)target.data(), target.size());
   
   if (blist != NULL) {
     for (int i = 0; i < blist->nymbles_size(); i++) {
       std::string nymble = blist->nymbles(i);
-      HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
+      HMAC_Update(&hmac_ctx, (u_char*)nymble.data(), nymble.size());
     }
   }
   
@@ -245,15 +245,15 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
   SHA256_CTX hash_ctx;
   
   SHA256_Init(&hash_ctx);
-  SHA256_Update(&hash_ctx, (u_char*)sid.c_str(), sid.size());
+  SHA256_Update(&hash_ctx, (u_char*)sid.data(), sid.size());
   SHA256_Update(&hash_ctx, (u_char*)&this->cur_time_period, sizeof(this->cur_time_period));
   SHA256_Update(&hash_ctx, (u_char*)&this->cur_link_window, sizeof(this->cur_link_window));
-  SHA256_Update(&hash_ctx, (u_char*)target.c_str(), target.size());
+  SHA256_Update(&hash_ctx, (u_char*)target.data(), target.size());
   
   if (blist != NULL) {
     for (int i = 0; i < blist->nymbles_size(); i++) {
       std::string nymble = blist->nymbles(i);
-      SHA256_Update(&hash_ctx, (u_char*)nymble.c_str(), nymble.size());
+      SHA256_Update(&hash_ctx, (u_char*)nymble.data(), nymble.size());
     }
   }
   
@@ -286,7 +286,7 @@ bool NymbleManager::verifyBlacklist(std::string sid, u_int t, u_int w, Blacklist
   char hash[DIGEST_SIZE];
   SHA256_CTX ctx;
   
-  memcpy(hash, cert.daisy().c_str(), sizeof(hash));
+  memcpy(hash, cert.daisy().data(), sizeof(hash));
   
   for (u_int i = 0; i < t - cert.t(); i++) {
     SHA256_Init(&ctx);
@@ -303,15 +303,15 @@ bool NymbleManager::verifyBlacklist(std::string sid, u_int t, u_int w, Blacklist
   
   t = cert.t();
   
-  HMAC_Init(&hmac_ctx, this->mac_key_n.c_str(), this->mac_key_n.size(), EVP_sha256());
-  HMAC_Update(&hmac_ctx, (u_char*)sid.c_str(), sid.size());
+  HMAC_Init(&hmac_ctx, this->mac_key_n.data(), this->mac_key_n.size(), EVP_sha256());
+  HMAC_Update(&hmac_ctx, (u_char*)sid.data(), sid.size());
   HMAC_Update(&hmac_ctx, (u_char*)&t, sizeof(t));
   HMAC_Update(&hmac_ctx, (u_char*)&w, sizeof(w));
-  HMAC_Update(&hmac_ctx, (u_char*)target.c_str(), target.size());
+  HMAC_Update(&hmac_ctx, (u_char*)target.data(), target.size());
   
   for (int i = 0; i < blist.nymbles_size(); i++) {
     std::string nymble = blist.nymbles(i);
-    HMAC_Update(&hmac_ctx, (u_char*)nymble.c_str(), nymble.size());
+    HMAC_Update(&hmac_ctx, (u_char*)nymble.data(), nymble.size());
   }
   
   HMAC_Final(&hmac_ctx, (u_char*)mac, NULL);
@@ -336,7 +336,7 @@ bool NymbleManager::registerServer(std::string sid, ServerState* server_state)
   char hash[DIGEST_SIZE];
   SHA256_CTX ctx;
   
-  memcpy(hash, entry->getDaisyL().c_str(), sizeof(hash));
+  memcpy(hash, entry->getDaisyL().data(), sizeof(hash));
   
   for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
     SHA256_Init(&ctx);
@@ -385,7 +385,7 @@ bool NymbleManager::updateServer(std::string sid, ServerState* server_state, Ser
     char hash[DIGEST_SIZE];
     SHA256_CTX ctx;
     
-    memcpy(hash, (u_char*)entry->getDaisyL().c_str(), sizeof(hash));
+    memcpy(hash, (u_char*)entry->getDaisyL().data(), sizeof(hash));
     
     for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
       SHA256_Init(&ctx);
@@ -451,8 +451,8 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
     std::string cipher = ctxt.substr(CIPHER_BLOCK_SIZE, ctxt.size());
     
     EVP_CIPHER_CTX_init(&cipher_ctx);
-    EVP_DecryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.c_str(), (u_char*)iv.c_str());
-    EVP_DecryptUpdate(&cipher_ctx, (u_char*)buffer, &buffer_len, (u_char*)cipher.c_str(), cipher.size());
+    EVP_DecryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.data(), (u_char*)iv.data());
+    EVP_DecryptUpdate(&cipher_ctx, (u_char*)buffer, &buffer_len, (u_char*)cipher.data(), cipher.size());
     EVP_DecryptFinal_ex(&cipher_ctx, (u_char*)buffer + buffer_len, &final_len);
     EVP_CIPHER_CTX_cleanup(&cipher_ctx);
     
@@ -485,7 +485,7 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
   char hash[DIGEST_SIZE];
   SHA256_CTX ctx;
   
-  memcpy(hash, (u_char*)daisy_l.c_str(), sizeof(hash));
+  memcpy(hash, (u_char*)daisy_l.data(), sizeof(hash));
   
   for (u_int i = 0; i < this->time_periods - this->cur_time_period + 1; i++) {
     SHA256_Init(&ctx);
@@ -528,8 +528,8 @@ bool NymbleManager::computeTokens(u_int t_prime, Blacklist blist, Complaints cli
     std::string cipher = ctxt.substr(CIPHER_BLOCK_SIZE, ctxt.size());
     
     EVP_CIPHER_CTX_init(&cipher_ctx);
-    EVP_DecryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.c_str(), (u_char*)iv.c_str());
-    EVP_DecryptUpdate(&cipher_ctx, (u_char*)buffer, &buffer_len, (u_char*)cipher.c_str(), cipher.size());
+    EVP_DecryptInit_ex(&cipher_ctx, EVP_aes_128_cbc(), NULL, (u_char*)this->enc_key_n.data(), (u_char*)iv.data());
+    EVP_DecryptUpdate(&cipher_ctx, (u_char*)buffer, &buffer_len, (u_char*)cipher.data(), cipher.size());
     EVP_DecryptFinal_ex(&cipher_ctx, (u_char*)buffer + buffer_len, &final_len);
     EVP_CIPHER_CTX_cleanup(&cipher_ctx);
     

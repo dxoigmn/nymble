@@ -75,7 +75,7 @@ VALUE rb_nymble_digest(VALUE rb_self, VALUE rb_value)
   
   Nymble::digest(in, &out);
   
-  return rb_str_new(out.c_str(), out.size());
+  return rb_str_new(out.data(), out.size());
 }
 
 VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count)
@@ -87,7 +87,7 @@ VALUE rb_nymble_random_bytes(VALUE rb_self, VALUE rb_count)
   
   Nymble::random_bytes(size, &out);
   
-  return rb_str_new(out.c_str(), out.size());
+  return rb_str_new(out.data(), out.size());
 }
 
 VALUE rb_nymble_hexencode(VALUE rb_self, VALUE rb_string)
@@ -99,7 +99,7 @@ VALUE rb_nymble_hexencode(VALUE rb_self, VALUE rb_string)
   
   Nymble::hexencode(in, &out);
   
-  return rb_str_new(out.c_str(), out.size());
+  return rb_str_new(out.data(), out.size());
 }
 
 VALUE rb_nymble_hexdecode(VALUE rb_self, VALUE rb_string)
@@ -111,5 +111,5 @@ VALUE rb_nymble_hexdecode(VALUE rb_self, VALUE rb_string)
   
   Nymble::hexdecode(in, &out);
   
-  return rb_str_new(out.c_str(), out.size());
+  return rb_str_new(out.data(), out.size());
 }

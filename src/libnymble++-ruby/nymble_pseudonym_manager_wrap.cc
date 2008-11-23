@@ -89,7 +89,7 @@ VALUE rb_pm_create_pseudonym(VALUE rb_self, VALUE rb_user_id)
     return Qnil;
   }
   
-  return rb_str_new(pseudonym_str.c_str(), pseudonym_str.length());
+  return rb_str_new(pseudonym_str.data(), pseudonym_str.length());
 }
 
 void rb_pm_delete(Nymble::PseudonymManager* pm)

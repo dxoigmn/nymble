@@ -94,7 +94,7 @@ VALUE rb_server_blacklist(VALUE rb_self)
     return Qnil;
   }
   
-  return rb_str_new(blacklist_str.c_str(), blacklist_str.size());
+  return rb_str_new(blacklist_str.data(), blacklist_str.size());
 }
 
 VALUE rb_server_blacklist_cert(VALUE rb_self)
@@ -115,7 +115,7 @@ VALUE rb_server_blacklist_cert(VALUE rb_self)
     return Qnil;
   }
   
-  return rb_str_new(cert_str.c_str(), cert_str.size());
+  return rb_str_new(cert_str.data(), cert_str.size());
 }
 
 VALUE rb_server_valid_ticket(VALUE rb_self, VALUE rb_ticket_str)
@@ -180,7 +180,7 @@ VALUE rb_server_complain(VALUE rb_self)
     return Qnil;
   }
   
-  return rb_str_new(server_state_str.c_str(), server_state_str.size());
+  return rb_str_new(server_state_str.data(), server_state_str.size());
 }
 
 VALUE rb_server_update(VALUE rb_self, VALUE rb_server_state_str)

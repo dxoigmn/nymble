@@ -63,7 +63,7 @@ VALUE rb_nm_mac_key_np(VALUE rb_self)
   Nymble::NymbleManager* nm = (Nymble::NymbleManager*) DATA_PTR(rb_self);
   std::string mac_key_np = nm->getMacKeyNP();
   
-  return rb_str_new(mac_key_np.c_str(), mac_key_np.size());
+  return rb_str_new(mac_key_np.data(), mac_key_np.size());
 }
 
 VALUE rb_nm_write_verify_key_n(VALUE rb_self, VALUE rb_path)
@@ -103,7 +103,7 @@ VALUE rb_nm_register_server(VALUE rb_self, VALUE rb_sid)
     return Qnil;
   }
   
-  return rb_str_new(server_state_str.c_str(), server_state_str.size());
+  return rb_str_new(server_state_str.data(), server_state_str.size());
 }
 
 VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_pseudonym_str)
@@ -135,7 +135,7 @@ VALUE rb_nm_create_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_pseudonym_st
     return Qnil;
   }
   
-  return rb_str_new(credential_str.c_str(), credential_str.size());
+  return rb_str_new(credential_str.data(), credential_str.size());
 }
 
 VALUE rb_nm_update_server(VALUE rb_self, VALUE rb_sid, VALUE rb_server_state_str)
@@ -174,7 +174,7 @@ VALUE rb_nm_update_server(VALUE rb_self, VALUE rb_sid, VALUE rb_server_state_str
     return Qnil;
   }
   
-  return rb_str_new(new_server_state_str.c_str(), new_server_state_str.size());
+  return rb_str_new(new_server_state_str.data(), new_server_state_str.size());
 }
 
 VALUE rb_nm_reset(VALUE rb_self, VALUE rb_args)

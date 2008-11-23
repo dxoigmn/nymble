@@ -99,7 +99,7 @@ VALUE rb_user_pseudonym(VALUE rb_self)
     return Qnil;
   }
   
-  return rb_str_new(pseudonym_str.c_str(), pseudonym_str.size());
+  return rb_str_new(pseudonym_str.data(), pseudonym_str.size());
 }
 
 VALUE rb_user_add_credential(VALUE rb_self, VALUE rb_sid, VALUE rb_credential_str)
@@ -145,7 +145,7 @@ VALUE rb_user_ticket(VALUE rb_self, VALUE rb_sid)
     return Qnil;
   }
   
-  return rb_str_new(ticket_str.c_str(), ticket_str.size());
+  return rb_str_new(ticket_str.data(), ticket_str.size());
 }
 
 VALUE rb_user_blacklisted(VALUE rb_self, VALUE rb_sid, VALUE rb_blacklist_str, VALUE rb_cert_str)
