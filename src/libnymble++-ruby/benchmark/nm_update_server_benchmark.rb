@@ -8,6 +8,7 @@ def benchmark
   
   1001.times do |count|
     next unless count % 50 == 0
+    
     puts count
     
     bm = Benchmark::Tms.new
