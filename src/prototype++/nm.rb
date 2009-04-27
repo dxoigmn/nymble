@@ -1,11 +1,16 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'openssl'
+require 'webrick/https'
 require 'sinatra'
+require 'sinatra_patch'
 require 'json'
 require File.join(File.dirname(__FILE__), '..', 'libnymble++-ruby', 'nymble')
 
 set :port, 3000
+set :server, 'webrick'
+set :handler_options, { :SSLEnable => true, :SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE, :SSLCertName => [["C","US"], ["O","NYMBLE"], ["CN", "NM"]] }
 
 configure do
   @@nm = Nymble::NymbleManager.new

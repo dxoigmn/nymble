@@ -1,15 +1,20 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'openssl'
+require 'webrick/https'
 require 'sinatra'
+require 'sinatra_patch'
 require 'rest_client'
 require 'json'
 require File.join(File.dirname(__FILE__), '..', 'libnymble++-ruby', 'nymble')
 
 set :port, 3002
+set :server, 'webrick'
+set :handler_options, { :SSLEnable => true, :SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE, :SSLCertName => [["C","US"], ["O","NYMBLE"], ["CN", "server_id"]] }
 
 configure do
-  data = RestClient.post('http://localhost:3000/server', :server_id => 'server_id')
+  data = RestClient.post('https://localhost:3000/server', :server_id => 'server_id')
   fail 'Failed to register server.' unless data
   @@server = Nymble::Server.new(data)
 end
@@ -22,7 +27,7 @@ before do
   complaint = @@server.complain!
   
   unless complaint
-    data = RestClient.put('http://localhost:3000/server/server_id', :complaint => complaint)
+    data = RestClient.put('https://localhost:3000/server/server_id', :complaint => complaint)
     fail 'Failed to complain!' unless data
     @@server.update!(data)
   end
