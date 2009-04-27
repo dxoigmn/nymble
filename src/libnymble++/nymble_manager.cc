@@ -278,7 +278,6 @@ bool NymbleManager::signBlacklist(std::string sid, std::string target, Blacklist
 bool NymbleManager::verifyBlacklist(std::string sid, u_int t, u_int w, Blacklist blist, BlacklistCert cert)
 {
   if (t < cert.t()) {
-    fprintf(stderr, "verifyBlacklist: t (%d) < cert.t (%d)\n", t, cert.t());
     return false;
   }
   
@@ -365,18 +364,15 @@ bool NymbleManager::updateServer(std::string sid, ServerState* server_state, Ser
   NymbleManagerEntry* entry = findServer(sid);
   
   if (entry == NULL) {
-    fprintf(stderr, "Couldn't find entry\n");
     return false;
   }
   
   if (new_server_state == NULL) {
-    fprintf(stderr, "new_server_state == NULL\n");
     return false;
   }
   
   // NOTE: What happens if getTimeLastUpdated > cur_time_period? Maybe link_window is different or something.
   if (entry->getTimeLastUpdated() == this->cur_time_period) {
-    fprintf(stderr, "cur_time_period == last time period\n");
     return false;
   }
   
@@ -397,29 +393,24 @@ bool NymbleManager::updateServer(std::string sid, ServerState* server_state, Ser
     new_server_state->mutable_cert()->set_daisy(hash, sizeof(hash));
   } else if (server_state->has_blist() && server_state->has_cert() && server_state->has_clist()) {
     if (!this->verifyBlacklist(sid, entry->getTimeLastUpdated(), this->cur_link_window, server_state->blist(), server_state->cert())) {
-      fprintf(stderr, "invalid blacklist\n");
       return false;
     }
     
     for (int i = 0; i < server_state->clist().complaints_size(); i++) {
       if (server_state->clist().complaints(i).time() >= this->cur_time_period) {
-        fprintf(stderr, "bad complaint time\n");
         return false;
       }
       
       if (!this->verifyTicket(sid, server_state->clist().complaints(i).time(), this->cur_link_window, server_state->clist().complaints(i).ticket())) {
-        fprintf(stderr, "invalid ticket\n");
         return false;
       }
     }
     
     if (!this->computeBlacklistUpdate(sid, server_state->blist(), server_state->clist(), new_server_state->mutable_blist(), new_server_state->mutable_cert())) {
-      fprintf(stderr, "computeBlacklistUpdate failed\n");
       return false;
     }
     
     if (!this->computeTokens(this->cur_time_period, server_state->blist(), server_state->clist(), new_server_state->mutable_seeds())) {
-      fprintf(stderr, "computeTokens failed\n");
       return false;
     }
   } else {
@@ -471,7 +462,6 @@ bool NymbleManager::computeBlacklistUpdate(std::string sid, Blacklist blist, Com
       std::string random;
       random_bytes(DIGEST_SIZE, &random);
       blist_out->add_nymbles(random);
-      fprintf(stderr, "User already blacklisted, adding random nymble!\n");
     } else {
       blist_out->add_nymbles(nymble0);
     }
@@ -548,7 +538,6 @@ bool NymbleManager::computeTokens(u_int t_prime, Blacklist blist, Complaints cli
     
     if (already_blacklisted) {
       random_bytes(DIGEST_SIZE, &seed_prime);
-      fprintf(stderr, "User already blacklisted, adding random seed!\n");
     } else {
       evolveSeed(seed, t_prime - clist.complaints(i).time(), &seed_prime);
     }
